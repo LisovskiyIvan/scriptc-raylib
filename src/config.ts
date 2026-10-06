@@ -31,8 +31,6 @@ export interface RaylibConfig {
   resolvedHeaderPath?: string;
 }
 
-export type CraylibConfig = RaylibConfig;
-
 /**
  * Searches for libraylib across Linux, macOS, Windows, and local bundled assets.
  */
