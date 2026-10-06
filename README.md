@@ -15,7 +15,7 @@ TypeScript-биндинги для [raylib 6.0](https://www.raylib.com), ген�
 - **🔄 Двойной стиль API**:
   - Прямые функции C-стиля (`InitWindow`, `BeginDrawing`, `ClearBackground`, `DrawCircle`).
   - Пространство имён `Raylib` с поддержкой camelCase (`Raylib.initWindow`, `Raylib.beginDrawing`, `Raylib.drawCircle`).
-- **🛡️ 438 функций raylib**: 116 прямых скалярных вызовов + 322 обёрнутых через C-шим с проверками layout на этапе компиляции (`_Static_assert`).
+- **🛡️ 495 функций raylib**: 116 прямых скалярных вызовов + 356 обёрнутых через C-шим с проверками layout на этапе компиляции (`_Static_assert`) + кастомные FFI-адаптеры (82.5% от всего raylib).
 
 ---
 
@@ -126,8 +126,8 @@ Raylib.closeWindow();
 
 ### 🎮 Запуск примеров (Examples)
 
-В репозитории доступны 9 готовых примеров в папке `examples/`:
-`index`, `shapes`, `shapes3d`, `textures`, `fonts`, `audio`, `models`, `shader`, `image`.
+В репозитории доступны 11 готовых примеров в папке `examples/`:
+`index`, `shapes`, `shapes3d`, `textures`, `fonts`, `audio`, `models`, `shader`, `image`, `camera`, `breakout`.
 
 Так как `scriptc` является AOT-компилятором, нативный FFI-манифест передаётся компилятору через флаг `--ffi`:
 
@@ -176,28 +176,28 @@ Raylib.config({ raylibPath: "auto" });
 ## 📊 Статус реализации функций
 
 Всего в заголовке raylib 6.0 содержится **600 функций**:
-- **438 функций реализованы** (116 direct + 322 wrapped) — **73.0%**
-- **162 функции исключены** по архитектурным причинам FFI — **27.0%**
+- **495 функций реализованы** (116 direct + 356 wrapped + custom adapters) — **82.5%**
+- **105 функций исключены** по архитектурным причинам FFI — **17.5%**
 
 ### Сводная таблица по модулям
 
 | Модуль | Реализовано | Пропущено | Всего | Прогресс |
 |---|:---:|:---:|:---:|:---:|
-| **Core / Window & Graphics Device** | 124 | 45 | 169 | 73% |
+| **Core / Window & Graphics Device** | 126 | 43 | 169 | 75% |
 | **Input Handling (Keyboard, Mouse, Gamepad)** | 38 | 1 | 39 | 97% |
 | **Gestures & Touch** | 8 | 0 | 8 | 100% |
-| **Camera System** | 0 | 2 | 2 | 0% |
-| **2D Shapes & Splines** | 67 | 2 | 69 | 97% |
-| **Textures & Images** | 55 | 60 | 115 | 48% |
-| **Fonts & Text** | 27 | 32 | 59 | 46% |
+| **Camera System** | 2 | 0 | 2 | 100% |
+| **2D Shapes & Splines** | 69 | 0 | 69 | 100% |
+| **Textures & Images** | 97 | 18 | 115 | 84% |
+| **Fonts & Text** | 28 | 31 | 59 | 47% |
 | **3D Shapes Drawing** | 21 | 0 | 21 | 100% |
-| **3D Models & Materials** | 43 | 9 | 52 | 83% |
-| **Audio & Music** | 55 | 11 | 66 | 83% |
-| **ИТОГО** | **438** | **162** | **600** | **73%** |
+| **3D Models & Materials** | 47 | 5 | 52 | 90% |
+| **Audio & Music** | 59 | 7 | 66 | 89% |
+| **ИТОГО** | **495** | **105** | **600** | **82.5%** |
 
 ---
 
-## ✅ Реализованные функции (438)
+## ✅ Реализованные функции (495)
 
 Каждая функция полностью типизирована, проверена и доступна для вызова как в PascalCase, так и в camelCase.
 
@@ -1003,7 +1003,9 @@ bun tools/build.ts
 - `textures.ts` — Загрузка и рендеринг текстур.
 - `models.ts` — Загрузка 3D моделей.
 - `shader.ts` — Работа с шейдерами.
-- `image.ts` — Генерация изображений.
+- `image.ts` — Генерация изображений и процедурное рисование.
+- `camera.ts` — Режимы 3D-камеры (Orbital, Free, FPS, Third Person) через `UpdateCamera`.
+- `breakout.ts` — Классическая аркадная игра Арканоид (счёт, комбо, частицы, жизни).
 
 Собрать любой пример можно командой:
 ```sh

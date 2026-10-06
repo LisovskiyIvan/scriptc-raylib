@@ -58,6 +58,11 @@ void rl_SetWindowIcon(const uint8_t *image_ptr, size_t image_len) {
     SetWindowIcon(image);
 }
 
+void rl_SetWindowIcons(uint8_t *images_ptr, size_t images_len, int32_t count) {
+    if (images_len != (size_t)sizeof(Image)) { return; }
+    SetWindowIcons((Image *)images_ptr, count);
+}
+
 void rl_SetWindowTitle(const uint8_t *title_ptr, size_t title_len) {
     char *title_buf = (char *)malloc(title_len + 1);
     if (title_buf == NULL) return;
@@ -319,6 +324,15 @@ void rl_GetCameraMatrix2D(float camera_offset_x, float camera_offset_y, float ca
     if (out_len != (size_t)sizeof(Matrix)) { return; }
     Matrix __v = GetCameraMatrix2D((Camera2D){ (Vector2){ camera_offset_x, camera_offset_y }, (Vector2){ camera_target_x, camera_target_y }, camera_rotation, camera_zoom });
     memcpy(out, &__v, sizeof(__v));
+}
+
+void rl_TakeScreenshot(const uint8_t *fileName_ptr, size_t fileName_len) {
+    char *fileName_buf = (char *)malloc(fileName_len + 1);
+    if (fileName_buf == NULL) return;
+    memcpy(fileName_buf, fileName_ptr, fileName_len);
+    fileName_buf[fileName_len] = '\0';
+    TakeScreenshot((const char *)fileName_buf);
+    free(fileName_buf);
 }
 
 void rl_OpenURL(const uint8_t *url_ptr, size_t url_len) {
@@ -618,6 +632,22 @@ void rl_GetGesturePinchVector(uint8_t *out, size_t out_len) {
     memcpy(out, &__v, sizeof(__v));
 }
 
+void rl_UpdateCamera(uint8_t *cam_ptr, size_t cam_len, int32_t mode) {
+    if (cam_len != (size_t)sizeof(Camera3D)) return;
+    Camera3D cam;
+    memcpy(&cam, cam_ptr, sizeof(Camera3D));
+    UpdateCamera(&cam, mode);
+    memcpy(cam_ptr, &cam, sizeof(Camera3D));
+}
+
+void rl_UpdateCameraPro(uint8_t *cam_ptr, size_t cam_len, float mov_x, float mov_y, float mov_z, float rot_x, float rot_y, float rot_z, float zoom) {
+    if (cam_len != (size_t)sizeof(Camera3D)) return;
+    Camera3D cam;
+    memcpy(&cam, cam_ptr, sizeof(Camera3D));
+    UpdateCameraPro(&cam, (Vector3){ mov_x, mov_y, mov_z }, (Vector3){ rot_x, rot_y, rot_z }, zoom);
+    memcpy(cam_ptr, &cam, sizeof(Camera3D));
+}
+
 void rl_SetShapesTexture(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float source_x, float source_y, float source_width, float source_height) {
     SetShapesTexture((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ source_x, source_y, source_width, source_height });
 }
@@ -904,6 +934,10 @@ bool rl_CheckCollisionPointLine(float point_x, float point_y, float p1_x, float 
     return __ret;
 }
 
+bool rl_CheckCollisionPointPoly(float point_x, float point_y, const uint8_t *points_ptr, size_t points_len, int32_t pointCount) {
+    return CheckCollisionPointPoly((Vector2){ point_x, point_y }, (const Vector2 *)points_ptr, pointCount);
+}
+
 void rl_GetCollisionRec(float rec1_x, float rec1_y, float rec1_width, float rec1_height, float rec2_x, float rec2_y, float rec2_width, float rec2_height, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(Rectangle)) { return; }
     Rectangle __v = GetCollisionRec((Rectangle){ rec1_x, rec1_y, rec1_width, rec1_height }, (Rectangle){ rec2_x, rec2_y, rec2_width, rec2_height });
@@ -957,6 +991,19 @@ void rl_UnloadImage(const uint8_t *image_ptr, size_t image_len) {
     Image image;
     memcpy(&image, image_ptr, sizeof(image));
     UnloadImage(image);
+}
+
+bool rl_ExportImage(const uint8_t *image_ptr, size_t image_len, const uint8_t *fileName_ptr, size_t fileName_len) {
+    if (image_len != (size_t)sizeof(Image)) { return false; }
+    char *fileName_buf = (char *)malloc(fileName_len + 1);
+    if (fileName_buf == NULL) return false;
+    memcpy(fileName_buf, fileName_ptr, fileName_len);
+    fileName_buf[fileName_len] = '\0';
+    Image image;
+    memcpy(&image, image_ptr, sizeof(image));
+    bool __ret = ExportImage(image, (const char *)fileName_buf);
+    free(fileName_buf);
+    return __ret;
 }
 
 void rl_GenImageColor(int32_t width, int32_t height, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a, uint8_t *out, size_t out_len) {
@@ -1070,6 +1117,129 @@ void rl_ImageTextEx(const uint8_t *font_ptr, size_t font_len, const uint8_t *tex
     memcpy(out, &__v, sizeof(__v));
 }
 
+void rl_ImageFormat(uint8_t *image_ptr, size_t image_len, int32_t newFormat) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageFormat((Image *)image_ptr, newFormat);
+}
+
+void rl_ImageToPOT(uint8_t *image_ptr, size_t image_len, uint8_t fill_r, uint8_t fill_g, uint8_t fill_b, uint8_t fill_a) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageToPOT((Image *)image_ptr, (Color){ fill_r, fill_g, fill_b, fill_a });
+}
+
+void rl_ImageCrop(uint8_t *image_ptr, size_t image_len, float crop_x, float crop_y, float crop_width, float crop_height) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageCrop((Image *)image_ptr, (Rectangle){ crop_x, crop_y, crop_width, crop_height });
+}
+
+void rl_ImageAlphaCrop(uint8_t *image_ptr, size_t image_len, float threshold) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageAlphaCrop((Image *)image_ptr, threshold);
+}
+
+void rl_ImageAlphaClear(uint8_t *image_ptr, size_t image_len, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a, float threshold) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageAlphaClear((Image *)image_ptr, (Color){ color_r, color_g, color_b, color_a }, threshold);
+}
+
+void rl_ImageAlphaMask(uint8_t *image_ptr, size_t image_len, const uint8_t *alphaMask_ptr, size_t alphaMask_len) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    if (alphaMask_len != (size_t)sizeof(Image)) { return; }
+    Image alphaMask;
+    memcpy(&alphaMask, alphaMask_ptr, sizeof(alphaMask));
+    ImageAlphaMask((Image *)image_ptr, alphaMask);
+}
+
+void rl_ImageAlphaPremultiply(uint8_t *image_ptr, size_t image_len) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageAlphaPremultiply((Image *)image_ptr);
+}
+
+void rl_ImageBlurGaussian(uint8_t *image_ptr, size_t image_len, int32_t blurSize) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageBlurGaussian((Image *)image_ptr, blurSize);
+}
+
+void rl_ImageResize(uint8_t *image_ptr, size_t image_len, int32_t newWidth, int32_t newHeight) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageResize((Image *)image_ptr, newWidth, newHeight);
+}
+
+void rl_ImageResizeNN(uint8_t *image_ptr, size_t image_len, int32_t newWidth, int32_t newHeight) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageResizeNN((Image *)image_ptr, newWidth, newHeight);
+}
+
+void rl_ImageResizeCanvas(uint8_t *image_ptr, size_t image_len, int32_t newWidth, int32_t newHeight, int32_t offsetX, int32_t offsetY, uint8_t fill_r, uint8_t fill_g, uint8_t fill_b, uint8_t fill_a) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageResizeCanvas((Image *)image_ptr, newWidth, newHeight, offsetX, offsetY, (Color){ fill_r, fill_g, fill_b, fill_a });
+}
+
+void rl_ImageMipmaps(uint8_t *image_ptr, size_t image_len) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageMipmaps((Image *)image_ptr);
+}
+
+void rl_ImageDither(uint8_t *image_ptr, size_t image_len, int32_t rBpp, int32_t gBpp, int32_t bBpp, int32_t aBpp) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageDither((Image *)image_ptr, rBpp, gBpp, bBpp, aBpp);
+}
+
+void rl_ImageFlipVertical(uint8_t *image_ptr, size_t image_len) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageFlipVertical((Image *)image_ptr);
+}
+
+void rl_ImageFlipHorizontal(uint8_t *image_ptr, size_t image_len) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageFlipHorizontal((Image *)image_ptr);
+}
+
+void rl_ImageRotate(uint8_t *image_ptr, size_t image_len, int32_t degrees) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageRotate((Image *)image_ptr, degrees);
+}
+
+void rl_ImageRotateCW(uint8_t *image_ptr, size_t image_len) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageRotateCW((Image *)image_ptr);
+}
+
+void rl_ImageRotateCCW(uint8_t *image_ptr, size_t image_len) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageRotateCCW((Image *)image_ptr);
+}
+
+void rl_ImageColorTint(uint8_t *image_ptr, size_t image_len, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageColorTint((Image *)image_ptr, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageColorInvert(uint8_t *image_ptr, size_t image_len) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageColorInvert((Image *)image_ptr);
+}
+
+void rl_ImageColorGrayscale(uint8_t *image_ptr, size_t image_len) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageColorGrayscale((Image *)image_ptr);
+}
+
+void rl_ImageColorContrast(uint8_t *image_ptr, size_t image_len, float contrast) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageColorContrast((Image *)image_ptr, contrast);
+}
+
+void rl_ImageColorBrightness(uint8_t *image_ptr, size_t image_len, int32_t brightness) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageColorBrightness((Image *)image_ptr, brightness);
+}
+
+void rl_ImageColorReplace(uint8_t *image_ptr, size_t image_len, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a, uint8_t replace_r, uint8_t replace_g, uint8_t replace_b, uint8_t replace_a) {
+    if (image_len != (size_t)sizeof(Image)) { return; }
+    ImageColorReplace((Image *)image_ptr, (Color){ color_r, color_g, color_b, color_a }, (Color){ replace_r, replace_g, replace_b, replace_a });
+}
+
 void rl_GetImageAlphaBorder(const uint8_t *image_ptr, size_t image_len, float threshold, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(Rectangle)) { return; }
     if (image_len != (size_t)sizeof(Image)) { return; }
@@ -1088,33 +1258,119 @@ void rl_GetImageColor(const uint8_t *image_ptr, size_t image_len, int32_t x, int
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_ImageClearBackground(uint8_t *dst_ptr, size_t dst_len, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (dst_len != sizeof(Image)) return;
-    ImageClearBackground((Image *)dst_ptr, (Color){ r, g, b, a });
+void rl_ImageClearBackground(uint8_t *dst_ptr, size_t dst_len, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageClearBackground((Image *)dst_ptr, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_ImageDrawLine(uint8_t *dst_ptr, size_t dst_len, int32_t startPosX, int32_t startPosY, int32_t endPosX, int32_t endPosY, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (dst_len != sizeof(Image)) return;
-    ImageDrawLine((Image *)dst_ptr, startPosX, startPosY, endPosX, endPosY, (Color){ r, g, b, a });
+void rl_ImageDrawPixel(uint8_t *dst_ptr, size_t dst_len, int32_t posX, int32_t posY, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawPixel((Image *)dst_ptr, posX, posY, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_ImageDrawCircle(uint8_t *dst_ptr, size_t dst_len, int32_t centerX, int32_t centerY, int32_t radius, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (dst_len != sizeof(Image)) return;
-    ImageDrawCircle((Image *)dst_ptr, centerX, centerY, radius, (Color){ r, g, b, a });
+void rl_ImageDrawPixelV(uint8_t *dst_ptr, size_t dst_len, float position_x, float position_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawPixelV((Image *)dst_ptr, (Vector2){ position_x, position_y }, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_ImageDrawRectangle(uint8_t *dst_ptr, size_t dst_len, int32_t posX, int32_t posY, int32_t width, int32_t height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (dst_len != sizeof(Image)) return;
-    ImageDrawRectangle((Image *)dst_ptr, posX, posY, width, height, (Color){ r, g, b, a });
+void rl_ImageDrawLine(uint8_t *dst_ptr, size_t dst_len, int32_t startPosX, int32_t startPosY, int32_t endPosX, int32_t endPosY, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawLine((Image *)dst_ptr, startPosX, startPosY, endPosX, endPosY, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_ImageDrawText(uint8_t *dst_ptr, size_t dst_len, const uint8_t *text_ptr, size_t text_len, int32_t posX, int32_t posY, int32_t fontSize, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (dst_len != sizeof(Image)) return;
+void rl_ImageDrawLineV(uint8_t *dst_ptr, size_t dst_len, float start_x, float start_y, float end_x, float end_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawLineV((Image *)dst_ptr, (Vector2){ start_x, start_y }, (Vector2){ end_x, end_y }, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawLineEx(uint8_t *dst_ptr, size_t dst_len, float start_x, float start_y, float end_x, float end_y, int32_t thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawLineEx((Image *)dst_ptr, (Vector2){ start_x, start_y }, (Vector2){ end_x, end_y }, thick, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawCircle(uint8_t *dst_ptr, size_t dst_len, int32_t centerX, int32_t centerY, int32_t radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawCircle((Image *)dst_ptr, centerX, centerY, radius, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawCircleV(uint8_t *dst_ptr, size_t dst_len, float center_x, float center_y, int32_t radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawCircleV((Image *)dst_ptr, (Vector2){ center_x, center_y }, radius, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawCircleLines(uint8_t *dst_ptr, size_t dst_len, int32_t centerX, int32_t centerY, int32_t radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawCircleLines((Image *)dst_ptr, centerX, centerY, radius, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawCircleLinesV(uint8_t *dst_ptr, size_t dst_len, float center_x, float center_y, int32_t radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawCircleLinesV((Image *)dst_ptr, (Vector2){ center_x, center_y }, radius, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawRectangle(uint8_t *dst_ptr, size_t dst_len, int32_t posX, int32_t posY, int32_t width, int32_t height, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectangle((Image *)dst_ptr, posX, posY, width, height, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawRectangleV(uint8_t *dst_ptr, size_t dst_len, float position_x, float position_y, float size_x, float size_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectangleV((Image *)dst_ptr, (Vector2){ position_x, position_y }, (Vector2){ size_x, size_y }, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawRectangleRec(uint8_t *dst_ptr, size_t dst_len, float rec_x, float rec_y, float rec_width, float rec_height, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectangleRec((Image *)dst_ptr, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawRectangleLines(uint8_t *dst_ptr, size_t dst_len, float rec_x, float rec_y, float rec_width, float rec_height, int32_t thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectangleLines((Image *)dst_ptr, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, thick, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawTriangle(uint8_t *dst_ptr, size_t dst_len, float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawTriangle((Image *)dst_ptr, (Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawTriangleEx(uint8_t *dst_ptr, size_t dst_len, float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t c1_r, uint8_t c1_g, uint8_t c1_b, uint8_t c1_a, uint8_t c2_r, uint8_t c2_g, uint8_t c2_b, uint8_t c2_a, uint8_t c3_r, uint8_t c3_g, uint8_t c3_b, uint8_t c3_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawTriangleEx((Image *)dst_ptr, (Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ c1_r, c1_g, c1_b, c1_a }, (Color){ c2_r, c2_g, c2_b, c2_a }, (Color){ c3_r, c3_g, c3_b, c3_a });
+}
+
+void rl_ImageDrawTriangleLines(uint8_t *dst_ptr, size_t dst_len, float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawTriangleLines((Image *)dst_ptr, (Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDraw(uint8_t *dst_ptr, size_t dst_len, const uint8_t *src_ptr, size_t src_len, float srcRec_x, float srcRec_y, float srcRec_width, float srcRec_height, float dstRec_x, float dstRec_y, float dstRec_width, float dstRec_height, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    if (src_len != (size_t)sizeof(Image)) { return; }
+    Image src;
+    memcpy(&src, src_ptr, sizeof(src));
+    ImageDraw((Image *)dst_ptr, src, (Rectangle){ srcRec_x, srcRec_y, srcRec_width, srcRec_height }, (Rectangle){ dstRec_x, dstRec_y, dstRec_width, dstRec_height }, (Color){ tint_r, tint_g, tint_b, tint_a });
+}
+
+void rl_ImageDrawText(uint8_t *dst_ptr, size_t dst_len, const uint8_t *text_ptr, size_t text_len, int32_t posX, int32_t posY, int32_t fontSize, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
     char *text_buf = (char *)malloc(text_len + 1);
-    if (!text_buf) return;
+    if (text_buf == NULL) return;
     memcpy(text_buf, text_ptr, text_len);
     text_buf[text_len] = '\0';
-    ImageDrawText((Image *)dst_ptr, text_buf, posX, posY, fontSize, (Color){ r, g, b, a });
+    ImageDrawText((Image *)dst_ptr, (const char *)text_buf, posX, posY, fontSize, (Color){ color_r, color_g, color_b, color_a });
+    free(text_buf);
+}
+
+void rl_ImageDrawTextEx(uint8_t *dst_ptr, size_t dst_len, const uint8_t *font_ptr, size_t font_len, const uint8_t *text_ptr, size_t text_len, float position_x, float position_y, float fontSize, float spacing, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    if (font_len != (size_t)sizeof(Font)) { return; }
+    char *text_buf = (char *)malloc(text_len + 1);
+    if (text_buf == NULL) return;
+    memcpy(text_buf, text_ptr, text_len);
+    text_buf[text_len] = '\0';
+    Font font;
+    memcpy(&font, font_ptr, sizeof(font));
+    ImageDrawTextEx((Image *)dst_ptr, font, (const char *)text_buf, (Vector2){ position_x, position_y }, fontSize, spacing, (Color){ tint_r, tint_g, tint_b, tint_a });
     free(text_buf);
 }
 
@@ -1729,6 +1985,11 @@ void rl_DrawBillboardPro(float camera_position_x, float camera_position_y, float
     DrawBillboardPro((Camera3D){ (Vector3){ camera_position_x, camera_position_y, camera_position_z }, (Vector3){ camera_target_x, camera_target_y, camera_target_z }, (Vector3){ camera_up_x, camera_up_y, camera_up_z }, camera_fovy, camera_projection }, (Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ source_x, source_y, source_width, source_height }, (Vector3){ position_x, position_y, position_z }, (Vector3){ up_x, up_y, up_z }, (Vector2){ size_x, size_y }, (Vector2){ origin_x, origin_y }, rotation, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
+void rl_UploadMesh(uint8_t *mesh_ptr, size_t mesh_len, bool dynamic) {
+    if (mesh_len != (size_t)sizeof(Mesh)) { return; }
+    UploadMesh((Mesh *)mesh_ptr, dynamic);
+}
+
 void rl_UpdateMeshBuffer(const uint8_t *mesh_ptr, size_t mesh_len, int32_t index, const uint8_t *data_ptr, size_t data_len, int32_t dataSize, int32_t offset) {
     if (mesh_len != (size_t)sizeof(Mesh)) { return; }
     Mesh mesh;
@@ -1760,6 +2021,11 @@ void rl_GetMeshBoundingBox(const uint8_t *mesh_ptr, size_t mesh_len, uint8_t *ou
     memcpy(&mesh, mesh_ptr, sizeof(mesh));
     BoundingBox __v = GetMeshBoundingBox(mesh);
     memcpy(out, &__v, sizeof(__v));
+}
+
+void rl_GenMeshTangents(uint8_t *mesh_ptr, size_t mesh_len) {
+    if (mesh_len != (size_t)sizeof(Mesh)) { return; }
+    GenMeshTangents((Mesh *)mesh_ptr);
 }
 
 bool rl_ExportMeshAsCode(const uint8_t *mesh_ptr, size_t mesh_len, const uint8_t *fileName_ptr, size_t fileName_len) {
@@ -1868,6 +2134,16 @@ void rl_UnloadMaterial(const uint8_t *material_ptr, size_t material_len) {
     UnloadMaterial(material);
 }
 
+void rl_SetMaterialTexture(uint8_t *material_ptr, size_t material_len, int32_t mapType, uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format) {
+    if (material_len != (size_t)sizeof(Material)) { return; }
+    SetMaterialTexture((Material *)material_ptr, mapType, (Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format });
+}
+
+void rl_SetModelMeshMaterial(uint8_t *model_ptr, size_t model_len, int32_t meshId, int32_t materialId) {
+    if (model_len != (size_t)sizeof(Model)) { return; }
+    SetModelMeshMaterial((Model *)model_ptr, meshId, materialId);
+}
+
 void rl_UpdateModelAnimation(const uint8_t *model_ptr, size_t model_len, const uint8_t *anim_ptr, size_t anim_len, float frame) {
     if (model_len != (size_t)sizeof(Model)) { return; }
     if (anim_len != (size_t)sizeof(ModelAnimation)) { return; }
@@ -1889,6 +2165,11 @@ void rl_UpdateModelAnimationEx(const uint8_t *model_ptr, size_t model_len, const
     ModelAnimation animB;
     memcpy(&animB, animB_ptr, sizeof(animB));
     UpdateModelAnimationEx(model, animA, frameA, animB, frameB, blend);
+}
+
+void rl_UnloadModelAnimations(uint8_t *animations_ptr, size_t animations_len, int32_t animCount) {
+    if (animations_len != (size_t)sizeof(ModelAnimation)) { return; }
+    UnloadModelAnimations((ModelAnimation *)animations_ptr, animCount);
 }
 
 bool rl_IsModelAnimationValid(const uint8_t *model_ptr, size_t model_len, const uint8_t *anim_ptr, size_t anim_len) {
@@ -2124,6 +2405,16 @@ void rl_WaveCopy(const uint8_t *wave_ptr, size_t wave_len, uint8_t *out, size_t 
     memcpy(&wave, wave_ptr, sizeof(wave));
     Wave __v = WaveCopy(wave);
     memcpy(out, &__v, sizeof(__v));
+}
+
+void rl_WaveCrop(uint8_t *wave_ptr, size_t wave_len, int32_t initFrame, int32_t finalFrame) {
+    if (wave_len != (size_t)sizeof(Wave)) { return; }
+    WaveCrop((Wave *)wave_ptr, initFrame, finalFrame);
+}
+
+void rl_WaveFormat(uint8_t *wave_ptr, size_t wave_len, int32_t sampleRate, int32_t sampleSize, int32_t channels) {
+    if (wave_len != (size_t)sizeof(Wave)) { return; }
+    WaveFormat((Wave *)wave_ptr, sampleRate, sampleSize, channels);
 }
 
 void rl_LoadMusicStream(const uint8_t *fileName_ptr, size_t fileName_len, uint8_t *out, size_t out_len) {

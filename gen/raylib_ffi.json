@@ -128,6 +128,15 @@
       "returns": "void"
     },
     {
+      "name": "rl_SetWindowIcons",
+      "symbol": "rl_SetWindowIcons",
+      "params": [
+        "mutable-bytes",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_SetWindowTitle",
       "symbol": "rl_SetWindowTitle",
       "params": [
@@ -876,6 +885,14 @@
       "returns": "i32"
     },
     {
+      "name": "rl_TakeScreenshot",
+      "symbol": "rl_TakeScreenshot",
+      "params": [
+        "string"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_SetConfigFlags",
       "symbol": "SetConfigFlags",
       "params": [
@@ -1439,6 +1456,30 @@
       "symbol": "GetGesturePinchAngle",
       "params": [],
       "returns": "f32"
+    },
+    {
+      "name": "rl_UpdateCamera",
+      "symbol": "rl_UpdateCamera",
+      "params": [
+        "mutable-bytes",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UpdateCameraPro",
+      "symbol": "rl_UpdateCameraPro",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "void"
     },
     {
       "name": "rl_SetShapesTexture",
@@ -2468,6 +2509,17 @@
       "returns": "bool"
     },
     {
+      "name": "rl_CheckCollisionPointPoly",
+      "symbol": "rl_CheckCollisionPointPoly",
+      "params": [
+        "f32",
+        "f32",
+        "bytes",
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
       "name": "rl_GetCollisionRec",
       "symbol": "rl_GetCollisionRec",
       "params": [
@@ -2541,6 +2593,15 @@
         "bytes"
       ],
       "returns": "void"
+    },
+    {
+      "name": "rl_ExportImage",
+      "symbol": "rl_ExportImage",
+      "params": [
+        "bytes",
+        "string"
+      ],
+      "returns": "bool"
     },
     {
       "name": "rl_GenImageColor",
@@ -2742,6 +2803,246 @@
       "returns": "void"
     },
     {
+      "name": "rl_ImageFormat",
+      "symbol": "rl_ImageFormat",
+      "params": [
+        "mutable-bytes",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageToPOT",
+      "symbol": "rl_ImageToPOT",
+      "params": [
+        "mutable-bytes",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageCrop",
+      "symbol": "rl_ImageCrop",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageAlphaCrop",
+      "symbol": "rl_ImageAlphaCrop",
+      "params": [
+        "mutable-bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageAlphaClear",
+      "symbol": "rl_ImageAlphaClear",
+      "params": [
+        "mutable-bytes",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageAlphaMask",
+      "symbol": "rl_ImageAlphaMask",
+      "params": [
+        "mutable-bytes",
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageAlphaPremultiply",
+      "symbol": "rl_ImageAlphaPremultiply",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageBlurGaussian",
+      "symbol": "rl_ImageBlurGaussian",
+      "params": [
+        "mutable-bytes",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageResize",
+      "symbol": "rl_ImageResize",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageResizeNN",
+      "symbol": "rl_ImageResizeNN",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageResizeCanvas",
+      "symbol": "rl_ImageResizeCanvas",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageMipmaps",
+      "symbol": "rl_ImageMipmaps",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDither",
+      "symbol": "rl_ImageDither",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageFlipVertical",
+      "symbol": "rl_ImageFlipVertical",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageFlipHorizontal",
+      "symbol": "rl_ImageFlipHorizontal",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageRotate",
+      "symbol": "rl_ImageRotate",
+      "params": [
+        "mutable-bytes",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageRotateCW",
+      "symbol": "rl_ImageRotateCW",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageRotateCCW",
+      "symbol": "rl_ImageRotateCCW",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageColorTint",
+      "symbol": "rl_ImageColorTint",
+      "params": [
+        "mutable-bytes",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageColorInvert",
+      "symbol": "rl_ImageColorInvert",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageColorGrayscale",
+      "symbol": "rl_ImageColorGrayscale",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageColorContrast",
+      "symbol": "rl_ImageColorContrast",
+      "params": [
+        "mutable-bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageColorBrightness",
+      "symbol": "rl_ImageColorBrightness",
+      "params": [
+        "mutable-bytes",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageColorReplace",
+      "symbol": "rl_ImageColorReplace",
+      "params": [
+        "mutable-bytes",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_GetImageAlphaBorder",
       "symbol": "rl_GetImageAlphaBorder",
       "params": [
@@ -2775,6 +3076,34 @@
       "returns": "void"
     },
     {
+      "name": "rl_ImageDrawPixel",
+      "symbol": "rl_ImageDrawPixel",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawPixelV",
+      "symbol": "rl_ImageDrawPixelV",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_ImageDrawLine",
       "symbol": "rl_ImageDrawLine",
       "params": [
@@ -2791,12 +3120,90 @@
       "returns": "void"
     },
     {
+      "name": "rl_ImageDrawLineV",
+      "symbol": "rl_ImageDrawLineV",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawLineEx",
+      "symbol": "rl_ImageDrawLineEx",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_ImageDrawCircle",
       "symbol": "rl_ImageDrawCircle",
       "params": [
         "mutable-bytes",
         "i32",
         "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawCircleV",
+      "symbol": "rl_ImageDrawCircleV",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawCircleLines",
+      "symbol": "rl_ImageDrawCircleLines",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawCircleLinesV",
+      "symbol": "rl_ImageDrawCircleLinesV",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
         "i32",
         "u8",
         "u8",
@@ -2822,6 +3229,138 @@
       "returns": "void"
     },
     {
+      "name": "rl_ImageDrawRectangleV",
+      "symbol": "rl_ImageDrawRectangleV",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawRectangleRec",
+      "symbol": "rl_ImageDrawRectangleRec",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawRectangleLines",
+      "symbol": "rl_ImageDrawRectangleLines",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawTriangle",
+      "symbol": "rl_ImageDrawTriangle",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawTriangleEx",
+      "symbol": "rl_ImageDrawTriangleEx",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawTriangleLines",
+      "symbol": "rl_ImageDrawTriangleLines",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDraw",
+      "symbol": "rl_ImageDraw",
+      "params": [
+        "mutable-bytes",
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_ImageDrawText",
       "symbol": "rl_ImageDrawText",
       "params": [
@@ -2830,6 +3369,24 @@
         "i32",
         "i32",
         "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawTextEx",
+      "symbol": "rl_ImageDrawTextEx",
+      "params": [
+        "mutable-bytes",
+        "bytes",
+        "string",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
         "u8",
         "u8",
         "u8",
@@ -4209,6 +4766,15 @@
       "returns": "void"
     },
     {
+      "name": "rl_UploadMesh",
+      "symbol": "rl_UploadMesh",
+      "params": [
+        "mutable-bytes",
+        "bool"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_UpdateMeshBuffer",
       "symbol": "rl_UpdateMeshBuffer",
       "params": [
@@ -4258,6 +4824,14 @@
       "symbol": "rl_GetMeshBoundingBox",
       "params": [
         "bytes",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshTangents",
+      "symbol": "rl_GenMeshTangents",
+      "params": [
         "mutable-bytes"
       ],
       "returns": "void"
@@ -4421,6 +4995,30 @@
       "returns": "void"
     },
     {
+      "name": "rl_SetMaterialTexture",
+      "symbol": "rl_SetMaterialTexture",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetModelMeshMaterial",
+      "symbol": "rl_SetModelMeshMaterial",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_UpdateModelAnimation",
       "symbol": "rl_UpdateModelAnimation",
       "params": [
@@ -4440,6 +5038,15 @@
         "bytes",
         "f32",
         "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UnloadModelAnimations",
+      "symbol": "rl_UnloadModelAnimations",
+      "params": [
+        "mutable-bytes",
+        "i32"
       ],
       "returns": "void"
     },
@@ -4830,6 +5437,27 @@
       "params": [
         "bytes",
         "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_WaveCrop",
+      "symbol": "rl_WaveCrop",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_WaveFormat",
+      "symbol": "rl_WaveFormat",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32",
+        "i32"
       ],
       "returns": "void"
     },

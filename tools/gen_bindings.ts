@@ -443,7 +443,7 @@ const SKIP_FILE_IO: RegExp[] = [
   /^GetWorkingDirectory$/, /^GetApplicationDirectory$/, /^ChangeDirectory$/, /^GetFileModTime$/,
   /^LoadDroppedFiles$/, /^UnloadDroppedFiles$/,
   /^LoadFileData$/, /^UnloadFileData$/, /^SaveFileData$/, /^LoadFileText$/, /^UnloadFileText$/, /^SaveFileText$/,
-  /^TakeScreenshot$/, /^ExportImage$/, /^ExportImageAsCode$/, /^ExportDataAsCode$/, /^ExportMesh$/,
+  /^ExportImageAsCode$/, /^ExportDataAsCode$/, /^ExportMesh$/,
   /^LoadAutomationEventList$/, /^ExportAutomationEvents$/, /^SetAutomationEventList$/, /^SetAutomationEventBase$/,
 ];
 // Manual memory management from script land makes no sense.
@@ -454,7 +454,8 @@ type ParamPlan =
   | { k: "string"; name: string }
   | { k: "bytes"; name: string }
   | { k: "flat"; name: string; structName: string; leaves: Leaf[] }
-  | { k: "opaque"; name: string; structName: string; size: number };
+  | { k: "opaque"; name: string; structName: string; size: number }
+  | { k: "mutable-opaque"; name: string; structName: string; size: number };
 
 type RetPlan = { k: "void" } | { k: "scalar"; prim: Prim } | { k: "struct-out"; structName: string; size: number };
 
@@ -838,84 +839,107 @@ const CUSTOM_HANDLERS: Record<string, () => Extract<FnPlan, { k: "custom" }>> = 
   }
 }`,
   }),
-  ImageClearBackground: () => ({
+  UpdateCamera: () => ({
     k: "custom",
-    tsName: "rl_ImageClearBackground",
-    symbol: "rl_ImageClearBackground",
-    manifestParams: ["mutable-bytes", "u8", "u8", "u8", "u8"],
+    tsName: "rl_UpdateCamera",
+    symbol: "rl_UpdateCamera",
+    manifestParams: ["mutable-bytes", "i32"],
     manifestRet: "void",
-    cCode: `void rl_ImageClearBackground(uint8_t *dst_ptr, size_t dst_len, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (dst_len != sizeof(Image)) return;
-    ImageClearBackground((Image *)dst_ptr, (Color){ r, g, b, a });
+    cCode: `void rl_UpdateCamera(uint8_t *cam_ptr, size_t cam_len, int32_t mode) {
+    if (cam_len != (size_t)sizeof(Camera3D)) return;
+    Camera3D cam;
+    memcpy(&cam, cam_ptr, sizeof(Camera3D));
+    UpdateCamera(&cam, mode);
+    memcpy(cam_ptr, &cam, sizeof(Camera3D));
 }`,
-    ffiDecl: `export declare function rl_ImageClearBackground(dst: Uint8Array, r: number, g: number, b: number, a: number): void;`,
-    apiCode: `export function ImageClearBackground(dst: Image, color: Color): void {
-  rl_ImageClearBackground(dst, color.r, color.g, color.b, color.a);
+    ffiDecl: `export declare function rl_UpdateCamera(cam: Uint8Array, mode: number): void;`,
+    apiCode: `export function UpdateCamera(camera: Camera3D, mode: number): Camera3D {
+  const __buf = new Uint8Array(44);
+  const __dv = new DataView(__buf.buffer, __buf.byteOffset, 44);
+  __dv.setFloat32(0, camera.position.x, true);
+  __dv.setFloat32(4, camera.position.y, true);
+  __dv.setFloat32(8, camera.position.z, true);
+  __dv.setFloat32(12, camera.target.x, true);
+  __dv.setFloat32(16, camera.target.y, true);
+  __dv.setFloat32(20, camera.target.z, true);
+  __dv.setFloat32(24, camera.up.x, true);
+  __dv.setFloat32(28, camera.up.y, true);
+  __dv.setFloat32(32, camera.up.z, true);
+  __dv.setFloat32(36, camera.fovy, true);
+  __dv.setInt32(40, camera.projection, true);
+  rl_UpdateCamera(__buf, mode);
+  const updated = __read_Camera3D(__buf);
+  camera.position.x = updated.position.x;
+  camera.position.y = updated.position.y;
+  camera.position.z = updated.position.z;
+  camera.target.x = updated.target.x;
+  camera.target.y = updated.target.y;
+  camera.target.z = updated.target.z;
+  camera.up.x = updated.up.x;
+  camera.up.y = updated.up.y;
+  camera.up.z = updated.up.z;
+  camera.fovy = updated.fovy;
+  camera.projection = updated.projection;
+  return camera;
 }`,
   }),
-  ImageDrawRectangle: () => ({
+  UpdateCameraPro: () => ({
     k: "custom",
-    tsName: "rl_ImageDrawRectangle",
-    symbol: "rl_ImageDrawRectangle",
-    manifestParams: ["mutable-bytes", "i32", "i32", "i32", "i32", "u8", "u8", "u8", "u8"],
+    tsName: "rl_UpdateCameraPro",
+    symbol: "rl_UpdateCameraPro",
+    manifestParams: ["mutable-bytes", "f32", "f32", "f32", "f32", "f32", "f32", "f32"],
     manifestRet: "void",
-    cCode: `void rl_ImageDrawRectangle(uint8_t *dst_ptr, size_t dst_len, int32_t posX, int32_t posY, int32_t width, int32_t height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (dst_len != sizeof(Image)) return;
-    ImageDrawRectangle((Image *)dst_ptr, posX, posY, width, height, (Color){ r, g, b, a });
+    cCode: `void rl_UpdateCameraPro(uint8_t *cam_ptr, size_t cam_len, float mov_x, float mov_y, float mov_z, float rot_x, float rot_y, float rot_z, float zoom) {
+    if (cam_len != (size_t)sizeof(Camera3D)) return;
+    Camera3D cam;
+    memcpy(&cam, cam_ptr, sizeof(Camera3D));
+    UpdateCameraPro(&cam, (Vector3){ mov_x, mov_y, mov_z }, (Vector3){ rot_x, rot_y, rot_z }, zoom);
+    memcpy(cam_ptr, &cam, sizeof(Camera3D));
 }`,
-    ffiDecl: `export declare function rl_ImageDrawRectangle(dst: Uint8Array, posX: number, posY: number, width: number, height: number, r: number, g: number, b: number, a: number): void;`,
-    apiCode: `export function ImageDrawRectangle(dst: Image, posX: number, posY: number, width: number, height: number, color: Color): void {
-  rl_ImageDrawRectangle(dst, posX, posY, width, height, color.r, color.g, color.b, color.a);
+    ffiDecl: `export declare function rl_UpdateCameraPro(cam: Uint8Array, mov_x: number, mov_y: number, mov_z: number, rot_x: number, rot_y: number, rot_z: number, zoom: number): void;`,
+    apiCode: `export function UpdateCameraPro(camera: Camera3D, movement: Vector3, rotation: Vector3, zoom: number): Camera3D {
+  const __buf = new Uint8Array(44);
+  const __dv = new DataView(__buf.buffer, __buf.byteOffset, 44);
+  __dv.setFloat32(0, camera.position.x, true);
+  __dv.setFloat32(4, camera.position.y, true);
+  __dv.setFloat32(8, camera.position.z, true);
+  __dv.setFloat32(12, camera.target.x, true);
+  __dv.setFloat32(16, camera.target.y, true);
+  __dv.setFloat32(20, camera.target.z, true);
+  __dv.setFloat32(24, camera.up.x, true);
+  __dv.setFloat32(28, camera.up.y, true);
+  __dv.setFloat32(32, camera.up.z, true);
+  __dv.setFloat32(36, camera.fovy, true);
+  __dv.setInt32(40, camera.projection, true);
+  rl_UpdateCameraPro(__buf, movement.x, movement.y, movement.z, rotation.x, rotation.y, rotation.z, zoom);
+  const updated = __read_Camera3D(__buf);
+  camera.position.x = updated.position.x;
+  camera.position.y = updated.position.y;
+  camera.position.z = updated.position.z;
+  camera.target.x = updated.target.x;
+  camera.target.y = updated.target.y;
+  camera.target.z = updated.target.z;
+  camera.up.x = updated.up.x;
+  camera.up.y = updated.up.y;
+  camera.up.z = updated.up.z;
+  camera.fovy = updated.fovy;
+  camera.projection = updated.projection;
+  return camera;
 }`,
   }),
-  ImageDrawCircle: () => ({
+  CheckCollisionPointPoly: () => ({
     k: "custom",
-    tsName: "rl_ImageDrawCircle",
-    symbol: "rl_ImageDrawCircle",
-    manifestParams: ["mutable-bytes", "i32", "i32", "i32", "u8", "u8", "u8", "u8"],
-    manifestRet: "void",
-    cCode: `void rl_ImageDrawCircle(uint8_t *dst_ptr, size_t dst_len, int32_t centerX, int32_t centerY, int32_t radius, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (dst_len != sizeof(Image)) return;
-    ImageDrawCircle((Image *)dst_ptr, centerX, centerY, radius, (Color){ r, g, b, a });
+    tsName: "rl_CheckCollisionPointPoly",
+    symbol: "rl_CheckCollisionPointPoly",
+    manifestParams: ["f32", "f32", "bytes", "i32"],
+    manifestRet: "bool",
+    cCode: `bool rl_CheckCollisionPointPoly(float point_x, float point_y, const uint8_t *points_ptr, size_t points_len, int32_t pointCount) {
+    return CheckCollisionPointPoly((Vector2){ point_x, point_y }, (const Vector2 *)points_ptr, pointCount);
 }`,
-    ffiDecl: `export declare function rl_ImageDrawCircle(dst: Uint8Array, centerX: number, centerY: number, radius: number, r: number, g: number, b: number, a: number): void;`,
-    apiCode: `export function ImageDrawCircle(dst: Image, centerX: number, centerY: number, radius: number, color: Color): void {
-  rl_ImageDrawCircle(dst, centerX, centerY, radius, color.r, color.g, color.b, color.a);
-}`,
-  }),
-  ImageDrawLine: () => ({
-    k: "custom",
-    tsName: "rl_ImageDrawLine",
-    symbol: "rl_ImageDrawLine",
-    manifestParams: ["mutable-bytes", "i32", "i32", "i32", "i32", "u8", "u8", "u8", "u8"],
-    manifestRet: "void",
-    cCode: `void rl_ImageDrawLine(uint8_t *dst_ptr, size_t dst_len, int32_t startPosX, int32_t startPosY, int32_t endPosX, int32_t endPosY, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (dst_len != sizeof(Image)) return;
-    ImageDrawLine((Image *)dst_ptr, startPosX, startPosY, endPosX, endPosY, (Color){ r, g, b, a });
-}`,
-    ffiDecl: `export declare function rl_ImageDrawLine(dst: Uint8Array, startPosX: number, startPosY: number, endPosX: number, endPosY: number, r: number, g: number, b: number, a: number): void;`,
-    apiCode: `export function ImageDrawLine(dst: Image, startPosX: number, startPosY: number, endPosX: number, endPosY: number, color: Color): void {
-  rl_ImageDrawLine(dst, startPosX, startPosY, endPosX, endPosY, color.r, color.g, color.b, color.a);
-}`,
-  }),
-  ImageDrawText: () => ({
-    k: "custom",
-    tsName: "rl_ImageDrawText",
-    symbol: "rl_ImageDrawText",
-    manifestParams: ["mutable-bytes", "string", "i32", "i32", "i32", "u8", "u8", "u8", "u8"],
-    manifestRet: "void",
-    cCode: `void rl_ImageDrawText(uint8_t *dst_ptr, size_t dst_len, const uint8_t *text_ptr, size_t text_len, int32_t posX, int32_t posY, int32_t fontSize, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    if (dst_len != sizeof(Image)) return;
-    char *text_buf = (char *)malloc(text_len + 1);
-    if (!text_buf) return;
-    memcpy(text_buf, text_ptr, text_len);
-    text_buf[text_len] = '\\0';
-    ImageDrawText((Image *)dst_ptr, text_buf, posX, posY, fontSize, (Color){ r, g, b, a });
-    free(text_buf);
-}`,
-    ffiDecl: `export declare function rl_ImageDrawText(dst: Uint8Array, text: string, posX: number, posY: number, fontSize: number, r: number, g: number, b: number, a: number): void;`,
-    apiCode: `export function ImageDrawText(dst: Image, text: string, posX: number, posY: number, fontSize: number, color: Color): void {
-  rl_ImageDrawText(dst, text, posX, posY, fontSize, color.r, color.g, color.b, color.a);
+    ffiDecl: `export declare function rl_CheckCollisionPointPoly(point_x: number, point_y: number, points: Uint8Array, pointCount: number): boolean;`,
+    apiCode: `export function CheckCollisionPointPoly(point: Vector2, points: Float32Array | Uint8Array | Vector2[], pointCount?: number): boolean {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  return rl_CheckCollisionPointPoly(point.x, point.y, __b, pointCount !== undefined ? pointCount : __cnt);
 }`,
   }),
 };
@@ -973,6 +997,13 @@ function classify(fn: RawFn): FnPlan {
       if (lay.flat) params.push({ k: "flat", name: p.name, structName: t.base.name, leaves: lay.leaves });
       else params.push({ k: "opaque", name: p.name, structName: t.base.name, size: lay.size });
       continue;
+    }
+    if (t.ptr === 1 && t.arrLen === undefined && t.base.t === "struct" && !p.type.includes("const")) {
+      const lay = layoutStruct(t.base.name);
+      if (!lay.flat && t.base.name !== "GlyphInfo") {
+        params.push({ k: "mutable-opaque", name: p.name, structName: t.base.name, size: lay.size });
+        continue;
+      }
     }
     if (t.ptr >= 1 && t.base.t === "struct") return { k: "skip", reason: "struct-pointer" };
     return { k: "skip", reason: "pointer-param" };
@@ -1033,6 +1064,12 @@ function classify(fn: RawFn): FnPlan {
       pre.push(`if (${p.name}_len != (size_t)sizeof(${p.structName})) { ${earlyRet} }`);
       locals.push(`${p.structName} ${p.name};`, `memcpy(&${p.name}, ${p.name}_ptr, sizeof(${p.name}));`);
       callArgs.push(p.name);
+    } else if (p.k === "mutable-opaque") {
+      cParams.push(`uint8_t *${p.name}_ptr`, `size_t ${p.name}_len`);
+      manifestParams.push("mutable-bytes");
+      tsParams.push({ name: p.name, ts: p.structName });
+      pre.push(`if (${p.name}_len != (size_t)sizeof(${p.structName})) { ${earlyRet} }`);
+      callArgs.push(`(${p.structName} *)${p.name}_ptr`);
     } else {
       // flat: expand struct into scalar C params; the call receives the rebuilt struct
       for (const leaf of p.leaves) {
@@ -1226,7 +1263,7 @@ function main(): void {
       for (const p of plan.params) {
         if (p.k === "scalar") params.push(`${p.name}: ${PRIM_TS[p.prim]}`);
         else if (p.k === "string") params.push(`${p.name}: string`);
-        else if (p.k === "bytes" || p.k === "opaque") params.push(`${p.name}: Uint8Array`);
+        else if (p.k === "bytes" || p.k === "opaque" || p.k === "mutable-opaque") params.push(`${p.name}: Uint8Array`);
         else for (const leaf of p.leaves) params.push(`${p.name}_${leaf.path.join("_")}: ${PRIM_TS[leaf.prim]}`);
       }
       if (plan.ret.k === "struct-out") params.push("__out: Uint8Array");

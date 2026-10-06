@@ -22,6 +22,7 @@ import {
   rl_MinimizeWindow,
   rl_RestoreWindow,
   rl_SetWindowIcon,
+  rl_SetWindowIcons,
   rl_SetWindowTitle,
   rl_SetWindowPosition,
   rl_SetWindowMonitor,
@@ -102,6 +103,7 @@ import {
   rl_WaitTime,
   rl_SetRandomSeed,
   rl_GetRandomValue,
+  rl_TakeScreenshot,
   rl_SetConfigFlags,
   rl_OpenURL,
   rl_SetTraceLogLevel,
@@ -173,6 +175,8 @@ import {
   rl_GetGestureDragAngle,
   rl_GetGesturePinchVector,
   rl_GetGesturePinchAngle,
+  rl_UpdateCamera,
+  rl_UpdateCameraPro,
   rl_SetShapesTexture,
   rl_GetShapesTexture,
   rl_GetShapesTextureRectangle,
@@ -239,6 +243,7 @@ import {
   rl_CheckCollisionPointCircle,
   rl_CheckCollisionPointTriangle,
   rl_CheckCollisionPointLine,
+  rl_CheckCollisionPointPoly,
   rl_GetCollisionRec,
   rl_LoadImage,
   rl_LoadImageRaw,
@@ -246,6 +251,7 @@ import {
   rl_LoadImageFromScreen,
   rl_IsImageValid,
   rl_UnloadImage,
+  rl_ExportImage,
   rl_GenImageColor,
   rl_GenImageGradientLinear,
   rl_GenImageGradientRadial,
@@ -260,13 +266,52 @@ import {
   rl_ImageFromChannel,
   rl_ImageText,
   rl_ImageTextEx,
+  rl_ImageFormat,
+  rl_ImageToPOT,
+  rl_ImageCrop,
+  rl_ImageAlphaCrop,
+  rl_ImageAlphaClear,
+  rl_ImageAlphaMask,
+  rl_ImageAlphaPremultiply,
+  rl_ImageBlurGaussian,
+  rl_ImageResize,
+  rl_ImageResizeNN,
+  rl_ImageResizeCanvas,
+  rl_ImageMipmaps,
+  rl_ImageDither,
+  rl_ImageFlipVertical,
+  rl_ImageFlipHorizontal,
+  rl_ImageRotate,
+  rl_ImageRotateCW,
+  rl_ImageRotateCCW,
+  rl_ImageColorTint,
+  rl_ImageColorInvert,
+  rl_ImageColorGrayscale,
+  rl_ImageColorContrast,
+  rl_ImageColorBrightness,
+  rl_ImageColorReplace,
   rl_GetImageAlphaBorder,
   rl_GetImageColor,
   rl_ImageClearBackground,
+  rl_ImageDrawPixel,
+  rl_ImageDrawPixelV,
   rl_ImageDrawLine,
+  rl_ImageDrawLineV,
+  rl_ImageDrawLineEx,
   rl_ImageDrawCircle,
+  rl_ImageDrawCircleV,
+  rl_ImageDrawCircleLines,
+  rl_ImageDrawCircleLinesV,
   rl_ImageDrawRectangle,
+  rl_ImageDrawRectangleV,
+  rl_ImageDrawRectangleRec,
+  rl_ImageDrawRectangleLines,
+  rl_ImageDrawTriangle,
+  rl_ImageDrawTriangleEx,
+  rl_ImageDrawTriangleLines,
+  rl_ImageDraw,
   rl_ImageDrawText,
+  rl_ImageDrawTextEx,
   rl_LoadTexture,
   rl_LoadTextureFromImage,
   rl_LoadTextureCubemap,
@@ -361,10 +406,12 @@ import {
   rl_DrawBillboard,
   rl_DrawBillboardRec,
   rl_DrawBillboardPro,
+  rl_UploadMesh,
   rl_UpdateMeshBuffer,
   rl_UnloadMesh,
   rl_DrawMesh,
   rl_GetMeshBoundingBox,
+  rl_GenMeshTangents,
   rl_ExportMeshAsCode,
   rl_GenMeshPoly,
   rl_GenMeshPlane,
@@ -380,8 +427,11 @@ import {
   rl_LoadMaterialDefault,
   rl_IsMaterialValid,
   rl_UnloadMaterial,
+  rl_SetMaterialTexture,
+  rl_SetModelMeshMaterial,
   rl_UpdateModelAnimation,
   rl_UpdateModelAnimationEx,
+  rl_UnloadModelAnimations,
   rl_IsModelAnimationValid,
   rl_CheckCollisionSpheres,
   rl_CheckCollisionBoxes,
@@ -417,6 +467,8 @@ import {
   rl_SetSoundPitch,
   rl_SetSoundPan,
   rl_WaveCopy,
+  rl_WaveCrop,
+  rl_WaveFormat,
   rl_LoadMusicStream,
   rl_IsMusicValid,
   rl_UnloadMusicStream,
@@ -1071,6 +1123,10 @@ export function SetWindowIcon(image: Uint8Array): void {
   rl_SetWindowIcon(image);
 }
 
+export function SetWindowIcons(images: Image, count: number): void {
+  rl_SetWindowIcons(images, count);
+}
+
 export function SetWindowTitle(title: string): void {
   rl_SetWindowTitle(title);
 }
@@ -1430,6 +1486,10 @@ export function GetRandomValue(a0: number, a1: number): number {
   return rl_GetRandomValue(a0, a1);
 }
 
+export function TakeScreenshot(fileName: string): void {
+  rl_TakeScreenshot(fileName);
+}
+
 export function SetConfigFlags(a0: number) {
   rl_SetConfigFlags(a0);
 }
@@ -1733,6 +1793,66 @@ export function GetGesturePinchAngle(): number {
   return rl_GetGesturePinchAngle();
 }
 
+export function UpdateCamera(camera: Camera3D, mode: number): Camera3D {
+  const __buf = new Uint8Array(44);
+  const __dv = new DataView(__buf.buffer, __buf.byteOffset, 44);
+  __dv.setFloat32(0, camera.position.x, true);
+  __dv.setFloat32(4, camera.position.y, true);
+  __dv.setFloat32(8, camera.position.z, true);
+  __dv.setFloat32(12, camera.target.x, true);
+  __dv.setFloat32(16, camera.target.y, true);
+  __dv.setFloat32(20, camera.target.z, true);
+  __dv.setFloat32(24, camera.up.x, true);
+  __dv.setFloat32(28, camera.up.y, true);
+  __dv.setFloat32(32, camera.up.z, true);
+  __dv.setFloat32(36, camera.fovy, true);
+  __dv.setInt32(40, camera.projection, true);
+  rl_UpdateCamera(__buf, mode);
+  const updated = __read_Camera3D(__buf);
+  camera.position.x = updated.position.x;
+  camera.position.y = updated.position.y;
+  camera.position.z = updated.position.z;
+  camera.target.x = updated.target.x;
+  camera.target.y = updated.target.y;
+  camera.target.z = updated.target.z;
+  camera.up.x = updated.up.x;
+  camera.up.y = updated.up.y;
+  camera.up.z = updated.up.z;
+  camera.fovy = updated.fovy;
+  camera.projection = updated.projection;
+  return camera;
+}
+
+export function UpdateCameraPro(camera: Camera3D, movement: Vector3, rotation: Vector3, zoom: number): Camera3D {
+  const __buf = new Uint8Array(44);
+  const __dv = new DataView(__buf.buffer, __buf.byteOffset, 44);
+  __dv.setFloat32(0, camera.position.x, true);
+  __dv.setFloat32(4, camera.position.y, true);
+  __dv.setFloat32(8, camera.position.z, true);
+  __dv.setFloat32(12, camera.target.x, true);
+  __dv.setFloat32(16, camera.target.y, true);
+  __dv.setFloat32(20, camera.target.z, true);
+  __dv.setFloat32(24, camera.up.x, true);
+  __dv.setFloat32(28, camera.up.y, true);
+  __dv.setFloat32(32, camera.up.z, true);
+  __dv.setFloat32(36, camera.fovy, true);
+  __dv.setInt32(40, camera.projection, true);
+  rl_UpdateCameraPro(__buf, movement.x, movement.y, movement.z, rotation.x, rotation.y, rotation.z, zoom);
+  const updated = __read_Camera3D(__buf);
+  camera.position.x = updated.position.x;
+  camera.position.y = updated.position.y;
+  camera.position.z = updated.position.z;
+  camera.target.x = updated.target.x;
+  camera.target.y = updated.target.y;
+  camera.target.z = updated.target.z;
+  camera.up.x = updated.up.x;
+  camera.up.y = updated.up.y;
+  camera.up.z = updated.up.z;
+  camera.fovy = updated.fovy;
+  camera.projection = updated.projection;
+  return camera;
+}
+
 export function SetShapesTexture(texture: Texture, source: Rectangle): void {
   rl_SetShapesTexture(texture.id, texture.width, texture.height, texture.mipmaps, texture.format, source.x, source.y, source.width, source.height);
 }
@@ -2023,6 +2143,11 @@ export function CheckCollisionPointLine(point: Vector2, p1: Vector2, p2: Vector2
   return rl_CheckCollisionPointLine(point.x, point.y, p1.x, p1.y, p2.x, p2.y, threshold);
 }
 
+export function CheckCollisionPointPoly(point: Vector2, points: Float32Array | Uint8Array | Vector2[], pointCount?: number): boolean {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  return rl_CheckCollisionPointPoly(point.x, point.y, __b, pointCount !== undefined ? pointCount : __cnt);
+}
+
 export function GetCollisionRec(rec1: Rectangle, rec2: Rectangle): Rectangle {
   const __buf = new Uint8Array(16);
   rl_GetCollisionRec(rec1.x, rec1.y, rec1.width, rec1.height, rec2.x, rec2.y, rec2.width, rec2.height, __buf);
@@ -2059,6 +2184,10 @@ export function IsImageValid(image: Uint8Array): boolean {
 
 export function UnloadImage(image: Uint8Array): void {
   rl_UnloadImage(image);
+}
+
+export function ExportImage(image: Uint8Array, fileName: string): boolean {
+  return rl_ExportImage(image, fileName);
 }
 
 export function GenImageColor(width: number, height: number, color: Color): Image {
@@ -2145,6 +2274,102 @@ export function ImageTextEx(font: Uint8Array, text: string, fontSize: number, sp
   return __buf;
 }
 
+export function ImageFormat(image: Image, newFormat: number): void {
+  rl_ImageFormat(image, newFormat);
+}
+
+export function ImageToPOT(image: Image, fill: Color): void {
+  rl_ImageToPOT(image, fill.r, fill.g, fill.b, fill.a);
+}
+
+export function ImageCrop(image: Image, crop: Rectangle): void {
+  rl_ImageCrop(image, crop.x, crop.y, crop.width, crop.height);
+}
+
+export function ImageAlphaCrop(image: Image, threshold: number): void {
+  rl_ImageAlphaCrop(image, threshold);
+}
+
+export function ImageAlphaClear(image: Image, color: Color, threshold: number): void {
+  rl_ImageAlphaClear(image, color.r, color.g, color.b, color.a, threshold);
+}
+
+export function ImageAlphaMask(image: Image, alphaMask: Uint8Array): void {
+  rl_ImageAlphaMask(image, alphaMask);
+}
+
+export function ImageAlphaPremultiply(image: Image): void {
+  rl_ImageAlphaPremultiply(image);
+}
+
+export function ImageBlurGaussian(image: Image, blurSize: number): void {
+  rl_ImageBlurGaussian(image, blurSize);
+}
+
+export function ImageResize(image: Image, newWidth: number, newHeight: number): void {
+  rl_ImageResize(image, newWidth, newHeight);
+}
+
+export function ImageResizeNN(image: Image, newWidth: number, newHeight: number): void {
+  rl_ImageResizeNN(image, newWidth, newHeight);
+}
+
+export function ImageResizeCanvas(image: Image, newWidth: number, newHeight: number, offsetX: number, offsetY: number, fill: Color): void {
+  rl_ImageResizeCanvas(image, newWidth, newHeight, offsetX, offsetY, fill.r, fill.g, fill.b, fill.a);
+}
+
+export function ImageMipmaps(image: Image): void {
+  rl_ImageMipmaps(image);
+}
+
+export function ImageDither(image: Image, rBpp: number, gBpp: number, bBpp: number, aBpp: number): void {
+  rl_ImageDither(image, rBpp, gBpp, bBpp, aBpp);
+}
+
+export function ImageFlipVertical(image: Image): void {
+  rl_ImageFlipVertical(image);
+}
+
+export function ImageFlipHorizontal(image: Image): void {
+  rl_ImageFlipHorizontal(image);
+}
+
+export function ImageRotate(image: Image, degrees: number): void {
+  rl_ImageRotate(image, degrees);
+}
+
+export function ImageRotateCW(image: Image): void {
+  rl_ImageRotateCW(image);
+}
+
+export function ImageRotateCCW(image: Image): void {
+  rl_ImageRotateCCW(image);
+}
+
+export function ImageColorTint(image: Image, color: Color): void {
+  rl_ImageColorTint(image, color.r, color.g, color.b, color.a);
+}
+
+export function ImageColorInvert(image: Image): void {
+  rl_ImageColorInvert(image);
+}
+
+export function ImageColorGrayscale(image: Image): void {
+  rl_ImageColorGrayscale(image);
+}
+
+export function ImageColorContrast(image: Image, contrast: number): void {
+  rl_ImageColorContrast(image, contrast);
+}
+
+export function ImageColorBrightness(image: Image, brightness: number): void {
+  rl_ImageColorBrightness(image, brightness);
+}
+
+export function ImageColorReplace(image: Image, color: Color, replace: Color): void {
+  rl_ImageColorReplace(image, color.r, color.g, color.b, color.a, replace.r, replace.g, replace.b, replace.a);
+}
+
 export function GetImageAlphaBorder(image: Uint8Array, threshold: number): Rectangle {
   const __buf = new Uint8Array(16);
   rl_GetImageAlphaBorder(image, threshold, __buf);
@@ -2161,20 +2386,80 @@ export function ImageClearBackground(dst: Image, color: Color): void {
   rl_ImageClearBackground(dst, color.r, color.g, color.b, color.a);
 }
 
+export function ImageDrawPixel(dst: Image, posX: number, posY: number, color: Color): void {
+  rl_ImageDrawPixel(dst, posX, posY, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawPixelV(dst: Image, position: Vector2, color: Color): void {
+  rl_ImageDrawPixelV(dst, position.x, position.y, color.r, color.g, color.b, color.a);
+}
+
 export function ImageDrawLine(dst: Image, startPosX: number, startPosY: number, endPosX: number, endPosY: number, color: Color): void {
   rl_ImageDrawLine(dst, startPosX, startPosY, endPosX, endPosY, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawLineV(dst: Image, start: Vector2, end: Vector2, color: Color): void {
+  rl_ImageDrawLineV(dst, start.x, start.y, end.x, end.y, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawLineEx(dst: Image, start: Vector2, end: Vector2, thick: number, color: Color): void {
+  rl_ImageDrawLineEx(dst, start.x, start.y, end.x, end.y, thick, color.r, color.g, color.b, color.a);
 }
 
 export function ImageDrawCircle(dst: Image, centerX: number, centerY: number, radius: number, color: Color): void {
   rl_ImageDrawCircle(dst, centerX, centerY, radius, color.r, color.g, color.b, color.a);
 }
 
+export function ImageDrawCircleV(dst: Image, center: Vector2, radius: number, color: Color): void {
+  rl_ImageDrawCircleV(dst, center.x, center.y, radius, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawCircleLines(dst: Image, centerX: number, centerY: number, radius: number, color: Color): void {
+  rl_ImageDrawCircleLines(dst, centerX, centerY, radius, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawCircleLinesV(dst: Image, center: Vector2, radius: number, color: Color): void {
+  rl_ImageDrawCircleLinesV(dst, center.x, center.y, radius, color.r, color.g, color.b, color.a);
+}
+
 export function ImageDrawRectangle(dst: Image, posX: number, posY: number, width: number, height: number, color: Color): void {
   rl_ImageDrawRectangle(dst, posX, posY, width, height, color.r, color.g, color.b, color.a);
 }
 
+export function ImageDrawRectangleV(dst: Image, position: Vector2, size: Vector2, color: Color): void {
+  rl_ImageDrawRectangleV(dst, position.x, position.y, size.x, size.y, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawRectangleRec(dst: Image, rec: Rectangle, color: Color): void {
+  rl_ImageDrawRectangleRec(dst, rec.x, rec.y, rec.width, rec.height, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawRectangleLines(dst: Image, rec: Rectangle, thick: number, color: Color): void {
+  rl_ImageDrawRectangleLines(dst, rec.x, rec.y, rec.width, rec.height, thick, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawTriangle(dst: Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color): void {
+  rl_ImageDrawTriangle(dst, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawTriangleEx(dst: Image, v1: Vector2, v2: Vector2, v3: Vector2, c1: Color, c2: Color, c3: Color): void {
+  rl_ImageDrawTriangleEx(dst, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, c1.r, c1.g, c1.b, c1.a, c2.r, c2.g, c2.b, c2.a, c3.r, c3.g, c3.b, c3.a);
+}
+
+export function ImageDrawTriangleLines(dst: Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color): void {
+  rl_ImageDrawTriangleLines(dst, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDraw(dst: Image, src: Uint8Array, srcRec: Rectangle, dstRec: Rectangle, tint: Color): void {
+  rl_ImageDraw(dst, src, srcRec.x, srcRec.y, srcRec.width, srcRec.height, dstRec.x, dstRec.y, dstRec.width, dstRec.height, tint.r, tint.g, tint.b, tint.a);
+}
+
 export function ImageDrawText(dst: Image, text: string, posX: number, posY: number, fontSize: number, color: Color): void {
   rl_ImageDrawText(dst, text, posX, posY, fontSize, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawTextEx(dst: Image, font: Uint8Array, text: string, position: Vector2, fontSize: number, spacing: number, tint: Color): void {
+  rl_ImageDrawTextEx(dst, font, text, position.x, position.y, fontSize, spacing, tint.r, tint.g, tint.b, tint.a);
 }
 
 export function LoadTexture(fileName: string): Texture {
@@ -2617,6 +2902,10 @@ export function DrawBillboardPro(camera: Camera3D, texture: Texture, source: Rec
   rl_DrawBillboardPro(camera.position.x, camera.position.y, camera.position.z, camera.target.x, camera.target.y, camera.target.z, camera.up.x, camera.up.y, camera.up.z, camera.fovy, camera.projection, texture.id, texture.width, texture.height, texture.mipmaps, texture.format, source.x, source.y, source.width, source.height, position.x, position.y, position.z, up.x, up.y, up.z, size.x, size.y, origin.x, origin.y, rotation, tint.r, tint.g, tint.b, tint.a);
 }
 
+export function UploadMesh(mesh: Mesh, dynamic: boolean): void {
+  rl_UploadMesh(mesh, dynamic);
+}
+
 export function UpdateMeshBuffer(mesh: Uint8Array, index: number, data: Uint8Array, dataSize: number, offset: number): void {
   rl_UpdateMeshBuffer(mesh, index, data, dataSize, offset);
 }
@@ -2633,6 +2922,10 @@ export function GetMeshBoundingBox(mesh: Uint8Array): BoundingBox {
   const __buf = new Uint8Array(24);
   rl_GetMeshBoundingBox(mesh, __buf);
   return __read_BoundingBox(__buf);
+}
+
+export function GenMeshTangents(mesh: Mesh): void {
+  rl_GenMeshTangents(mesh);
 }
 
 export function ExportMeshAsCode(mesh: Uint8Array, fileName: string): boolean {
@@ -2719,12 +3012,24 @@ export function UnloadMaterial(material: Uint8Array): void {
   rl_UnloadMaterial(material);
 }
 
+export function SetMaterialTexture(material: Material, mapType: number, texture: Texture): void {
+  rl_SetMaterialTexture(material, mapType, texture.id, texture.width, texture.height, texture.mipmaps, texture.format);
+}
+
+export function SetModelMeshMaterial(model: Model, meshId: number, materialId: number): void {
+  rl_SetModelMeshMaterial(model, meshId, materialId);
+}
+
 export function UpdateModelAnimation(model: Uint8Array, anim: Uint8Array, frame: number): void {
   rl_UpdateModelAnimation(model, anim, frame);
 }
 
 export function UpdateModelAnimationEx(model: Uint8Array, animA: Uint8Array, frameA: number, animB: Uint8Array, frameB: number, blend: number): void {
   rl_UpdateModelAnimationEx(model, animA, frameA, animB, frameB, blend);
+}
+
+export function UnloadModelAnimations(animations: ModelAnimation, animCount: number): void {
+  rl_UnloadModelAnimations(animations, animCount);
 }
 
 export function IsModelAnimationValid(model: Uint8Array, anim: Uint8Array): boolean {
@@ -2887,6 +3192,14 @@ export function WaveCopy(wave: Uint8Array): Wave {
   return __buf;
 }
 
+export function WaveCrop(wave: Wave, initFrame: number, finalFrame: number): void {
+  rl_WaveCrop(wave, initFrame, finalFrame);
+}
+
+export function WaveFormat(wave: Wave, sampleRate: number, sampleSize: number, channels: number): void {
+  rl_WaveFormat(wave, sampleRate, sampleSize, channels);
+}
+
 export function LoadMusicStream(fileName: string): Music {
   const __buf = new Uint8Array(56);
   rl_LoadMusicStream(fileName, __buf);
@@ -3046,6 +3359,8 @@ export const Raylib = {
   restoreWindow: RestoreWindow,
   SetWindowIcon,
   setWindowIcon: SetWindowIcon,
+  SetWindowIcons,
+  setWindowIcons: SetWindowIcons,
   SetWindowTitle,
   setWindowTitle: SetWindowTitle,
   SetWindowPosition,
@@ -3206,6 +3521,8 @@ export const Raylib = {
   setRandomSeed: SetRandomSeed,
   GetRandomValue,
   getRandomValue: GetRandomValue,
+  TakeScreenshot,
+  takeScreenshot: TakeScreenshot,
   SetConfigFlags,
   setConfigFlags: SetConfigFlags,
   OpenURL,
@@ -3348,6 +3665,10 @@ export const Raylib = {
   getGesturePinchVector: GetGesturePinchVector,
   GetGesturePinchAngle,
   getGesturePinchAngle: GetGesturePinchAngle,
+  UpdateCamera,
+  updateCamera: UpdateCamera,
+  UpdateCameraPro,
+  updateCameraPro: UpdateCameraPro,
   SetShapesTexture,
   setShapesTexture: SetShapesTexture,
   GetShapesTexture,
@@ -3480,6 +3801,8 @@ export const Raylib = {
   checkCollisionPointTriangle: CheckCollisionPointTriangle,
   CheckCollisionPointLine,
   checkCollisionPointLine: CheckCollisionPointLine,
+  CheckCollisionPointPoly,
+  checkCollisionPointPoly: CheckCollisionPointPoly,
   GetCollisionRec,
   getCollisionRec: GetCollisionRec,
   LoadImage,
@@ -3494,6 +3817,8 @@ export const Raylib = {
   isImageValid: IsImageValid,
   UnloadImage,
   unloadImage: UnloadImage,
+  ExportImage,
+  exportImage: ExportImage,
   GenImageColor,
   genImageColor: GenImageColor,
   GenImageGradientLinear,
@@ -3522,20 +3847,98 @@ export const Raylib = {
   imageText: ImageText,
   ImageTextEx,
   imageTextEx: ImageTextEx,
+  ImageFormat,
+  imageFormat: ImageFormat,
+  ImageToPOT,
+  imageToPOT: ImageToPOT,
+  ImageCrop,
+  imageCrop: ImageCrop,
+  ImageAlphaCrop,
+  imageAlphaCrop: ImageAlphaCrop,
+  ImageAlphaClear,
+  imageAlphaClear: ImageAlphaClear,
+  ImageAlphaMask,
+  imageAlphaMask: ImageAlphaMask,
+  ImageAlphaPremultiply,
+  imageAlphaPremultiply: ImageAlphaPremultiply,
+  ImageBlurGaussian,
+  imageBlurGaussian: ImageBlurGaussian,
+  ImageResize,
+  imageResize: ImageResize,
+  ImageResizeNN,
+  imageResizeNN: ImageResizeNN,
+  ImageResizeCanvas,
+  imageResizeCanvas: ImageResizeCanvas,
+  ImageMipmaps,
+  imageMipmaps: ImageMipmaps,
+  ImageDither,
+  imageDither: ImageDither,
+  ImageFlipVertical,
+  imageFlipVertical: ImageFlipVertical,
+  ImageFlipHorizontal,
+  imageFlipHorizontal: ImageFlipHorizontal,
+  ImageRotate,
+  imageRotate: ImageRotate,
+  ImageRotateCW,
+  imageRotateCW: ImageRotateCW,
+  ImageRotateCCW,
+  imageRotateCCW: ImageRotateCCW,
+  ImageColorTint,
+  imageColorTint: ImageColorTint,
+  ImageColorInvert,
+  imageColorInvert: ImageColorInvert,
+  ImageColorGrayscale,
+  imageColorGrayscale: ImageColorGrayscale,
+  ImageColorContrast,
+  imageColorContrast: ImageColorContrast,
+  ImageColorBrightness,
+  imageColorBrightness: ImageColorBrightness,
+  ImageColorReplace,
+  imageColorReplace: ImageColorReplace,
   GetImageAlphaBorder,
   getImageAlphaBorder: GetImageAlphaBorder,
   GetImageColor,
   getImageColor: GetImageColor,
   ImageClearBackground,
   imageClearBackground: ImageClearBackground,
+  ImageDrawPixel,
+  imageDrawPixel: ImageDrawPixel,
+  ImageDrawPixelV,
+  imageDrawPixelV: ImageDrawPixelV,
   ImageDrawLine,
   imageDrawLine: ImageDrawLine,
+  ImageDrawLineV,
+  imageDrawLineV: ImageDrawLineV,
+  ImageDrawLineEx,
+  imageDrawLineEx: ImageDrawLineEx,
   ImageDrawCircle,
   imageDrawCircle: ImageDrawCircle,
+  ImageDrawCircleV,
+  imageDrawCircleV: ImageDrawCircleV,
+  ImageDrawCircleLines,
+  imageDrawCircleLines: ImageDrawCircleLines,
+  ImageDrawCircleLinesV,
+  imageDrawCircleLinesV: ImageDrawCircleLinesV,
   ImageDrawRectangle,
   imageDrawRectangle: ImageDrawRectangle,
+  ImageDrawRectangleV,
+  imageDrawRectangleV: ImageDrawRectangleV,
+  ImageDrawRectangleRec,
+  imageDrawRectangleRec: ImageDrawRectangleRec,
+  ImageDrawRectangleLines,
+  imageDrawRectangleLines: ImageDrawRectangleLines,
+  ImageDrawTriangle,
+  imageDrawTriangle: ImageDrawTriangle,
+  ImageDrawTriangleEx,
+  imageDrawTriangleEx: ImageDrawTriangleEx,
+  ImageDrawTriangleLines,
+  imageDrawTriangleLines: ImageDrawTriangleLines,
+  ImageDraw,
+  imageDraw: ImageDraw,
   ImageDrawText,
   imageDrawText: ImageDrawText,
+  ImageDrawTextEx,
+  imageDrawTextEx: ImageDrawTextEx,
   LoadTexture,
   loadTexture: LoadTexture,
   LoadTextureFromImage,
@@ -3724,6 +4127,8 @@ export const Raylib = {
   drawBillboardRec: DrawBillboardRec,
   DrawBillboardPro,
   drawBillboardPro: DrawBillboardPro,
+  UploadMesh,
+  uploadMesh: UploadMesh,
   UpdateMeshBuffer,
   updateMeshBuffer: UpdateMeshBuffer,
   UnloadMesh,
@@ -3732,6 +4137,8 @@ export const Raylib = {
   drawMesh: DrawMesh,
   GetMeshBoundingBox,
   getMeshBoundingBox: GetMeshBoundingBox,
+  GenMeshTangents,
+  genMeshTangents: GenMeshTangents,
   ExportMeshAsCode,
   exportMeshAsCode: ExportMeshAsCode,
   GenMeshPoly,
@@ -3762,10 +4169,16 @@ export const Raylib = {
   isMaterialValid: IsMaterialValid,
   UnloadMaterial,
   unloadMaterial: UnloadMaterial,
+  SetMaterialTexture,
+  setMaterialTexture: SetMaterialTexture,
+  SetModelMeshMaterial,
+  setModelMeshMaterial: SetModelMeshMaterial,
   UpdateModelAnimation,
   updateModelAnimation: UpdateModelAnimation,
   UpdateModelAnimationEx,
   updateModelAnimationEx: UpdateModelAnimationEx,
+  UnloadModelAnimations,
+  unloadModelAnimations: UnloadModelAnimations,
   IsModelAnimationValid,
   isModelAnimationValid: IsModelAnimationValid,
   CheckCollisionSpheres,
@@ -3836,6 +4249,10 @@ export const Raylib = {
   setSoundPan: SetSoundPan,
   WaveCopy,
   waveCopy: WaveCopy,
+  WaveCrop,
+  waveCrop: WaveCrop,
+  WaveFormat,
+  waveFormat: WaveFormat,
   LoadMusicStream,
   loadMusicStream: LoadMusicStream,
   IsMusicValid,
