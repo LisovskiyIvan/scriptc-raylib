@@ -26,7 +26,9 @@
     "build": "bun tools/build.ts",
     "build:sh": "./build.sh",
     "gen": "bun tools/gen_bindings.ts",
-    "demo": "bun run build && ./demo/demo"
+    "demo": "bun run build && ./demo/demo",
+    "example": "bun tools/run_example.ts",
+    "run": "bun tools/run_example.ts"
   },
   "keywords": [
     "raylib",

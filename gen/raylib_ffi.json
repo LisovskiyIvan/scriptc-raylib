@@ -5005,9 +5005,8 @@
     }
   ],
   "libraries": [
-    "./libraylib_shim.a"
+    "./libraylib_shim.a",
+    "/opt/homebrew/Cellar/raylib/6.0/lib/libraylib.dylib"
   ],
-  "system_libraries": [
-    "raylib"
-  ]
+  "system_libraries": []
 }

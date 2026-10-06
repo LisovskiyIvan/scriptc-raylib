@@ -124,6 +124,26 @@ while (!Raylib.windowShouldClose()) {
 Raylib.closeWindow();
 ```
 
+### 🎮 Запуск примеров (Examples)
+
+В репозитории доступны 9 готовых примеров в папке `examples/`:
+`index`, `shapes`, `shapes3d`, `textures`, `fonts`, `audio`, `models`, `shader`, `image`.
+
+Так как `scriptc` является AOT-компилятором, нативный FFI-манифест передаётся компилятору через флаг `--ffi`:
+
+```sh
+# Напрямую через scriptc run:
+scriptc run examples/index.ts --ffi gen/raylib_ffi.json
+
+# Либо через удобный раннер (автоматически подтягивает --ffi):
+bun run example index
+bun run example shapes
+
+# Либо сборка в автономный бинарник:
+scriptc build examples/shapes.ts --ffi gen/raylib_ffi.json -o examples/shapes
+./examples/shapes
+```
+
 ### Настройка пути к raylib: `Raylib.config`
 
 Функция `Raylib.config` (принимает опции интерфейса `RaylibConfig`) позволяет явно задать путь к библиотеке raylib или выполнить автопоиск:

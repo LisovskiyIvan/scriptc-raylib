@@ -83,6 +83,62 @@ function findRaylibHeader(explicit?: string): string {
   return "/opt/homebrew/include/raylib.h";
 }
 
+function findRaylibLibrary(explicit?: string): string | null {
+  if (explicit && existsSync(explicit)) return explicit;
+
+  if (process.env.RAYLIB_LIB && existsSync(process.env.RAYLIB_LIB)) {
+    return process.env.RAYLIB_LIB;
+  }
+
+  if (process.env.RAYLIB_PATH) {
+    for (const sub of [
+      "lib/libraylib.dylib", "lib/libraylib.so", "lib/raylib.dll", "lib/raylib.lib",
+      "src/libraylib.dylib", "src/libraylib.so", "src/raylib.dll",
+      "libraylib.dylib", "libraylib.so", "raylib.dll",
+    ]) {
+      const p = join(process.env.RAYLIB_PATH, sub);
+      if (existsSync(p)) return p;
+    }
+  }
+
+  // pkg-config check (Linux, macOS, MSYS2)
+  try {
+    const pcLibDir = execSync("pkg-config --variable=libdir raylib 2>/dev/null", { encoding: "utf-8" }).trim();
+    if (pcLibDir) {
+      for (const name of ["libraylib.dylib", "libraylib.so", "libraylib.a", "raylib.lib", "raylib.dll"]) {
+        const p = join(pcLibDir, name);
+        if (existsSync(p)) return p;
+      }
+    }
+  } catch {}
+
+  const candidates = [
+    // macOS
+    "/opt/homebrew/lib/libraylib.dylib",
+    "/usr/local/lib/libraylib.dylib",
+    "/opt/local/lib/libraylib.dylib",
+    // Linux
+    "/usr/lib/libraylib.so",
+    "/usr/lib64/libraylib.so",
+    "/usr/local/lib/libraylib.so",
+    "/usr/lib/x86_64-linux-gnu/libraylib.so",
+    "/usr/lib/aarch64-linux-gnu/libraylib.so",
+    // Windows
+    "C:/raylib/raylib/src/raylib.dll",
+    "C:/msys64/mingw64/bin/raylib.dll",
+    "C:/vcpkg/installed/x64-windows/bin/raylib.dll",
+    // Bundled fallback
+    resolve("assets/lib/libraylib.dylib"),
+    resolve("assets/lib/libraylib.so"),
+  ];
+
+  for (const c of candidates) {
+    if (existsSync(c)) return c;
+  }
+
+  return null;
+}
+
 const headerPath = findRaylibHeader(process.argv[2]);
 const outDir = process.argv[3] ?? "gen";
 
@@ -1037,8 +1093,11 @@ function main(): void {
         returns: plan.ret.k === "scalar" ? primClass(plan.ret.prim) : "void",
       };
     }),
-    libraries: ["./libraylib_shim.a"],
-    system_libraries: ["raylib"],
+    libraries: (() => {
+      const resolved = findRaylibLibrary();
+      return resolved ? ["./libraylib_shim.a", resolved] : ["./libraylib_shim.a"];
+    })(),
+    system_libraries: findRaylibLibrary() ? [] : ["raylib"],
   };
 
   // ---------- raylib_shim.c ----------
