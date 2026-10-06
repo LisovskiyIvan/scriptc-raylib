@@ -1,0 +1,45 @@
+{
+  "name": "craylib",
+  "version": "0.1.0",
+  "description": "Fast typed raylib bindings for scriptc (TypeScript to native AOT)",
+  "type": "module",
+  "main": "./index.ts",
+  "module": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./ffi": "./gen/raylib_ffi.json",
+    "./colors": "./colors.ts",
+    "./constants": "./constants.ts"
+  },
+  "files": [
+    "index.ts",
+    "colors.ts",
+    "constants.ts",
+    "gen",
+    "src",
+    "build.sh",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "./build.sh",
+    "gen": "bun tools/gen_bindings.ts \"$(pkg-config --variable=includedir raylib)/raylib.h\" gen",
+    "demo": "LIBRARY_PATH=\"$(pkg-config --variable=libdir raylib)\" scriptc build demo/main.ts --ffi gen/raylib_ffi.json -o demo/demo && ./demo/demo"
+  },
+  "keywords": [
+    "raylib",
+    "scriptc",
+    "game",
+    "gamedev",
+    "graphics",
+    "native",
+    "typescript",
+    "bindings"
+  ],
+  "author": "Lisovskii Ivan <daymedead.dev@gmail.com>",
+  "license": "Zlib",
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

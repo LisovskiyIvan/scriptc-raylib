@@ -1,0 +1,4826 @@
+{
+  "ffi_format": 6,
+  "functions": [
+    {
+      "name": "rl_InitWindow",
+      "symbol": "rl_InitWindow",
+      "params": [
+        "i32",
+        "i32",
+        "string"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_CloseWindow",
+      "symbol": "CloseWindow",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_WindowShouldClose",
+      "symbol": "WindowShouldClose",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsWindowReady",
+      "symbol": "IsWindowReady",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsWindowFullscreen",
+      "symbol": "IsWindowFullscreen",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsWindowHidden",
+      "symbol": "IsWindowHidden",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsWindowMinimized",
+      "symbol": "IsWindowMinimized",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsWindowMaximized",
+      "symbol": "IsWindowMaximized",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsWindowFocused",
+      "symbol": "IsWindowFocused",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsWindowResized",
+      "symbol": "IsWindowResized",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsWindowState",
+      "symbol": "IsWindowState",
+      "params": [
+        "u32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_SetWindowState",
+      "symbol": "SetWindowState",
+      "params": [
+        "u32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ClearWindowState",
+      "symbol": "ClearWindowState",
+      "params": [
+        "u32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ToggleFullscreen",
+      "symbol": "ToggleFullscreen",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ToggleBorderlessWindowed",
+      "symbol": "ToggleBorderlessWindowed",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_MaximizeWindow",
+      "symbol": "MaximizeWindow",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_MinimizeWindow",
+      "symbol": "MinimizeWindow",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_RestoreWindow",
+      "symbol": "RestoreWindow",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetWindowIcon",
+      "symbol": "rl_SetWindowIcon",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetWindowTitle",
+      "symbol": "rl_SetWindowTitle",
+      "params": [
+        "string"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetWindowPosition",
+      "symbol": "SetWindowPosition",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetWindowMonitor",
+      "symbol": "SetWindowMonitor",
+      "params": [
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetWindowMinSize",
+      "symbol": "SetWindowMinSize",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetWindowMaxSize",
+      "symbol": "SetWindowMaxSize",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetWindowSize",
+      "symbol": "SetWindowSize",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetWindowOpacity",
+      "symbol": "SetWindowOpacity",
+      "params": [
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetWindowFocused",
+      "symbol": "SetWindowFocused",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetScreenWidth",
+      "symbol": "GetScreenWidth",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetScreenHeight",
+      "symbol": "GetScreenHeight",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetRenderWidth",
+      "symbol": "GetRenderWidth",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetRenderHeight",
+      "symbol": "GetRenderHeight",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetMonitorCount",
+      "symbol": "GetMonitorCount",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetCurrentMonitor",
+      "symbol": "GetCurrentMonitor",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetMonitorPosition",
+      "symbol": "rl_GetMonitorPosition",
+      "params": [
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetMonitorWidth",
+      "symbol": "GetMonitorWidth",
+      "params": [
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetMonitorHeight",
+      "symbol": "GetMonitorHeight",
+      "params": [
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetMonitorPhysicalWidth",
+      "symbol": "GetMonitorPhysicalWidth",
+      "params": [
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetMonitorPhysicalHeight",
+      "symbol": "GetMonitorPhysicalHeight",
+      "params": [
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetMonitorRefreshRate",
+      "symbol": "GetMonitorRefreshRate",
+      "params": [
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetWindowPosition",
+      "symbol": "rl_GetWindowPosition",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetWindowScaleDPI",
+      "symbol": "rl_GetWindowScaleDPI",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetClipboardText",
+      "symbol": "rl_SetClipboardText",
+      "params": [
+        "string"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetClipboardImage",
+      "symbol": "rl_GetClipboardImage",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_EnableEventWaiting",
+      "symbol": "EnableEventWaiting",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DisableEventWaiting",
+      "symbol": "DisableEventWaiting",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ShowCursor",
+      "symbol": "ShowCursor",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_HideCursor",
+      "symbol": "HideCursor",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsCursorHidden",
+      "symbol": "IsCursorHidden",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_EnableCursor",
+      "symbol": "EnableCursor",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DisableCursor",
+      "symbol": "DisableCursor",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsCursorOnScreen",
+      "symbol": "IsCursorOnScreen",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_ClearBackground",
+      "symbol": "rl_ClearBackground",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_BeginDrawing",
+      "symbol": "BeginDrawing",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_EndDrawing",
+      "symbol": "EndDrawing",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_BeginMode2D",
+      "symbol": "rl_BeginMode2D",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_EndMode2D",
+      "symbol": "EndMode2D",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_BeginMode3D",
+      "symbol": "rl_BeginMode3D",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_EndMode3D",
+      "symbol": "EndMode3D",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_BeginTextureMode",
+      "symbol": "rl_BeginTextureMode",
+      "params": [
+        "u32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_EndTextureMode",
+      "symbol": "EndTextureMode",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_BeginShaderMode",
+      "symbol": "rl_BeginShaderMode",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_EndShaderMode",
+      "symbol": "EndShaderMode",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_BeginBlendMode",
+      "symbol": "BeginBlendMode",
+      "params": [
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_EndBlendMode",
+      "symbol": "EndBlendMode",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_BeginScissorMode",
+      "symbol": "BeginScissorMode",
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_EndScissorMode",
+      "symbol": "EndScissorMode",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_BeginVrStereoMode",
+      "symbol": "rl_BeginVrStereoMode",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_EndVrStereoMode",
+      "symbol": "EndVrStereoMode",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadVrStereoConfig",
+      "symbol": "rl_LoadVrStereoConfig",
+      "params": [
+        "bytes",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UnloadVrStereoConfig",
+      "symbol": "rl_UnloadVrStereoConfig",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadShader",
+      "symbol": "rl_LoadShader",
+      "params": [
+        "string",
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadShaderFromMemory",
+      "symbol": "rl_LoadShaderFromMemory",
+      "params": [
+        "string",
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsShaderValid",
+      "symbol": "rl_IsShaderValid",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_GetShaderLocation",
+      "symbol": "rl_GetShaderLocation",
+      "params": [
+        "bytes",
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetShaderLocationAttrib",
+      "symbol": "rl_GetShaderLocationAttrib",
+      "params": [
+        "bytes",
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_SetShaderValue",
+      "symbol": "rl_SetShaderValue",
+      "params": [
+        "bytes",
+        "i32",
+        "bytes",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetShaderValueV",
+      "symbol": "rl_SetShaderValueV",
+      "params": [
+        "bytes",
+        "i32",
+        "bytes",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetShaderValueMatrix",
+      "symbol": "rl_SetShaderValueMatrix",
+      "params": [
+        "bytes",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetShaderValueTexture",
+      "symbol": "rl_SetShaderValueTexture",
+      "params": [
+        "bytes",
+        "i32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UnloadShader",
+      "symbol": "rl_UnloadShader",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetScreenToWorldRay",
+      "symbol": "rl_GetScreenToWorldRay",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetScreenToWorldRayEx",
+      "symbol": "rl_GetScreenToWorldRayEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetWorldToScreen",
+      "symbol": "rl_GetWorldToScreen",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetWorldToScreenEx",
+      "symbol": "rl_GetWorldToScreenEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetWorldToScreen2D",
+      "symbol": "rl_GetWorldToScreen2D",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetScreenToWorld2D",
+      "symbol": "rl_GetScreenToWorld2D",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetCameraMatrix",
+      "symbol": "rl_GetCameraMatrix",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetCameraMatrix2D",
+      "symbol": "rl_GetCameraMatrix2D",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetTargetFPS",
+      "symbol": "SetTargetFPS",
+      "params": [
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetFrameTime",
+      "symbol": "GetFrameTime",
+      "params": [],
+      "returns": "f32"
+    },
+    {
+      "name": "rl_GetTime",
+      "symbol": "GetTime",
+      "params": [],
+      "returns": "f64"
+    },
+    {
+      "name": "rl_GetFPS",
+      "symbol": "GetFPS",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_SwapScreenBuffer",
+      "symbol": "SwapScreenBuffer",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_PollInputEvents",
+      "symbol": "PollInputEvents",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_WaitTime",
+      "symbol": "WaitTime",
+      "params": [
+        "f64"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetRandomSeed",
+      "symbol": "SetRandomSeed",
+      "params": [
+        "u32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetRandomValue",
+      "symbol": "GetRandomValue",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_SetConfigFlags",
+      "symbol": "SetConfigFlags",
+      "params": [
+        "u32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_OpenURL",
+      "symbol": "rl_OpenURL",
+      "params": [
+        "string"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetTraceLogLevel",
+      "symbol": "SetTraceLogLevel",
+      "params": [
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_FileRename",
+      "symbol": "rl_FileRename",
+      "params": [
+        "string",
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_FileRemove",
+      "symbol": "rl_FileRemove",
+      "params": [
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_FileCopy",
+      "symbol": "rl_FileCopy",
+      "params": [
+        "string",
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_FileMove",
+      "symbol": "rl_FileMove",
+      "params": [
+        "string",
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_FileTextReplace",
+      "symbol": "rl_FileTextReplace",
+      "params": [
+        "string",
+        "string",
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_FileTextFindIndex",
+      "symbol": "rl_FileTextFindIndex",
+      "params": [
+        "string",
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_IsFileExtension",
+      "symbol": "rl_IsFileExtension",
+      "params": [
+        "string",
+        "string"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_GetFileLength",
+      "symbol": "rl_GetFileLength",
+      "params": [
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_MakeDirectory",
+      "symbol": "rl_MakeDirectory",
+      "params": [
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_IsPathFile",
+      "symbol": "rl_IsPathFile",
+      "params": [
+        "string"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsFileNameValid",
+      "symbol": "rl_IsFileNameValid",
+      "params": [
+        "string"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_LoadDirectoryFiles",
+      "symbol": "rl_LoadDirectoryFiles",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadDirectoryFilesEx",
+      "symbol": "rl_LoadDirectoryFilesEx",
+      "params": [
+        "string",
+        "string",
+        "bool",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UnloadDirectoryFiles",
+      "symbol": "rl_UnloadDirectoryFiles",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetDirectoryFileCount",
+      "symbol": "rl_GetDirectoryFileCount",
+      "params": [
+        "string"
+      ],
+      "returns": "u32"
+    },
+    {
+      "name": "rl_GetDirectoryFileCountEx",
+      "symbol": "rl_GetDirectoryFileCountEx",
+      "params": [
+        "string",
+        "string",
+        "bool"
+      ],
+      "returns": "u32"
+    },
+    {
+      "name": "rl_UnloadAutomationEventList",
+      "symbol": "rl_UnloadAutomationEventList",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ExportAutomationEventList",
+      "symbol": "rl_ExportAutomationEventList",
+      "params": [
+        "bytes",
+        "string"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_SetAutomationEventBaseFrame",
+      "symbol": "SetAutomationEventBaseFrame",
+      "params": [
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_StartAutomationEventRecording",
+      "symbol": "StartAutomationEventRecording",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_StopAutomationEventRecording",
+      "symbol": "StopAutomationEventRecording",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_PlayAutomationEvent",
+      "symbol": "rl_PlayAutomationEvent",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsKeyPressed",
+      "symbol": "IsKeyPressed",
+      "params": [
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsKeyPressedRepeat",
+      "symbol": "IsKeyPressedRepeat",
+      "params": [
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsKeyDown",
+      "symbol": "IsKeyDown",
+      "params": [
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsKeyReleased",
+      "symbol": "IsKeyReleased",
+      "params": [
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsKeyUp",
+      "symbol": "IsKeyUp",
+      "params": [
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_GetKeyPressed",
+      "symbol": "GetKeyPressed",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetCharPressed",
+      "symbol": "GetCharPressed",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_SetExitKey",
+      "symbol": "SetExitKey",
+      "params": [
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsGamepadAvailable",
+      "symbol": "IsGamepadAvailable",
+      "params": [
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsGamepadButtonPressed",
+      "symbol": "IsGamepadButtonPressed",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsGamepadButtonDown",
+      "symbol": "IsGamepadButtonDown",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsGamepadButtonReleased",
+      "symbol": "IsGamepadButtonReleased",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsGamepadButtonUp",
+      "symbol": "IsGamepadButtonUp",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_GetGamepadButtonPressed",
+      "symbol": "GetGamepadButtonPressed",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetGamepadAxisCount",
+      "symbol": "GetGamepadAxisCount",
+      "params": [
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetGamepadAxisMovement",
+      "symbol": "GetGamepadAxisMovement",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "f32"
+    },
+    {
+      "name": "rl_SetGamepadMappings",
+      "symbol": "rl_SetGamepadMappings",
+      "params": [
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_SetGamepadVibration",
+      "symbol": "SetGamepadVibration",
+      "params": [
+        "i32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsMouseButtonPressed",
+      "symbol": "IsMouseButtonPressed",
+      "params": [
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsMouseButtonDown",
+      "symbol": "IsMouseButtonDown",
+      "params": [
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsMouseButtonReleased",
+      "symbol": "IsMouseButtonReleased",
+      "params": [
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_IsMouseButtonUp",
+      "symbol": "IsMouseButtonUp",
+      "params": [
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_GetMouseX",
+      "symbol": "GetMouseX",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetMouseY",
+      "symbol": "GetMouseY",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetMousePosition",
+      "symbol": "rl_GetMousePosition",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetMouseDelta",
+      "symbol": "rl_GetMouseDelta",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetMousePosition",
+      "symbol": "SetMousePosition",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetMouseOffset",
+      "symbol": "SetMouseOffset",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetMouseScale",
+      "symbol": "SetMouseScale",
+      "params": [
+        "f32",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetMouseWheelMove",
+      "symbol": "GetMouseWheelMove",
+      "params": [],
+      "returns": "f32"
+    },
+    {
+      "name": "rl_GetMouseWheelMoveV",
+      "symbol": "rl_GetMouseWheelMoveV",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetMouseCursor",
+      "symbol": "SetMouseCursor",
+      "params": [
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetTouchX",
+      "symbol": "GetTouchX",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetTouchY",
+      "symbol": "GetTouchY",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetTouchPosition",
+      "symbol": "rl_GetTouchPosition",
+      "params": [
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetTouchPointId",
+      "symbol": "GetTouchPointId",
+      "params": [
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetTouchPointCount",
+      "symbol": "GetTouchPointCount",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_SetGesturesEnabled",
+      "symbol": "SetGesturesEnabled",
+      "params": [
+        "u32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsGestureDetected",
+      "symbol": "IsGestureDetected",
+      "params": [
+        "u32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_GetGestureDetected",
+      "symbol": "GetGestureDetected",
+      "params": [],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetGestureHoldDuration",
+      "symbol": "GetGestureHoldDuration",
+      "params": [],
+      "returns": "f32"
+    },
+    {
+      "name": "rl_GetGestureDragVector",
+      "symbol": "rl_GetGestureDragVector",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetGestureDragAngle",
+      "symbol": "GetGestureDragAngle",
+      "params": [],
+      "returns": "f32"
+    },
+    {
+      "name": "rl_GetGesturePinchVector",
+      "symbol": "rl_GetGesturePinchVector",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetGesturePinchAngle",
+      "symbol": "GetGesturePinchAngle",
+      "params": [],
+      "returns": "f32"
+    },
+    {
+      "name": "rl_SetShapesTexture",
+      "symbol": "rl_SetShapesTexture",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetShapesTexture",
+      "symbol": "rl_GetShapesTexture",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetShapesTextureRectangle",
+      "symbol": "rl_GetShapesTextureRectangle",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawPixel",
+      "symbol": "rl_DrawPixel",
+      "params": [
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawPixelV",
+      "symbol": "rl_DrawPixelV",
+      "params": [
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawLine",
+      "symbol": "rl_DrawLine",
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawLineV",
+      "symbol": "rl_DrawLineV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawLineEx",
+      "symbol": "rl_DrawLineEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawLineBezier",
+      "symbol": "rl_DrawLineBezier",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawLineDashed",
+      "symbol": "rl_DrawLineDashed",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircle",
+      "symbol": "rl_DrawCircle",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleV",
+      "symbol": "rl_DrawCircleV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleGradient",
+      "symbol": "rl_DrawCircleGradient",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleSector",
+      "symbol": "rl_DrawCircleSector",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleSectorLines",
+      "symbol": "rl_DrawCircleSectorLines",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleLines",
+      "symbol": "rl_DrawCircleLines",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleLinesV",
+      "symbol": "rl_DrawCircleLinesV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawEllipse",
+      "symbol": "rl_DrawEllipse",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawEllipseV",
+      "symbol": "rl_DrawEllipseV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawEllipseLines",
+      "symbol": "rl_DrawEllipseLines",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawEllipseLinesV",
+      "symbol": "rl_DrawEllipseLinesV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRing",
+      "symbol": "rl_DrawRing",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRingLines",
+      "symbol": "rl_DrawRingLines",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangle",
+      "symbol": "rl_DrawRectangle",
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangleV",
+      "symbol": "rl_DrawRectangleV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangleRec",
+      "symbol": "rl_DrawRectangleRec",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectanglePro",
+      "symbol": "rl_DrawRectanglePro",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangleGradientV",
+      "symbol": "rl_DrawRectangleGradientV",
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangleGradientH",
+      "symbol": "rl_DrawRectangleGradientH",
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangleGradientEx",
+      "symbol": "rl_DrawRectangleGradientEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangleLines",
+      "symbol": "rl_DrawRectangleLines",
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangleLinesEx",
+      "symbol": "rl_DrawRectangleLinesEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangleRounded",
+      "symbol": "rl_DrawRectangleRounded",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangleRoundedLines",
+      "symbol": "rl_DrawRectangleRoundedLines",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRectangleRoundedLinesEx",
+      "symbol": "rl_DrawRectangleRoundedLinesEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTriangle",
+      "symbol": "rl_DrawTriangle",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTriangleLines",
+      "symbol": "rl_DrawTriangleLines",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawPoly",
+      "symbol": "rl_DrawPoly",
+      "params": [
+        "f32",
+        "f32",
+        "i32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawPolyLines",
+      "symbol": "rl_DrawPolyLines",
+      "params": [
+        "f32",
+        "f32",
+        "i32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawPolyLinesEx",
+      "symbol": "rl_DrawPolyLinesEx",
+      "params": [
+        "f32",
+        "f32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSplineSegmentLinear",
+      "symbol": "rl_DrawSplineSegmentLinear",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSplineSegmentBasis",
+      "symbol": "rl_DrawSplineSegmentBasis",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSplineSegmentCatmullRom",
+      "symbol": "rl_DrawSplineSegmentCatmullRom",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSplineSegmentBezierQuadratic",
+      "symbol": "rl_DrawSplineSegmentBezierQuadratic",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSplineSegmentBezierCubic",
+      "symbol": "rl_DrawSplineSegmentBezierCubic",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetSplinePointLinear",
+      "symbol": "rl_GetSplinePointLinear",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetSplinePointBasis",
+      "symbol": "rl_GetSplinePointBasis",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetSplinePointCatmullRom",
+      "symbol": "rl_GetSplinePointCatmullRom",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetSplinePointBezierQuad",
+      "symbol": "rl_GetSplinePointBezierQuad",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetSplinePointBezierCubic",
+      "symbol": "rl_GetSplinePointBezierCubic",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_CheckCollisionRecs",
+      "symbol": "rl_CheckCollisionRecs",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_CheckCollisionCircles",
+      "symbol": "rl_CheckCollisionCircles",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_CheckCollisionCircleRec",
+      "symbol": "rl_CheckCollisionCircleRec",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_CheckCollisionCircleLine",
+      "symbol": "rl_CheckCollisionCircleLine",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_CheckCollisionPointRec",
+      "symbol": "rl_CheckCollisionPointRec",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_CheckCollisionPointCircle",
+      "symbol": "rl_CheckCollisionPointCircle",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_CheckCollisionPointTriangle",
+      "symbol": "rl_CheckCollisionPointTriangle",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_CheckCollisionPointLine",
+      "symbol": "rl_CheckCollisionPointLine",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_GetCollisionRec",
+      "symbol": "rl_GetCollisionRec",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadImage",
+      "symbol": "rl_LoadImage",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadImageRaw",
+      "symbol": "rl_LoadImageRaw",
+      "params": [
+        "string",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadImageFromTexture",
+      "symbol": "rl_LoadImageFromTexture",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadImageFromScreen",
+      "symbol": "rl_LoadImageFromScreen",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsImageValid",
+      "symbol": "rl_IsImageValid",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_UnloadImage",
+      "symbol": "rl_UnloadImage",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenImageColor",
+      "symbol": "rl_GenImageColor",
+      "params": [
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenImageGradientLinear",
+      "symbol": "rl_GenImageGradientLinear",
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenImageGradientRadial",
+      "symbol": "rl_GenImageGradientRadial",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenImageGradientSquare",
+      "symbol": "rl_GenImageGradientSquare",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenImageChecked",
+      "symbol": "rl_GenImageChecked",
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenImageWhiteNoise",
+      "symbol": "rl_GenImageWhiteNoise",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenImagePerlinNoise",
+      "symbol": "rl_GenImagePerlinNoise",
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenImageCellular",
+      "symbol": "rl_GenImageCellular",
+      "params": [
+        "i32",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenImageText",
+      "symbol": "rl_GenImageText",
+      "params": [
+        "i32",
+        "i32",
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageCopy",
+      "symbol": "rl_ImageCopy",
+      "params": [
+        "bytes",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageFromImage",
+      "symbol": "rl_ImageFromImage",
+      "params": [
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageFromChannel",
+      "symbol": "rl_ImageFromChannel",
+      "params": [
+        "bytes",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageText",
+      "symbol": "rl_ImageText",
+      "params": [
+        "string",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageTextEx",
+      "symbol": "rl_ImageTextEx",
+      "params": [
+        "bytes",
+        "string",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetImageAlphaBorder",
+      "symbol": "rl_GetImageAlphaBorder",
+      "params": [
+        "bytes",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetImageColor",
+      "symbol": "rl_GetImageColor",
+      "params": [
+        "bytes",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadTexture",
+      "symbol": "rl_LoadTexture",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadTextureFromImage",
+      "symbol": "rl_LoadTextureFromImage",
+      "params": [
+        "bytes",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadTextureCubemap",
+      "symbol": "rl_LoadTextureCubemap",
+      "params": [
+        "bytes",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadRenderTexture",
+      "symbol": "rl_LoadRenderTexture",
+      "params": [
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsTextureValid",
+      "symbol": "rl_IsTextureValid",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_UnloadTexture",
+      "symbol": "rl_UnloadTexture",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsRenderTextureValid",
+      "symbol": "rl_IsRenderTextureValid",
+      "params": [
+        "u32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_UnloadRenderTexture",
+      "symbol": "rl_UnloadRenderTexture",
+      "params": [
+        "u32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UpdateTexture",
+      "symbol": "rl_UpdateTexture",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UpdateTextureRec",
+      "symbol": "rl_UpdateTextureRec",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetTextureFilter",
+      "symbol": "rl_SetTextureFilter",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetTextureWrap",
+      "symbol": "rl_SetTextureWrap",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTexture",
+      "symbol": "rl_DrawTexture",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTextureV",
+      "symbol": "rl_DrawTextureV",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTextureEx",
+      "symbol": "rl_DrawTextureEx",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTextureRec",
+      "symbol": "rl_DrawTextureRec",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTexturePro",
+      "symbol": "rl_DrawTexturePro",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTextureNPatch",
+      "symbol": "rl_DrawTextureNPatch",
+      "params": [
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorIsEqual",
+      "symbol": "rl_ColorIsEqual",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_Fade",
+      "symbol": "rl_Fade",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorToInt",
+      "symbol": "rl_ColorToInt",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_ColorNormalize",
+      "symbol": "rl_ColorNormalize",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorFromNormalized",
+      "symbol": "rl_ColorFromNormalized",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorToHSV",
+      "symbol": "rl_ColorToHSV",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorFromHSV",
+      "symbol": "rl_ColorFromHSV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorTint",
+      "symbol": "rl_ColorTint",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorBrightness",
+      "symbol": "rl_ColorBrightness",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorContrast",
+      "symbol": "rl_ColorContrast",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorAlpha",
+      "symbol": "rl_ColorAlpha",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorAlphaBlend",
+      "symbol": "rl_ColorAlphaBlend",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ColorLerp",
+      "symbol": "rl_ColorLerp",
+      "params": [
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetColor",
+      "symbol": "rl_GetColor",
+      "params": [
+        "u32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetPixelDataSize",
+      "symbol": "GetPixelDataSize",
+      "params": [
+        "i32",
+        "i32",
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetFontDefault",
+      "symbol": "rl_GetFontDefault",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadFont",
+      "symbol": "rl_LoadFont",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadFontFromImage",
+      "symbol": "rl_LoadFontFromImage",
+      "params": [
+        "bytes",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsFontValid",
+      "symbol": "rl_IsFontValid",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_UnloadFont",
+      "symbol": "rl_UnloadFont",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ExportFontAsCode",
+      "symbol": "rl_ExportFontAsCode",
+      "params": [
+        "bytes",
+        "string"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_DrawFPS",
+      "symbol": "DrawFPS",
+      "params": [
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawText",
+      "symbol": "rl_DrawText",
+      "params": [
+        "string",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTextEx",
+      "symbol": "rl_DrawTextEx",
+      "params": [
+        "bytes",
+        "string",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTextPro",
+      "symbol": "rl_DrawTextPro",
+      "params": [
+        "bytes",
+        "string",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTextCodepoint",
+      "symbol": "rl_DrawTextCodepoint",
+      "params": [
+        "bytes",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetTextLineSpacing",
+      "symbol": "SetTextLineSpacing",
+      "params": [
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_MeasureText",
+      "symbol": "rl_MeasureText",
+      "params": [
+        "string",
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_MeasureTextEx",
+      "symbol": "rl_MeasureTextEx",
+      "params": [
+        "bytes",
+        "string",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetGlyphIndex",
+      "symbol": "rl_GetGlyphIndex",
+      "params": [
+        "bytes",
+        "i32"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetGlyphInfo",
+      "symbol": "rl_GetGlyphInfo",
+      "params": [
+        "bytes",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetGlyphAtlasRec",
+      "symbol": "rl_GetGlyphAtlasRec",
+      "params": [
+        "bytes",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetCodepointCount",
+      "symbol": "rl_GetCodepointCount",
+      "params": [
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_TextIsEqual",
+      "symbol": "rl_TextIsEqual",
+      "params": [
+        "string",
+        "string"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_TextLength",
+      "symbol": "rl_TextLength",
+      "params": [
+        "string"
+      ],
+      "returns": "u32"
+    },
+    {
+      "name": "rl_TextFindIndex",
+      "symbol": "rl_TextFindIndex",
+      "params": [
+        "string",
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_TextToInteger",
+      "symbol": "rl_TextToInteger",
+      "params": [
+        "string"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_TextToFloat",
+      "symbol": "rl_TextToFloat",
+      "params": [
+        "string"
+      ],
+      "returns": "f32"
+    },
+    {
+      "name": "rl_DrawLine3D",
+      "symbol": "rl_DrawLine3D",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawPoint3D",
+      "symbol": "rl_DrawPoint3D",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircle3D",
+      "symbol": "rl_DrawCircle3D",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTriangle3D",
+      "symbol": "rl_DrawTriangle3D",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCube",
+      "symbol": "rl_DrawCube",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCubeV",
+      "symbol": "rl_DrawCubeV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCubeWires",
+      "symbol": "rl_DrawCubeWires",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCubeWiresV",
+      "symbol": "rl_DrawCubeWiresV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSphere",
+      "symbol": "rl_DrawSphere",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSphereEx",
+      "symbol": "rl_DrawSphereEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSphereWires",
+      "symbol": "rl_DrawSphereWires",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCylinder",
+      "symbol": "rl_DrawCylinder",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCylinderEx",
+      "symbol": "rl_DrawCylinderEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCylinderWires",
+      "symbol": "rl_DrawCylinderWires",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCylinderWiresEx",
+      "symbol": "rl_DrawCylinderWiresEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCapsule",
+      "symbol": "rl_DrawCapsule",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCapsuleWires",
+      "symbol": "rl_DrawCapsuleWires",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawPlane",
+      "symbol": "rl_DrawPlane",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRay",
+      "symbol": "rl_DrawRay",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawGrid",
+      "symbol": "DrawGrid",
+      "params": [
+        "i32",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadModel",
+      "symbol": "rl_LoadModel",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadModelFromMesh",
+      "symbol": "rl_LoadModelFromMesh",
+      "params": [
+        "bytes",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsModelValid",
+      "symbol": "rl_IsModelValid",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_UnloadModel",
+      "symbol": "rl_UnloadModel",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetModelBoundingBox",
+      "symbol": "rl_GetModelBoundingBox",
+      "params": [
+        "bytes",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawModel",
+      "symbol": "rl_DrawModel",
+      "params": [
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawModelEx",
+      "symbol": "rl_DrawModelEx",
+      "params": [
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawModelWires",
+      "symbol": "rl_DrawModelWires",
+      "params": [
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawModelWiresEx",
+      "symbol": "rl_DrawModelWiresEx",
+      "params": [
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawBoundingBox",
+      "symbol": "rl_DrawBoundingBox",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawBillboard",
+      "symbol": "rl_DrawBillboard",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawBillboardRec",
+      "symbol": "rl_DrawBillboardRec",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawBillboardPro",
+      "symbol": "rl_DrawBillboardPro",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u32",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UpdateMeshBuffer",
+      "symbol": "rl_UpdateMeshBuffer",
+      "params": [
+        "bytes",
+        "i32",
+        "bytes",
+        "i32",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UnloadMesh",
+      "symbol": "rl_UnloadMesh",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawMesh",
+      "symbol": "rl_DrawMesh",
+      "params": [
+        "bytes",
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetMeshBoundingBox",
+      "symbol": "rl_GetMeshBoundingBox",
+      "params": [
+        "bytes",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ExportMeshAsCode",
+      "symbol": "rl_ExportMeshAsCode",
+      "params": [
+        "bytes",
+        "string"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_GenMeshPoly",
+      "symbol": "rl_GenMeshPoly",
+      "params": [
+        "i32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshPlane",
+      "symbol": "rl_GenMeshPlane",
+      "params": [
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshCube",
+      "symbol": "rl_GenMeshCube",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshSphere",
+      "symbol": "rl_GenMeshSphere",
+      "params": [
+        "f32",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshHemiSphere",
+      "symbol": "rl_GenMeshHemiSphere",
+      "params": [
+        "f32",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshCylinder",
+      "symbol": "rl_GenMeshCylinder",
+      "params": [
+        "f32",
+        "f32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshCone",
+      "symbol": "rl_GenMeshCone",
+      "params": [
+        "f32",
+        "f32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshTorus",
+      "symbol": "rl_GenMeshTorus",
+      "params": [
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshKnot",
+      "symbol": "rl_GenMeshKnot",
+      "params": [
+        "f32",
+        "f32",
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshHeightmap",
+      "symbol": "rl_GenMeshHeightmap",
+      "params": [
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GenMeshCubicmap",
+      "symbol": "rl_GenMeshCubicmap",
+      "params": [
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadMaterialDefault",
+      "symbol": "rl_LoadMaterialDefault",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsMaterialValid",
+      "symbol": "rl_IsMaterialValid",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_UnloadMaterial",
+      "symbol": "rl_UnloadMaterial",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UpdateModelAnimation",
+      "symbol": "rl_UpdateModelAnimation",
+      "params": [
+        "bytes",
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UpdateModelAnimationEx",
+      "symbol": "rl_UpdateModelAnimationEx",
+      "params": [
+        "bytes",
+        "bytes",
+        "f32",
+        "bytes",
+        "f32",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsModelAnimationValid",
+      "symbol": "rl_IsModelAnimationValid",
+      "params": [
+        "bytes",
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_CheckCollisionSpheres",
+      "symbol": "rl_CheckCollisionSpheres",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_CheckCollisionBoxes",
+      "symbol": "rl_CheckCollisionBoxes",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_CheckCollisionBoxSphere",
+      "symbol": "rl_CheckCollisionBoxSphere",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_GetRayCollisionSphere",
+      "symbol": "rl_GetRayCollisionSphere",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetRayCollisionBox",
+      "symbol": "rl_GetRayCollisionBox",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetRayCollisionMesh",
+      "symbol": "rl_GetRayCollisionMesh",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetRayCollisionTriangle",
+      "symbol": "rl_GetRayCollisionTriangle",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetRayCollisionQuad",
+      "symbol": "rl_GetRayCollisionQuad",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_InitAudioDevice",
+      "symbol": "InitAudioDevice",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_CloseAudioDevice",
+      "symbol": "CloseAudioDevice",
+      "params": [],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsAudioDeviceReady",
+      "symbol": "IsAudioDeviceReady",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_SetMasterVolume",
+      "symbol": "SetMasterVolume",
+      "params": [
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetMasterVolume",
+      "symbol": "GetMasterVolume",
+      "params": [],
+      "returns": "f32"
+    },
+    {
+      "name": "rl_LoadWave",
+      "symbol": "rl_LoadWave",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsWaveValid",
+      "symbol": "rl_IsWaveValid",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_LoadSound",
+      "symbol": "rl_LoadSound",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadSoundFromWave",
+      "symbol": "rl_LoadSoundFromWave",
+      "params": [
+        "bytes",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadSoundAlias",
+      "symbol": "rl_LoadSoundAlias",
+      "params": [
+        "bytes",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsSoundValid",
+      "symbol": "rl_IsSoundValid",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_UpdateSound",
+      "symbol": "rl_UpdateSound",
+      "params": [
+        "bytes",
+        "bytes",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UnloadWave",
+      "symbol": "rl_UnloadWave",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UnloadSound",
+      "symbol": "rl_UnloadSound",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UnloadSoundAlias",
+      "symbol": "rl_UnloadSoundAlias",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ExportWave",
+      "symbol": "rl_ExportWave",
+      "params": [
+        "bytes",
+        "string"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_ExportWaveAsCode",
+      "symbol": "rl_ExportWaveAsCode",
+      "params": [
+        "bytes",
+        "string"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_PlaySound",
+      "symbol": "rl_PlaySound",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_StopSound",
+      "symbol": "rl_StopSound",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_PauseSound",
+      "symbol": "rl_PauseSound",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ResumeSound",
+      "symbol": "rl_ResumeSound",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsSoundPlaying",
+      "symbol": "rl_IsSoundPlaying",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_SetSoundVolume",
+      "symbol": "rl_SetSoundVolume",
+      "params": [
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetSoundPitch",
+      "symbol": "rl_SetSoundPitch",
+      "params": [
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetSoundPan",
+      "symbol": "rl_SetSoundPan",
+      "params": [
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_WaveCopy",
+      "symbol": "rl_WaveCopy",
+      "params": [
+        "bytes",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadMusicStream",
+      "symbol": "rl_LoadMusicStream",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsMusicValid",
+      "symbol": "rl_IsMusicValid",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_UnloadMusicStream",
+      "symbol": "rl_UnloadMusicStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_PlayMusicStream",
+      "symbol": "rl_PlayMusicStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsMusicStreamPlaying",
+      "symbol": "rl_IsMusicStreamPlaying",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_UpdateMusicStream",
+      "symbol": "rl_UpdateMusicStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_StopMusicStream",
+      "symbol": "rl_StopMusicStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_PauseMusicStream",
+      "symbol": "rl_PauseMusicStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ResumeMusicStream",
+      "symbol": "rl_ResumeMusicStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SeekMusicStream",
+      "symbol": "rl_SeekMusicStream",
+      "params": [
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetMusicVolume",
+      "symbol": "rl_SetMusicVolume",
+      "params": [
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetMusicPitch",
+      "symbol": "rl_SetMusicPitch",
+      "params": [
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetMusicPan",
+      "symbol": "rl_SetMusicPan",
+      "params": [
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetMusicTimeLength",
+      "symbol": "rl_GetMusicTimeLength",
+      "params": [
+        "bytes"
+      ],
+      "returns": "f32"
+    },
+    {
+      "name": "rl_GetMusicTimePlayed",
+      "symbol": "rl_GetMusicTimePlayed",
+      "params": [
+        "bytes"
+      ],
+      "returns": "f32"
+    },
+    {
+      "name": "rl_LoadAudioStream",
+      "symbol": "rl_LoadAudioStream",
+      "params": [
+        "u32",
+        "u32",
+        "u32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsAudioStreamValid",
+      "symbol": "rl_IsAudioStreamValid",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_UnloadAudioStream",
+      "symbol": "rl_UnloadAudioStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_UpdateAudioStream",
+      "symbol": "rl_UpdateAudioStream",
+      "params": [
+        "bytes",
+        "bytes",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsAudioStreamProcessed",
+      "symbol": "rl_IsAudioStreamProcessed",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_PlayAudioStream",
+      "symbol": "rl_PlayAudioStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_PauseAudioStream",
+      "symbol": "rl_PauseAudioStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ResumeAudioStream",
+      "symbol": "rl_ResumeAudioStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_IsAudioStreamPlaying",
+      "symbol": "rl_IsAudioStreamPlaying",
+      "params": [
+        "bytes"
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "rl_StopAudioStream",
+      "symbol": "rl_StopAudioStream",
+      "params": [
+        "bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetAudioStreamVolume",
+      "symbol": "rl_SetAudioStreamVolume",
+      "params": [
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetAudioStreamPitch",
+      "symbol": "rl_SetAudioStreamPitch",
+      "params": [
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetAudioStreamPan",
+      "symbol": "rl_SetAudioStreamPan",
+      "params": [
+        "bytes",
+        "f32"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_SetAudioStreamBufferSizeDefault",
+      "symbol": "SetAudioStreamBufferSizeDefault",
+      "params": [
+        "i32"
+      ],
+      "returns": "void"
+    }
+  ],
+  "libraries": [
+    "./libraylib_shim.a"
+  ],
+  "system_libraries": [
+    "raylib"
+  ]
+}
