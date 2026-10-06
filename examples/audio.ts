@@ -13,17 +13,29 @@ let wave = Raylib.loadWave(audioFile);
 let sound = Raylib.loadSound(audioFile);
 let music = Raylib.loadMusicStream(audioFile);
 
+Raylib.playMusicStream(music);
+Raylib.pauseMusicStream(music);
+
 let volume = 1.0;
 let pitch = 1.0;
 let pan = 0.5;
-let playing = false;
 let musicPlaying = false;
 
 while (!Raylib.windowShouldClose()) {
   const dt = Raylib.getFrameTime();
 
-  if (Raylib.isKeyPressed(KEYS.SPACE)) playing = !playing;
-  if (Raylib.isKeyPressed(KEYS.M)) musicPlaying = !musicPlaying;
+  if (Raylib.isKeyPressed(KEYS.SPACE)) {
+    Raylib.playSound(sound);
+  }
+
+  if (Raylib.isKeyPressed(KEYS.M)) {
+    musicPlaying = !musicPlaying;
+    if (musicPlaying) {
+      Raylib.resumeMusicStream(music);
+    } else {
+      Raylib.pauseMusicStream(music);
+    }
+  }
 
   if (Raylib.isKeyDown(KEYS.UP)) volume = Math.min(volume + dt, 1.0);
   if (Raylib.isKeyDown(KEYS.DOWN)) volume = Math.max(volume - dt, 0.0);
@@ -31,15 +43,7 @@ while (!Raylib.windowShouldClose()) {
   if (Raylib.isKeyDown(KEYS.LEFT)) pitch = Math.max(pitch - dt * 0.5, 0.1);
   if (Raylib.isKeyPressed(KEYS.P)) pan = pan > 0.5 ? 0.0 : 1.0;
 
-  if (playing) {
-    Raylib.playSound(sound);
-    playing = false;
-  }
-
-  if (musicPlaying) {
-    Raylib.playMusicStream(music);
-    Raylib.updateMusicStream(music);
-  }
+  Raylib.updateMusicStream(music);
 
   Raylib.setMasterVolume(volume);
   Raylib.setSoundVolume(sound, volume);
@@ -59,11 +63,11 @@ while (!Raylib.windowShouldClose()) {
   Raylib.drawText(`Sound Pan: ${pan < 0.5 ? "L" : pan > 0.5 ? "R" : "C"}`, 10, y, 20, COLORS.LIME); y += 30;
 
   Raylib.drawText(`Sound: ${Raylib.isSoundPlaying(sound) ? "Playing" : "Stopped"}`, 10, y, 20, COLORS.ORANGE); y += 25;
-  Raylib.drawText(`Music: ${Raylib.isMusicStreamPlaying(music) ? "Playing" : "Stopped"}`, 10, y, 20, COLORS.MAGENTA); y += 30;
+  Raylib.drawText(`Music: ${Raylib.isMusicStreamPlaying(music) ? "Playing" : "Paused"}`, 10, y, 20, COLORS.MAGENTA); y += 30;
 
-  Raylib.drawText(`Wave: ${wave}`, 10, y, 18, COLORS.BEIGE); y += 22;
-  Raylib.drawText(`Sound: ${sound}`, 10, y, 18, COLORS.BEIGE); y += 22;
-  Raylib.drawText(`Music: ${music}`, 10, y, 18, COLORS.BEIGE); y += 30;
+  Raylib.drawText(`Wave: ${Raylib.isWaveValid(wave) ? "Loaded (48kHz, 16-bit, Stereo)" : "Invalid"}`, 10, y, 18, COLORS.BEIGE); y += 22;
+  Raylib.drawText(`Sound: ${Raylib.isSoundValid(sound) ? "Ready to play" : "Invalid"}`, 10, y, 18, COLORS.BEIGE); y += 22;
+  Raylib.drawText(`Music: ${Raylib.isMusicStreamPlaying(music) ? "Active" : "Paused"}`, 10, y, 18, COLORS.BEIGE); y += 30;
 
   const musicTime = Raylib.getMusicTimePlayed(music);
   const musicLen = Raylib.getMusicTimeLength(music);
