@@ -49,12 +49,14 @@ demo/main.ts ──(scriptc build --ffi)───┴─────────�
 
 ### Предварительные требования
 
-1. Установленный **raylib** (на macOS через Homebrew):
-   ```sh
-   brew install raylib
-   ```
+1. **raylib 5.5 / 6.0**:
+   - **macOS**: `brew install raylib` (или MacPorts: `sudo port install raylib`)
+   - **Linux (Ubuntu/Debian)**: `sudo apt install libraylib-dev`
+   - **Linux (Arch Linux)**: `sudo pacman -S raylib`
+   - **Linux (Fedora)**: `sudo dnf install raylib-devel`
+   - **Windows**: MSYS2 (`pacman -S mingw-w64-x86_64-raylib`), vcpkg (`vcpkg install raylib:x64-windows`), официальный инсталлятор [raylib Windows Installer](https://www.raylib.com) или заголовок из `assets/include/raylib.h`.
 2. Компилятор **scriptc** (версия 0.2.3 или новее).
-3. **Bun** (для кодогенерации).
+3. **Bun** (для кодогенерации и кроссплатформенной сборки).
 
 ### Использование в проекте
 
@@ -932,19 +934,37 @@ Raylib.config({
 
 ### Сборка библиотеки и демонстрационного приложения
 
+Кроссплатформенная сборка (Linux, macOS, Windows):
+```sh
+bun run build
+# или напрямую через bun:
+bun tools/build.ts
+```
+
+На POSIX-системах (macOS / Linux):
 ```sh
 ./build.sh
 ```
 
-Скрипт выполняет три шага:
-1. Парсит `raylib.h` и генерирует TS/JSON/C файлы в `gen/`.
-2. Компилирует C-обёртку `gen/raylib_shim.c` в статическую библиотеку `gen/libraylib_shim.a`.
-3. Собирает бинарник через `scriptc build demo/main.ts --ffi gen/raylib_ffi.json -o demo/demo`.
+На Windows (PowerShell):
+```powershell
+.\build.ps1
+```
+
+Скрипт сборки:
+1. Автоматически находит заголовок `raylib.h` (через `pkg-config`, стандартные системные пути Linux/macOS/Windows или локальные `assets/include`).
+2. Генерирует TS-биндинги, C-шим и манифест FFI в `gen/`.
+3. Компилирует Си-обёртку `gen/raylib_shim.c` в статическую библиотеку `gen/libraylib_shim.a`.
+4. Собирает бинарник через `scriptc build demo/main.ts --ffi gen/raylib_ffi.json -o demo/demo`.
 
 ### Запуск демо
 
 ```sh
+# macOS / Linux:
 ./demo/demo
+
+# Windows:
+.\demo\demo.exe
 ```
 
 ### Запуск примеров

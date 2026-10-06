@@ -24,10 +24,66 @@
  * Usage: bun tools/gen_bindings.ts [raylib.h] [outdir]
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { execSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 
-const headerPath = process.argv[2] ?? "/opt/homebrew/include/raylib.h";
+function findRaylibHeader(explicit?: string): string {
+  if (explicit && existsSync(explicit)) return explicit;
+
+  if (process.env.RAYLIB_H && existsSync(process.env.RAYLIB_H)) {
+    return process.env.RAYLIB_H;
+  }
+
+  if (process.env.RAYLIB_PATH) {
+    for (const sub of ["include/raylib.h", "src/raylib.h", "raylib.h"]) {
+      const p = join(process.env.RAYLIB_PATH, sub);
+      if (existsSync(p)) return p;
+    }
+  }
+
+  // pkg-config check (Linux, macOS, MSYS2)
+  try {
+    const pc = execSync("pkg-config --variable=includedir raylib 2>/dev/null", { encoding: "utf-8" }).trim();
+    if (pc && existsSync(join(pc, "raylib.h"))) {
+      return join(pc, "raylib.h");
+    }
+  } catch {}
+
+  const candidates = [
+    // macOS (Homebrew ARM/Intel, MacPorts)
+    "/opt/homebrew/include/raylib.h",
+    "/usr/local/include/raylib.h",
+    "/opt/local/include/raylib.h",
+    // Linux (FHS standard, Debian/Ubuntu multiarch, Arch, Fedora)
+    "/usr/include/raylib.h",
+    "/usr/local/include/raylib.h",
+    "/usr/include/x86_64-linux-gnu/raylib.h",
+    "/usr/include/aarch64-linux-gnu/raylib.h",
+    "/usr/include/arm-linux-gnueabihf/raylib.h",
+    // Windows (MSYS2, w64devkit, raylib installer, vcpkg)
+    "C:/raylib/raylib/src/raylib.h",
+    "C:/raylib/w64devkit/x86_64-w64-mingw32/include/raylib.h",
+    "C:/msys64/mingw64/include/raylib.h",
+    "C:/msys64/ucrt64/include/raylib.h",
+    "C:/msys64/clang64/include/raylib.h",
+    "C:/vcpkg/installed/x64-windows/include/raylib.h",
+    "C:/Program Files/raylib/include/raylib.h",
+    "C:/Program Files (x86)/raylib/include/raylib.h",
+    // Local bundled assets fallback
+    resolve("assets/include/raylib.h"),
+    join(import.meta.dir ?? "", "../assets/include/raylib.h"),
+  ];
+
+  for (const c of candidates) {
+    if (existsSync(c)) return c;
+  }
+
+  if (explicit) return explicit;
+  return "/opt/homebrew/include/raylib.h";
+}
+
+const headerPath = findRaylibHeader(process.argv[2]);
 const outDir = process.argv[3] ?? "gen";
 
 // ---------------------------------------------------------------------------
