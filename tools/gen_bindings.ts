@@ -942,6 +942,235 @@ const CUSTOM_HANDLERS: Record<string, () => Extract<FnPlan, { k: "custom" }>> = 
   return rl_CheckCollisionPointPoly(point.x, point.y, __b, pointCount !== undefined ? pointCount : __cnt);
 }`,
   }),
+  DrawMeshInstanced: () => ({
+    k: "custom",
+    tsName: "rl_DrawMeshInstanced",
+    symbol: "rl_DrawMeshInstanced",
+    manifestParams: ["bytes", "bytes", "bytes", "i32"],
+    manifestRet: "void",
+    cCode: `static Shader rl_default_instancing_shader = { 0 };
+static bool rl_default_instancing_shader_loaded = false;
+
+static void rl_ensure_instancing_shader(void) {
+    if (!rl_default_instancing_shader_loaded || !IsShaderValid(rl_default_instancing_shader)) {
+        const char *vs = 
+            "#version 330\\n"
+            "in vec3 vertexPosition;\\n"
+            "in vec2 vertexTexCoord;\\n"
+            "in vec3 vertexNormal;\\n"
+            "in vec4 vertexColor;\\n"
+            "in mat4 instanceTransform;\\n"
+            "uniform mat4 mvp;\\n"
+            "out vec2 fragTexCoord;\\n"
+            "out vec4 fragColor;\\n"
+            "void main() {\\n"
+            "    fragTexCoord = vertexTexCoord;\\n"
+            "    fragColor = vertexColor;\\n"
+            "    gl_Position = mvp * instanceTransform * vec4(vertexPosition, 1.0);\\n"
+            "}\\n";
+        const char *fs = 
+            "#version 330\\n"
+            "in vec2 fragTexCoord;\\n"
+            "in vec4 fragColor;\\n"
+            "uniform sampler2D texture0;\\n"
+            "uniform vec4 colDiffuse;\\n"
+            "out vec4 finalColor;\\n"
+            "void main() {\\n"
+            "    vec4 tex = texture(texture0, fragTexCoord);\\n"
+            "    finalColor = tex * colDiffuse * fragColor;\\n"
+            "}\\n";
+        rl_default_instancing_shader = LoadShaderFromMemory(vs, fs);
+        rl_default_instancing_shader.locs[SHADER_LOC_MATRIX_MVP] = GetShaderLocation(rl_default_instancing_shader, "mvp");
+        rl_default_instancing_shader.locs[SHADER_LOC_MAP_DIFFUSE] = GetShaderLocation(rl_default_instancing_shader, "texture0");
+        rl_default_instancing_shader.locs[SHADER_LOC_VERTEX_INSTANCETRANSFORM] = GetShaderLocationAttrib(rl_default_instancing_shader, "instanceTransform");
+        rl_default_instancing_shader_loaded = true;
+    }
+}
+
+void rl_DrawMeshInstanced(const uint8_t *mesh_ptr, size_t mesh_len, const uint8_t *mat_ptr, size_t mat_len, const uint8_t *transforms_ptr, size_t transforms_len, int32_t instances) {
+    if (mesh_len != sizeof(Mesh) || mat_len != sizeof(Material) || instances <= 0) return;
+    if (transforms_len < (size_t)instances * sizeof(Matrix)) return;
+    Mesh mesh;
+    Material mat;
+    memcpy(&mesh, mesh_ptr, sizeof(Mesh));
+    memcpy(&mat, mat_ptr, sizeof(Material));
+
+    if (!mat.shader.locs || mat.shader.locs[SHADER_LOC_VERTEX_INSTANCETRANSFORM] == -1) {
+        rl_ensure_instancing_shader();
+        if (IsShaderValid(rl_default_instancing_shader)) {
+            mat.shader = rl_default_instancing_shader;
+        }
+    }
+    DrawMeshInstanced(mesh, mat, (const Matrix *)transforms_ptr, instances);
+}`,
+    ffiDecl: `export declare function rl_DrawMeshInstanced(mesh: Uint8Array, material: Uint8Array, transforms: Uint8Array, instances: number): void;`,
+    apiCode: `export function DrawMeshInstanced(mesh: Mesh, material: Material, transforms: Float32Array | Uint8Array | Matrix[], instances?: number): void {
+  const [__b, __cnt] = __toMatrixBytes(transforms);
+  rl_DrawMeshInstanced(mesh, material, __b, instances !== undefined ? instances : __cnt);
+}`,
+  }),
+  CheckCollisionLines: () => ({
+    k: "custom",
+    tsName: "rl_CheckCollisionLines",
+    symbol: "rl_CheckCollisionLines",
+    manifestParams: ["f32", "f32", "f32", "f32", "f32", "f32", "f32", "f32", "mutable-bytes"],
+    manifestRet: "bool",
+    cCode: `bool rl_CheckCollisionLines(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y, uint8_t *out_ptr, size_t out_len) {
+    Vector2 col = { 0 };
+    bool hit = CheckCollisionLines((Vector2){ p1x, p1y }, (Vector2){ p2x, p2y }, (Vector2){ p3x, p3y }, (Vector2){ p4x, p4y }, &col);
+    if (out_ptr && out_len >= sizeof(Vector2)) {
+        memcpy(out_ptr, &col, sizeof(Vector2));
+    }
+    return hit;
+}`,
+    ffiDecl: `export declare function rl_CheckCollisionLines(p1x: number, p1y: number, p2x: number, p2y: number, p3x: number, p3y: number, p4x: number, p4y: number, __out: Uint8Array): boolean;`,
+    apiCode: `export function CheckCollisionLines(startPos1: Vector2, endPos1: Vector2, startPos2: Vector2, endPos2: Vector2): { collision: boolean; point: Vector2 } {
+  const __buf = new Uint8Array(8);
+  const hit = rl_CheckCollisionLines(startPos1.x, startPos1.y, endPos1.x, endPos1.y, startPos2.x, startPos2.y, endPos2.x, endPos2.y, __buf);
+  const __dv = new DataView(__buf.buffer, __buf.byteOffset, 8);
+  return { collision: hit, point: { x: __dv.getFloat32(0, true), y: __dv.getFloat32(4, true) } };
+}`,
+  }),
+  LoadImageFromMemory: () => ({
+    k: "custom",
+    tsName: "rl_LoadImageFromMemory",
+    symbol: "rl_LoadImageFromMemory",
+    manifestParams: ["string", "bytes", "i32", "mutable-bytes"],
+    manifestRet: "void",
+    cCode: `void rl_LoadImageFromMemory(const uint8_t *fileType_ptr, size_t fileType_len, const uint8_t *data_ptr, size_t data_len, int32_t dataSize, uint8_t *out, size_t out_len) {
+    if (out_len != sizeof(Image)) return;
+    char *type_buf = (char *)malloc(fileType_len + 1);
+    if (!type_buf) return;
+    memcpy(type_buf, fileType_ptr, fileType_len);
+    type_buf[fileType_len] = '\\0';
+    int size = (dataSize > 0) ? dataSize : (int)data_len;
+    Image img = LoadImageFromMemory((const char *)type_buf, (const unsigned char *)data_ptr, size);
+    free(type_buf);
+    memcpy(out, &img, sizeof(Image));
+}`,
+    ffiDecl: `export declare function rl_LoadImageFromMemory(fileType: string, fileData: Uint8Array, dataSize: number, __out: Uint8Array): void;`,
+    apiCode: `export function LoadImageFromMemory(fileType: string, fileData: Uint8Array, dataSize?: number): Image {
+  const __buf = new Uint8Array(24);
+  rl_LoadImageFromMemory(fileType, fileData, dataSize !== undefined ? dataSize : fileData.byteLength, __buf);
+  return __buf;
+}`,
+  }),
+  LoadWaveFromMemory: () => ({
+    k: "custom",
+    tsName: "rl_LoadWaveFromMemory",
+    symbol: "rl_LoadWaveFromMemory",
+    manifestParams: ["string", "bytes", "i32", "mutable-bytes"],
+    manifestRet: "void",
+    cCode: `void rl_LoadWaveFromMemory(const uint8_t *fileType_ptr, size_t fileType_len, const uint8_t *data_ptr, size_t data_len, int32_t dataSize, uint8_t *out, size_t out_len) {
+    if (out_len != sizeof(Wave)) return;
+    char *type_buf = (char *)malloc(fileType_len + 1);
+    if (!type_buf) return;
+    memcpy(type_buf, fileType_ptr, fileType_len);
+    type_buf[fileType_len] = '\\0';
+    int size = (dataSize > 0) ? dataSize : (int)data_len;
+    Wave w = LoadWaveFromMemory((const char *)type_buf, (const unsigned char *)data_ptr, size);
+    free(type_buf);
+    memcpy(out, &w, sizeof(Wave));
+}`,
+    ffiDecl: `export declare function rl_LoadWaveFromMemory(fileType: string, fileData: Uint8Array, dataSize: number, __out: Uint8Array): void;`,
+    apiCode: `export function LoadWaveFromMemory(fileType: string, fileData: Uint8Array, dataSize?: number): Wave {
+  const __buf = new Uint8Array(24);
+  rl_LoadWaveFromMemory(fileType, fileData, dataSize !== undefined ? dataSize : fileData.byteLength, __buf);
+  return __buf;
+}`,
+  }),
+  LoadMusicStreamFromMemory: () => ({
+    k: "custom",
+    tsName: "rl_LoadMusicStreamFromMemory",
+    symbol: "rl_LoadMusicStreamFromMemory",
+    manifestParams: ["string", "bytes", "i32", "mutable-bytes"],
+    manifestRet: "void",
+    cCode: `void rl_LoadMusicStreamFromMemory(const uint8_t *fileType_ptr, size_t fileType_len, const uint8_t *data_ptr, size_t data_len, int32_t dataSize, uint8_t *out, size_t out_len) {
+    if (out_len != sizeof(Music)) return;
+    char *type_buf = (char *)malloc(fileType_len + 1);
+    if (!type_buf) return;
+    memcpy(type_buf, fileType_ptr, fileType_len);
+    type_buf[fileType_len] = '\\0';
+    int size = (dataSize > 0) ? dataSize : (int)data_len;
+    Music m = LoadMusicStreamFromMemory((const char *)type_buf, (const unsigned char *)data_ptr, size);
+    free(type_buf);
+    memcpy(out, &m, sizeof(Music));
+}`,
+    ffiDecl: `export declare function rl_LoadMusicStreamFromMemory(fileType: string, data: Uint8Array, dataSize: number, __out: Uint8Array): void;`,
+    apiCode: `export function LoadMusicStreamFromMemory(fileType: string, data: Uint8Array, dataSize?: number): Music {
+  const __buf = new Uint8Array(56);
+  rl_LoadMusicStreamFromMemory(fileType, data, dataSize !== undefined ? dataSize : data.byteLength, __buf);
+  return __buf;
+}`,
+  }),
+  LoadModelAnimations: () => ({
+    k: "custom",
+    tsName: "rl_LoadModelAnimations",
+    symbol: "rl_LoadModelAnimations",
+    manifestParams: ["string", "mutable-bytes"],
+    manifestRet: "i32",
+    cCode: `int32_t rl_LoadModelAnimations(const uint8_t *fileName_ptr, size_t fileName_len, uint8_t *out_ptr, size_t out_len) {
+    char *name_buf = (char *)malloc(fileName_len + 1);
+    if (!name_buf) return 0;
+    memcpy(name_buf, fileName_ptr, fileName_len);
+    name_buf[fileName_len] = '\\0';
+    int count = 0;
+    ModelAnimation *anims = LoadModelAnimations(name_buf, &count);
+    free(name_buf);
+    if (!anims || count <= 0) return 0;
+    size_t copyCount = (size_t)count;
+    if (copyCount * sizeof(ModelAnimation) > out_len) {
+        copyCount = out_len / sizeof(ModelAnimation);
+    }
+    if (out_ptr && copyCount > 0) {
+        memcpy(out_ptr, anims, copyCount * sizeof(ModelAnimation));
+    }
+    free(anims);
+    return (int32_t)copyCount;
+}`,
+    ffiDecl: `export declare function rl_LoadModelAnimations(fileName: string, __out: Uint8Array): number;`,
+    apiCode: `export function LoadModelAnimations(fileName: string): ModelAnimation[] {
+  const maxAnims = 256;
+  const __buf = new Uint8Array(maxAnims * 48);
+  const count = rl_LoadModelAnimations(fileName, __buf);
+  const result: ModelAnimation[] = [];
+  for (let i = 0; i < count; i++) {
+    result.push(new Uint8Array(__buf.buffer, __buf.byteOffset + i * 48, 48));
+  }
+  return result;
+}`,
+  }),
+  UnloadModelAnimations: () => ({
+    k: "custom",
+    tsName: "rl_UnloadModelAnimations",
+    symbol: "rl_UnloadModelAnimations",
+    manifestParams: ["bytes", "i32"],
+    manifestRet: "void",
+    cCode: `void rl_UnloadModelAnimations(const uint8_t *anims_ptr, size_t anims_len, int32_t count) {
+    if (!anims_ptr || count <= 0) return;
+    for (int i = 0; i < count; i++) {
+        if ((size_t)(i + 1) * sizeof(ModelAnimation) > anims_len) break;
+        ModelAnimation *anim = (ModelAnimation *)(anims_ptr + i * sizeof(ModelAnimation));
+        if (anim->keyframePoses) {
+            for (int k = 0; k < anim->keyframeCount; k++) {
+                if (anim->keyframePoses[k]) free(anim->keyframePoses[k]);
+            }
+            free(anim->keyframePoses);
+            anim->keyframePoses = NULL;
+        }
+    }
+}`,
+    ffiDecl: `export declare function rl_UnloadModelAnimations(animations: Uint8Array, animCount: number): void;`,
+    apiCode: `export function UnloadModelAnimations(animations: ModelAnimation[] | ModelAnimation, animCount?: number): void {
+  if (Array.isArray(animations)) {
+    for (let i = 0; i < animations.length; i++) {
+      rl_UnloadModelAnimations(animations[i]!, 1);
+    }
+  } else {
+    rl_UnloadModelAnimations(animations, animCount !== undefined ? animCount : 1);
+  }
+}`,
+  }),
 };
 
 function classify(fn: RawFn): FnPlan {
@@ -1346,6 +1575,43 @@ export function __toVector3Bytes(points: Float32Array | Uint8Array | Vector3[]):
     f[i * 3 + 2] = arr[i].z;
   }
   return [new Uint8Array(f.buffer), arr.length];
+}
+
+export function __toMatrixBytes(transforms: Float32Array | Uint8Array | Matrix[]): [Uint8Array, number] {
+  if (transforms instanceof Float32Array) {
+    return [new Uint8Array(transforms.buffer, transforms.byteOffset, transforms.byteLength), Math.floor(transforms.length / 16)];
+  }
+  if (transforms instanceof Uint8Array) {
+    return [transforms, Math.floor(transforms.byteLength / 64)];
+  }
+  const arr = transforms as Matrix[];
+  const f = new Float32Array(arr.length * 16);
+  for (let i = 0; i < arr.length; i++) {
+    const m = arr[i]!;
+    f[i * 16 + 0] = m.m0;  f[i * 16 + 1] = m.m4;  f[i * 16 + 2] = m.m8;   f[i * 16 + 3] = m.m12;
+    f[i * 16 + 4] = m.m1;  f[i * 16 + 5] = m.m5;  f[i * 16 + 6] = m.m9;   f[i * 16 + 7] = m.m13;
+    f[i * 16 + 8] = m.m2;  f[i * 16 + 9] = m.m6;  f[i * 16 + 10] = m.m10; f[i * 16 + 11] = m.m14;
+    f[i * 16 + 12] = m.m3; f[i * 16 + 13] = m.m7; f[i * 16 + 14] = m.m11; f[i * 16 + 15] = m.m15;
+  }
+  return [new Uint8Array(f.buffer), arr.length];
+}
+
+export function GetModelAnimationBoneCount(anim: ModelAnimation): number {
+  return new DataView(anim.buffer, anim.byteOffset, anim.byteLength).getInt32(32, true);
+}
+
+export function GetModelAnimationFrameCount(anim: ModelAnimation): number {
+  return new DataView(anim.buffer, anim.byteOffset, anim.byteLength).getInt32(36, true);
+}
+
+export function GetModelAnimationName(anim: ModelAnimation): string {
+  let end = 0;
+  while (end < 32 && anim[end] !== 0) end++;
+  return new TextDecoder().decode(anim.subarray(0, end));
+}
+
+export function UnloadModelAnimation(anim: ModelAnimation): void {
+  UnloadModelAnimations(anim, 1);
 }`);
   api.push(``);
   for (const { fn, plan } of bound) {
@@ -1401,6 +1667,14 @@ export function __toVector3Bytes(points: Float32Array | Uint8Array | Vector3[]):
       api.push(`  ${camel}: ${fn.name},`);
     }
   }
+  api.push(`  getModelAnimationBoneCount: GetModelAnimationBoneCount,`);
+  api.push(`  GetModelAnimationBoneCount,`);
+  api.push(`  getModelAnimationFrameCount: GetModelAnimationFrameCount,`);
+  api.push(`  GetModelAnimationFrameCount,`);
+  api.push(`  getModelAnimationName: GetModelAnimationName,`);
+  api.push(`  GetModelAnimationName,`);
+  api.push(`  unloadModelAnimation: UnloadModelAnimation,`);
+  api.push(`  UnloadModelAnimation,`);
   api.push(`};`);
   api.push(``);
   const apiTs = api.join("\n");

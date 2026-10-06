@@ -15,7 +15,7 @@ TypeScript-биндинги для [raylib 6.0](https://www.raylib.com), ген�
 - **🔄 Двойной стиль API**:
   - Прямые функции C-стиля (`InitWindow`, `BeginDrawing`, `ClearBackground`, `DrawCircle`).
   - Пространство имён `Raylib` с поддержкой camelCase (`Raylib.initWindow`, `Raylib.beginDrawing`, `Raylib.drawCircle`).
-- **🛡️ 495 функций raylib**: 116 прямых скалярных вызовов + 356 обёрнутых через C-шим с проверками layout на этапе компиляции (`_Static_assert`) + кастомные FFI-адаптеры (82.5% от всего raylib).
+- **🛡️ 501 функция raylib**: 116 прямых скалярных вызовов + 355 обёрнутых через C-шим с проверками layout на этапе компиляции (`_Static_assert`) + 30 кастомных FFI-адаптеров (83.5% от всего raylib).
 
 ---
 
@@ -36,14 +36,18 @@ demo/main.ts ──(scriptc build --ffi)───┴─────────�
 Генератор классифицирует каждую из 600 функций raylib:
 
 1. **direct (116)** — сигнатура состоит только из скаляров: линкуется напрямую на оригинальный символ raylib без C-кода.
-2. **wrapped (322)** — функции, требующие Си-шима:
+2. **wrapped (355) + custom (30)** — функции, требующие Си-шима или специализированных адаптеров:
    - `const char*` → класс `string` (ptr + len): шим копирует в NUL-terminated буфер;
    - структуру по значению с одними скалярами (`Vector2`, `Color`, `Camera3D`, `Texture`, `Matrix`...) → разворачивается в отдельные скалярные аргументы, шим собирает структуру композитным литералом;
    - структуру с указателями внутри (`Image`, `Sound`, `Music`, `Shader`, `Model`...) → TS держит `Uint8Array` с байтами структуры и передаёт буфером (класс `bytes`), шим делает memcpy;
    - возврат структуры → шим копирует её в хвостовой out-буфер `Uint8Array` (класс `mutable-bytes`), TS читает поля через `DataView` по офсетам, проверенным `_Static_assert(sizeof(...))`;
    - строковые возвраты (`GetMonitorName`, `GetClipboardText`, `GetGamepadName`) → через буфер `mutable-bytes` с раскодированием через `TextDecoder`;
-   - массивы вершин (`DrawLineStrip`, `DrawTriangleFan`, `DrawTriangleStrip`, `DrawSpline*`, `DrawTriangleStrip3D`) → через байтовые буферы `Float32Array | Uint8Array | Vector2[]/Vector3[]`.
-3. **skipped (162)** — функции, не поддерживаемые архитектурой FFI (см. подробный разбор ниже).
+   - массивы вершин (`DrawLineStrip`, `DrawTriangleFan`, `DrawTriangleStrip`, `DrawSpline*`, `DrawTriangleStrip3D`) → через байтовые буферы `Float32Array | Uint8Array | Vector2[]/Vector3[]`;
+   - **инстансинг мешей (`DrawMeshInstanced`)** — принимает массив матриц трансформации (`Float32Array | Uint8Array | Matrix[]`) и автоматически подключает встроенный инстансинг-шейдер;
+   - **пересечение отрезков (`CheckCollisionLines`)** — возвращает структурированный объект `{ collision: boolean, point: Vector2 }`;
+   - **загрузка из памяти (`LoadImageFromMemory`, `LoadWaveFromMemory`, `LoadMusicStreamFromMemory`)** — декодирование форматов png/jpg/wav/ogg/mp3 напрямую из буферов байтов `Uint8Array`;
+   - **анимации моделей (`LoadModelAnimations`, `UnloadModelAnimations`)** — загрузка последовательностей анимаций скелета в массив `ModelAnimation[]`.
+3. **skipped (99)** — функции, не поддерживаемые архитектурой FFI (см. подробный разбор ниже).
 
 ---
 
@@ -126,8 +130,8 @@ Raylib.closeWindow();
 
 ### 🎮 Запуск примеров (Examples)
 
-В репозитории доступны 11 готовых примеров в папке `examples/`:
-`index`, `shapes`, `shapes3d`, `textures`, `fonts`, `audio`, `models`, `shader`, `image`, `camera`, `breakout`.
+В репозитории доступны 12 готовых примеров в папке `examples/`:
+`index`, `shapes`, `shapes3d`, `textures`, `fonts`, `audio`, `models`, `shader`, `image`, `camera`, `breakout`, `instancing`.
 
 Так как `scriptc` является AOT-компилятором, нативный FFI-манифест передаётся компилятору через флаг `--ffi`:
 
@@ -138,10 +142,11 @@ scriptc run examples/index.ts --ffi gen/raylib_ffi.json
 # Либо через удобный раннер (автоматически подтягивает --ffi):
 bun run example index
 bun run example shapes
+bun run example instancing
 
 # Либо сборка в автономный бинарник:
-scriptc build examples/shapes.ts --ffi gen/raylib_ffi.json -o examples/shapes
-./examples/shapes
+scriptc build examples/instancing.ts --ffi gen/raylib_ffi.json -o examples/instancing
+./examples/instancing
 ```
 
 ### Настройка пути к raylib: `Raylib.config`
@@ -168,7 +173,7 @@ Raylib.config({ raylibPath: "auto" });
 
 В отличие от подходов с фиксированными статическими реестрами (где использовались `MAX_MODELS 64`, `MAX_IMAGES 128`, `MAX_SOUNDS 32` и т.д.):
 
-- **В `craylib` лимитов нет:** Каждая сложная структура raylib (`Model`, `Image`, `Sound`, `Music`, `Shader`, `Font`, `Wave`, `Mesh`, `Material`) представлена независимым буфером `Uint8Array` точного размера `sizeof(Struct)`.
+- **В `craylib` лимитов нет:** Каждая сложная структура raylib (`Model`, `Image`, `Sound`, `Music`, `Shader`, `Font`, `Wave`, `Mesh`, `Material`, `ModelAnimation`) представлена независимым буфером `Uint8Array` точного размера `sizeof(Struct)`.
 - **Прямой round-trip:** При вызове `LoadModel()` Си-шим копирует нативную структуру в свежевыделенный `Uint8Array`. В TS вы владеете этим дескриптором напрямую. При передаче в функции отрисовки буфер байтов передаётся обратно в C без промежуточных таблиц поиска.
 - **Масштабируемость:** Можно загрузить сотни тысяч моделей, текстур или звуков — ограничением выступает только физическая оперативная память системы.
 
@@ -176,8 +181,8 @@ Raylib.config({ raylibPath: "auto" });
 ## 📊 Статус реализации функций
 
 Всего в заголовке raylib 6.0 содержится **600 функций**:
-- **495 функций реализованы** (116 direct + 356 wrapped + custom adapters) — **82.5%**
-- **105 функций исключены** по архитектурным причинам FFI — **17.5%**
+- **501 функция реализована** (116 direct + 355 wrapped + 30 custom) — **83.5%**
+- **99 функций исключены** по архитектурным причинам FFI — **16.5%**
 
 ### Сводная таблица по модулям
 
@@ -187,17 +192,17 @@ Raylib.config({ raylibPath: "auto" });
 | **Input Handling (Keyboard, Mouse, Gamepad)** | 38 | 1 | 39 | 97% |
 | **Gestures & Touch** | 8 | 0 | 8 | 100% |
 | **Camera System** | 2 | 0 | 2 | 100% |
-| **2D Shapes & Splines** | 69 | 0 | 69 | 100% |
-| **Textures & Images** | 97 | 18 | 115 | 84% |
+| **2D Shapes & Splines** | 70 | 0 | 70 | 100% |
+| **Textures & Images** | 98 | 16 | 114 | 86% |
 | **Fonts & Text** | 28 | 31 | 59 | 47% |
 | **3D Shapes Drawing** | 21 | 0 | 21 | 100% |
-| **3D Models & Materials** | 47 | 5 | 52 | 90% |
-| **Audio & Music** | 59 | 7 | 66 | 89% |
-| **ИТОГО** | **495** | **105** | **600** | **82.5%** |
+| **3D Models & Materials** | 49 | 3 | 52 | 94% |
+| **Audio & Music** | 61 | 5 | 66 | 92% |
+| **ИТОГО** | **501** | **99** | **600** | **83.5%** |
 
 ---
 
-## ✅ Реализованные функции (495)
+## ✅ Реализованные функции (501)
 
 Каждая функция полностью типизирована, проверена и доступна для вызова как в PascalCase, так и в camelCase.
 

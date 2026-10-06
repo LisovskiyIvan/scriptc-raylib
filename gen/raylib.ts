@@ -244,9 +244,11 @@ import {
   rl_CheckCollisionPointTriangle,
   rl_CheckCollisionPointLine,
   rl_CheckCollisionPointPoly,
+  rl_CheckCollisionLines,
   rl_GetCollisionRec,
   rl_LoadImage,
   rl_LoadImageRaw,
+  rl_LoadImageFromMemory,
   rl_LoadImageFromTexture,
   rl_LoadImageFromScreen,
   rl_IsImageValid,
@@ -410,6 +412,7 @@ import {
   rl_UpdateMeshBuffer,
   rl_UnloadMesh,
   rl_DrawMesh,
+  rl_DrawMeshInstanced,
   rl_GetMeshBoundingBox,
   rl_GenMeshTangents,
   rl_ExportMeshAsCode,
@@ -429,6 +432,7 @@ import {
   rl_UnloadMaterial,
   rl_SetMaterialTexture,
   rl_SetModelMeshMaterial,
+  rl_LoadModelAnimations,
   rl_UpdateModelAnimation,
   rl_UpdateModelAnimationEx,
   rl_UnloadModelAnimations,
@@ -447,6 +451,7 @@ import {
   rl_SetMasterVolume,
   rl_GetMasterVolume,
   rl_LoadWave,
+  rl_LoadWaveFromMemory,
   rl_IsWaveValid,
   rl_LoadSound,
   rl_LoadSoundFromWave,
@@ -470,6 +475,7 @@ import {
   rl_WaveCrop,
   rl_WaveFormat,
   rl_LoadMusicStream,
+  rl_LoadMusicStreamFromMemory,
   rl_IsMusicValid,
   rl_UnloadMusicStream,
   rl_PlayMusicStream,
@@ -1045,6 +1051,43 @@ export function __toVector3Bytes(points: Float32Array | Uint8Array | Vector3[]):
     f[i * 3 + 2] = arr[i].z;
   }
   return [new Uint8Array(f.buffer), arr.length];
+}
+
+export function __toMatrixBytes(transforms: Float32Array | Uint8Array | Matrix[]): [Uint8Array, number] {
+  if (transforms instanceof Float32Array) {
+    return [new Uint8Array(transforms.buffer, transforms.byteOffset, transforms.byteLength), Math.floor(transforms.length / 16)];
+  }
+  if (transforms instanceof Uint8Array) {
+    return [transforms, Math.floor(transforms.byteLength / 64)];
+  }
+  const arr = transforms as Matrix[];
+  const f = new Float32Array(arr.length * 16);
+  for (let i = 0; i < arr.length; i++) {
+    const m = arr[i]!;
+    f[i * 16 + 0] = m.m0;  f[i * 16 + 1] = m.m4;  f[i * 16 + 2] = m.m8;   f[i * 16 + 3] = m.m12;
+    f[i * 16 + 4] = m.m1;  f[i * 16 + 5] = m.m5;  f[i * 16 + 6] = m.m9;   f[i * 16 + 7] = m.m13;
+    f[i * 16 + 8] = m.m2;  f[i * 16 + 9] = m.m6;  f[i * 16 + 10] = m.m10; f[i * 16 + 11] = m.m14;
+    f[i * 16 + 12] = m.m3; f[i * 16 + 13] = m.m7; f[i * 16 + 14] = m.m11; f[i * 16 + 15] = m.m15;
+  }
+  return [new Uint8Array(f.buffer), arr.length];
+}
+
+export function GetModelAnimationBoneCount(anim: ModelAnimation): number {
+  return new DataView(anim.buffer, anim.byteOffset, anim.byteLength).getInt32(32, true);
+}
+
+export function GetModelAnimationFrameCount(anim: ModelAnimation): number {
+  return new DataView(anim.buffer, anim.byteOffset, anim.byteLength).getInt32(36, true);
+}
+
+export function GetModelAnimationName(anim: ModelAnimation): string {
+  let end = 0;
+  while (end < 32 && anim[end] !== 0) end++;
+  return new TextDecoder().decode(anim.subarray(0, end));
+}
+
+export function UnloadModelAnimation(anim: ModelAnimation): void {
+  UnloadModelAnimations(anim, 1);
 }
 
 export function InitWindow(width: number, height: number, title: string): void {
@@ -2148,6 +2191,13 @@ export function CheckCollisionPointPoly(point: Vector2, points: Float32Array | U
   return rl_CheckCollisionPointPoly(point.x, point.y, __b, pointCount !== undefined ? pointCount : __cnt);
 }
 
+export function CheckCollisionLines(startPos1: Vector2, endPos1: Vector2, startPos2: Vector2, endPos2: Vector2): { collision: boolean; point: Vector2 } {
+  const __buf = new Uint8Array(8);
+  const hit = rl_CheckCollisionLines(startPos1.x, startPos1.y, endPos1.x, endPos1.y, startPos2.x, startPos2.y, endPos2.x, endPos2.y, __buf);
+  const __dv = new DataView(__buf.buffer, __buf.byteOffset, 8);
+  return { collision: hit, point: { x: __dv.getFloat32(0, true), y: __dv.getFloat32(4, true) } };
+}
+
 export function GetCollisionRec(rec1: Rectangle, rec2: Rectangle): Rectangle {
   const __buf = new Uint8Array(16);
   rl_GetCollisionRec(rec1.x, rec1.y, rec1.width, rec1.height, rec2.x, rec2.y, rec2.width, rec2.height, __buf);
@@ -2163,6 +2213,12 @@ export function LoadImage(fileName: string): Image {
 export function LoadImageRaw(fileName: string, width: number, height: number, format: number, headerSize: number): Image {
   const __buf = new Uint8Array(24);
   rl_LoadImageRaw(fileName, width, height, format, headerSize, __buf);
+  return __buf;
+}
+
+export function LoadImageFromMemory(fileType: string, fileData: Uint8Array, dataSize?: number): Image {
+  const __buf = new Uint8Array(24);
+  rl_LoadImageFromMemory(fileType, fileData, dataSize !== undefined ? dataSize : fileData.byteLength, __buf);
   return __buf;
 }
 
@@ -2918,6 +2974,11 @@ export function DrawMesh(mesh: Uint8Array, material: Uint8Array, transform: Matr
   rl_DrawMesh(mesh, material, transform.m0, transform.m4, transform.m8, transform.m12, transform.m1, transform.m5, transform.m9, transform.m13, transform.m2, transform.m6, transform.m10, transform.m14, transform.m3, transform.m7, transform.m11, transform.m15);
 }
 
+export function DrawMeshInstanced(mesh: Mesh, material: Material, transforms: Float32Array | Uint8Array | Matrix[], instances?: number): void {
+  const [__b, __cnt] = __toMatrixBytes(transforms);
+  rl_DrawMeshInstanced(mesh, material, __b, instances !== undefined ? instances : __cnt);
+}
+
 export function GetMeshBoundingBox(mesh: Uint8Array): BoundingBox {
   const __buf = new Uint8Array(24);
   rl_GetMeshBoundingBox(mesh, __buf);
@@ -3020,6 +3081,17 @@ export function SetModelMeshMaterial(model: Model, meshId: number, materialId: n
   rl_SetModelMeshMaterial(model, meshId, materialId);
 }
 
+export function LoadModelAnimations(fileName: string): ModelAnimation[] {
+  const maxAnims = 256;
+  const __buf = new Uint8Array(maxAnims * 48);
+  const count = rl_LoadModelAnimations(fileName, __buf);
+  const result: ModelAnimation[] = [];
+  for (let i = 0; i < count; i++) {
+    result.push(new Uint8Array(__buf.buffer, __buf.byteOffset + i * 48, 48));
+  }
+  return result;
+}
+
 export function UpdateModelAnimation(model: Uint8Array, anim: Uint8Array, frame: number): void {
   rl_UpdateModelAnimation(model, anim, frame);
 }
@@ -3028,8 +3100,14 @@ export function UpdateModelAnimationEx(model: Uint8Array, animA: Uint8Array, fra
   rl_UpdateModelAnimationEx(model, animA, frameA, animB, frameB, blend);
 }
 
-export function UnloadModelAnimations(animations: ModelAnimation, animCount: number): void {
-  rl_UnloadModelAnimations(animations, animCount);
+export function UnloadModelAnimations(animations: ModelAnimation[] | ModelAnimation, animCount?: number): void {
+  if (Array.isArray(animations)) {
+    for (let i = 0; i < animations.length; i++) {
+      rl_UnloadModelAnimations(animations[i]!, 1);
+    }
+  } else {
+    rl_UnloadModelAnimations(animations, animCount !== undefined ? animCount : 1);
+  }
 }
 
 export function IsModelAnimationValid(model: Uint8Array, anim: Uint8Array): boolean {
@@ -3101,6 +3179,12 @@ export function GetMasterVolume(): number {
 export function LoadWave(fileName: string): Wave {
   const __buf = new Uint8Array(24);
   rl_LoadWave(fileName, __buf);
+  return __buf;
+}
+
+export function LoadWaveFromMemory(fileType: string, fileData: Uint8Array, dataSize?: number): Wave {
+  const __buf = new Uint8Array(24);
+  rl_LoadWaveFromMemory(fileType, fileData, dataSize !== undefined ? dataSize : fileData.byteLength, __buf);
   return __buf;
 }
 
@@ -3203,6 +3287,12 @@ export function WaveFormat(wave: Wave, sampleRate: number, sampleSize: number, c
 export function LoadMusicStream(fileName: string): Music {
   const __buf = new Uint8Array(56);
   rl_LoadMusicStream(fileName, __buf);
+  return __buf;
+}
+
+export function LoadMusicStreamFromMemory(fileType: string, data: Uint8Array, dataSize?: number): Music {
+  const __buf = new Uint8Array(56);
+  rl_LoadMusicStreamFromMemory(fileType, data, dataSize !== undefined ? dataSize : data.byteLength, __buf);
   return __buf;
 }
 
@@ -3803,12 +3893,16 @@ export const Raylib = {
   checkCollisionPointLine: CheckCollisionPointLine,
   CheckCollisionPointPoly,
   checkCollisionPointPoly: CheckCollisionPointPoly,
+  CheckCollisionLines,
+  checkCollisionLines: CheckCollisionLines,
   GetCollisionRec,
   getCollisionRec: GetCollisionRec,
   LoadImage,
   loadImage: LoadImage,
   LoadImageRaw,
   loadImageRaw: LoadImageRaw,
+  LoadImageFromMemory,
+  loadImageFromMemory: LoadImageFromMemory,
   LoadImageFromTexture,
   loadImageFromTexture: LoadImageFromTexture,
   LoadImageFromScreen,
@@ -4135,6 +4229,8 @@ export const Raylib = {
   unloadMesh: UnloadMesh,
   DrawMesh,
   drawMesh: DrawMesh,
+  DrawMeshInstanced,
+  drawMeshInstanced: DrawMeshInstanced,
   GetMeshBoundingBox,
   getMeshBoundingBox: GetMeshBoundingBox,
   GenMeshTangents,
@@ -4173,6 +4269,8 @@ export const Raylib = {
   setMaterialTexture: SetMaterialTexture,
   SetModelMeshMaterial,
   setModelMeshMaterial: SetModelMeshMaterial,
+  LoadModelAnimations,
+  loadModelAnimations: LoadModelAnimations,
   UpdateModelAnimation,
   updateModelAnimation: UpdateModelAnimation,
   UpdateModelAnimationEx,
@@ -4209,6 +4307,8 @@ export const Raylib = {
   getMasterVolume: GetMasterVolume,
   LoadWave,
   loadWave: LoadWave,
+  LoadWaveFromMemory,
+  loadWaveFromMemory: LoadWaveFromMemory,
   IsWaveValid,
   isWaveValid: IsWaveValid,
   LoadSound,
@@ -4255,6 +4355,8 @@ export const Raylib = {
   waveFormat: WaveFormat,
   LoadMusicStream,
   loadMusicStream: LoadMusicStream,
+  LoadMusicStreamFromMemory,
+  loadMusicStreamFromMemory: LoadMusicStreamFromMemory,
   IsMusicValid,
   isMusicValid: IsMusicValid,
   UnloadMusicStream,
@@ -4311,5 +4413,13 @@ export const Raylib = {
   setAudioStreamPan: SetAudioStreamPan,
   SetAudioStreamBufferSizeDefault,
   setAudioStreamBufferSizeDefault: SetAudioStreamBufferSizeDefault,
+  getModelAnimationBoneCount: GetModelAnimationBoneCount,
+  GetModelAnimationBoneCount,
+  getModelAnimationFrameCount: GetModelAnimationFrameCount,
+  GetModelAnimationFrameCount,
+  getModelAnimationName: GetModelAnimationName,
+  GetModelAnimationName,
+  unloadModelAnimation: UnloadModelAnimation,
+  UnloadModelAnimation,
 };
 

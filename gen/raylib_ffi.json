@@ -2520,6 +2520,22 @@
       "returns": "bool"
     },
     {
+      "name": "rl_CheckCollisionLines",
+      "symbol": "rl_CheckCollisionLines",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "mutable-bytes"
+      ],
+      "returns": "bool"
+    },
+    {
       "name": "rl_GetCollisionRec",
       "symbol": "rl_GetCollisionRec",
       "params": [
@@ -2552,6 +2568,17 @@
         "i32",
         "i32",
         "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadImageFromMemory",
+      "symbol": "rl_LoadImageFromMemory",
+      "params": [
+        "string",
+        "bytes",
         "i32",
         "mutable-bytes"
       ],
@@ -4820,6 +4847,17 @@
       "returns": "void"
     },
     {
+      "name": "rl_DrawMeshInstanced",
+      "symbol": "rl_DrawMeshInstanced",
+      "params": [
+        "bytes",
+        "bytes",
+        "bytes",
+        "i32"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_GetMeshBoundingBox",
       "symbol": "rl_GetMeshBoundingBox",
       "params": [
@@ -5019,6 +5057,15 @@
       "returns": "void"
     },
     {
+      "name": "rl_LoadModelAnimations",
+      "symbol": "rl_LoadModelAnimations",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "i32"
+    },
+    {
       "name": "rl_UpdateModelAnimation",
       "symbol": "rl_UpdateModelAnimation",
       "params": [
@@ -5045,7 +5092,7 @@
       "name": "rl_UnloadModelAnimations",
       "symbol": "rl_UnloadModelAnimations",
       "params": [
-        "mutable-bytes",
+        "bytes",
         "i32"
       ],
       "returns": "void"
@@ -5270,6 +5317,17 @@
       "returns": "void"
     },
     {
+      "name": "rl_LoadWaveFromMemory",
+      "symbol": "rl_LoadWaveFromMemory",
+      "params": [
+        "string",
+        "bytes",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_IsWaveValid",
       "symbol": "rl_IsWaveValid",
       "params": [
@@ -5466,6 +5524,17 @@
       "symbol": "rl_LoadMusicStream",
       "params": [
         "string",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadMusicStreamFromMemory",
+      "symbol": "rl_LoadMusicStreamFromMemory",
+      "params": [
+        "string",
+        "bytes",
+        "i32",
         "mutable-bytes"
       ],
       "returns": "void"

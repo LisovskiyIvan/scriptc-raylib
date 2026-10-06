@@ -938,6 +938,15 @@ bool rl_CheckCollisionPointPoly(float point_x, float point_y, const uint8_t *poi
     return CheckCollisionPointPoly((Vector2){ point_x, point_y }, (const Vector2 *)points_ptr, pointCount);
 }
 
+bool rl_CheckCollisionLines(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y, uint8_t *out_ptr, size_t out_len) {
+    Vector2 col = { 0 };
+    bool hit = CheckCollisionLines((Vector2){ p1x, p1y }, (Vector2){ p2x, p2y }, (Vector2){ p3x, p3y }, (Vector2){ p4x, p4y }, &col);
+    if (out_ptr && out_len >= sizeof(Vector2)) {
+        memcpy(out_ptr, &col, sizeof(Vector2));
+    }
+    return hit;
+}
+
 void rl_GetCollisionRec(float rec1_x, float rec1_y, float rec1_width, float rec1_height, float rec2_x, float rec2_y, float rec2_width, float rec2_height, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(Rectangle)) { return; }
     Rectangle __v = GetCollisionRec((Rectangle){ rec1_x, rec1_y, rec1_width, rec1_height }, (Rectangle){ rec2_x, rec2_y, rec2_width, rec2_height });
@@ -964,6 +973,18 @@ void rl_LoadImageRaw(const uint8_t *fileName_ptr, size_t fileName_len, int32_t w
     Image __v = LoadImageRaw((const char *)fileName_buf, width, height, format, headerSize);
     free(fileName_buf);
     memcpy(out, &__v, sizeof(__v));
+}
+
+void rl_LoadImageFromMemory(const uint8_t *fileType_ptr, size_t fileType_len, const uint8_t *data_ptr, size_t data_len, int32_t dataSize, uint8_t *out, size_t out_len) {
+    if (out_len != sizeof(Image)) return;
+    char *type_buf = (char *)malloc(fileType_len + 1);
+    if (!type_buf) return;
+    memcpy(type_buf, fileType_ptr, fileType_len);
+    type_buf[fileType_len] = '\0';
+    int size = (dataSize > 0) ? dataSize : (int)data_len;
+    Image img = LoadImageFromMemory((const char *)type_buf, (const unsigned char *)data_ptr, size);
+    free(type_buf);
+    memcpy(out, &img, sizeof(Image));
 }
 
 void rl_LoadImageFromTexture(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, uint8_t *out, size_t out_len) {
@@ -2014,6 +2035,62 @@ void rl_DrawMesh(const uint8_t *mesh_ptr, size_t mesh_len, const uint8_t *materi
     DrawMesh(mesh, material, (Matrix){ transform_m0, transform_m4, transform_m8, transform_m12, transform_m1, transform_m5, transform_m9, transform_m13, transform_m2, transform_m6, transform_m10, transform_m14, transform_m3, transform_m7, transform_m11, transform_m15 });
 }
 
+static Shader rl_default_instancing_shader = { 0 };
+static bool rl_default_instancing_shader_loaded = false;
+
+static void rl_ensure_instancing_shader(void) {
+    if (!rl_default_instancing_shader_loaded || !IsShaderValid(rl_default_instancing_shader)) {
+        const char *vs = 
+            "#version 330\n"
+            "in vec3 vertexPosition;\n"
+            "in vec2 vertexTexCoord;\n"
+            "in vec3 vertexNormal;\n"
+            "in vec4 vertexColor;\n"
+            "in mat4 instanceTransform;\n"
+            "uniform mat4 mvp;\n"
+            "out vec2 fragTexCoord;\n"
+            "out vec4 fragColor;\n"
+            "void main() {\n"
+            "    fragTexCoord = vertexTexCoord;\n"
+            "    fragColor = vertexColor;\n"
+            "    gl_Position = mvp * instanceTransform * vec4(vertexPosition, 1.0);\n"
+            "}\n";
+        const char *fs = 
+            "#version 330\n"
+            "in vec2 fragTexCoord;\n"
+            "in vec4 fragColor;\n"
+            "uniform sampler2D texture0;\n"
+            "uniform vec4 colDiffuse;\n"
+            "out vec4 finalColor;\n"
+            "void main() {\n"
+            "    vec4 tex = texture(texture0, fragTexCoord);\n"
+            "    finalColor = tex * colDiffuse * fragColor;\n"
+            "}\n";
+        rl_default_instancing_shader = LoadShaderFromMemory(vs, fs);
+        rl_default_instancing_shader.locs[SHADER_LOC_MATRIX_MVP] = GetShaderLocation(rl_default_instancing_shader, "mvp");
+        rl_default_instancing_shader.locs[SHADER_LOC_MAP_DIFFUSE] = GetShaderLocation(rl_default_instancing_shader, "texture0");
+        rl_default_instancing_shader.locs[SHADER_LOC_VERTEX_INSTANCETRANSFORM] = GetShaderLocationAttrib(rl_default_instancing_shader, "instanceTransform");
+        rl_default_instancing_shader_loaded = true;
+    }
+}
+
+void rl_DrawMeshInstanced(const uint8_t *mesh_ptr, size_t mesh_len, const uint8_t *mat_ptr, size_t mat_len, const uint8_t *transforms_ptr, size_t transforms_len, int32_t instances) {
+    if (mesh_len != sizeof(Mesh) || mat_len != sizeof(Material) || instances <= 0) return;
+    if (transforms_len < (size_t)instances * sizeof(Matrix)) return;
+    Mesh mesh;
+    Material mat;
+    memcpy(&mesh, mesh_ptr, sizeof(Mesh));
+    memcpy(&mat, mat_ptr, sizeof(Material));
+
+    if (!mat.shader.locs || mat.shader.locs[SHADER_LOC_VERTEX_INSTANCETRANSFORM] == -1) {
+        rl_ensure_instancing_shader();
+        if (IsShaderValid(rl_default_instancing_shader)) {
+            mat.shader = rl_default_instancing_shader;
+        }
+    }
+    DrawMeshInstanced(mesh, mat, (const Matrix *)transforms_ptr, instances);
+}
+
 void rl_GetMeshBoundingBox(const uint8_t *mesh_ptr, size_t mesh_len, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(BoundingBox)) { return; }
     if (mesh_len != (size_t)sizeof(Mesh)) { return; }
@@ -2144,6 +2221,26 @@ void rl_SetModelMeshMaterial(uint8_t *model_ptr, size_t model_len, int32_t meshI
     SetModelMeshMaterial((Model *)model_ptr, meshId, materialId);
 }
 
+int32_t rl_LoadModelAnimations(const uint8_t *fileName_ptr, size_t fileName_len, uint8_t *out_ptr, size_t out_len) {
+    char *name_buf = (char *)malloc(fileName_len + 1);
+    if (!name_buf) return 0;
+    memcpy(name_buf, fileName_ptr, fileName_len);
+    name_buf[fileName_len] = '\0';
+    int count = 0;
+    ModelAnimation *anims = LoadModelAnimations(name_buf, &count);
+    free(name_buf);
+    if (!anims || count <= 0) return 0;
+    size_t copyCount = (size_t)count;
+    if (copyCount * sizeof(ModelAnimation) > out_len) {
+        copyCount = out_len / sizeof(ModelAnimation);
+    }
+    if (out_ptr && copyCount > 0) {
+        memcpy(out_ptr, anims, copyCount * sizeof(ModelAnimation));
+    }
+    free(anims);
+    return (int32_t)copyCount;
+}
+
 void rl_UpdateModelAnimation(const uint8_t *model_ptr, size_t model_len, const uint8_t *anim_ptr, size_t anim_len, float frame) {
     if (model_len != (size_t)sizeof(Model)) { return; }
     if (anim_len != (size_t)sizeof(ModelAnimation)) { return; }
@@ -2167,9 +2264,19 @@ void rl_UpdateModelAnimationEx(const uint8_t *model_ptr, size_t model_len, const
     UpdateModelAnimationEx(model, animA, frameA, animB, frameB, blend);
 }
 
-void rl_UnloadModelAnimations(uint8_t *animations_ptr, size_t animations_len, int32_t animCount) {
-    if (animations_len != (size_t)sizeof(ModelAnimation)) { return; }
-    UnloadModelAnimations((ModelAnimation *)animations_ptr, animCount);
+void rl_UnloadModelAnimations(const uint8_t *anims_ptr, size_t anims_len, int32_t count) {
+    if (!anims_ptr || count <= 0) return;
+    for (int i = 0; i < count; i++) {
+        if ((size_t)(i + 1) * sizeof(ModelAnimation) > anims_len) break;
+        ModelAnimation *anim = (ModelAnimation *)(anims_ptr + i * sizeof(ModelAnimation));
+        if (anim->keyframePoses) {
+            for (int k = 0; k < anim->keyframeCount; k++) {
+                if (anim->keyframePoses[k]) free(anim->keyframePoses[k]);
+            }
+            free(anim->keyframePoses);
+            anim->keyframePoses = NULL;
+        }
+    }
 }
 
 bool rl_IsModelAnimationValid(const uint8_t *model_ptr, size_t model_len, const uint8_t *anim_ptr, size_t anim_len) {
@@ -2240,6 +2347,18 @@ void rl_LoadWave(const uint8_t *fileName_ptr, size_t fileName_len, uint8_t *out,
     Wave __v = LoadWave((const char *)fileName_buf);
     free(fileName_buf);
     memcpy(out, &__v, sizeof(__v));
+}
+
+void rl_LoadWaveFromMemory(const uint8_t *fileType_ptr, size_t fileType_len, const uint8_t *data_ptr, size_t data_len, int32_t dataSize, uint8_t *out, size_t out_len) {
+    if (out_len != sizeof(Wave)) return;
+    char *type_buf = (char *)malloc(fileType_len + 1);
+    if (!type_buf) return;
+    memcpy(type_buf, fileType_ptr, fileType_len);
+    type_buf[fileType_len] = '\0';
+    int size = (dataSize > 0) ? dataSize : (int)data_len;
+    Wave w = LoadWaveFromMemory((const char *)type_buf, (const unsigned char *)data_ptr, size);
+    free(type_buf);
+    memcpy(out, &w, sizeof(Wave));
 }
 
 bool rl_IsWaveValid(const uint8_t *wave_ptr, size_t wave_len) {
@@ -2426,6 +2545,18 @@ void rl_LoadMusicStream(const uint8_t *fileName_ptr, size_t fileName_len, uint8_
     Music __v = LoadMusicStream((const char *)fileName_buf);
     free(fileName_buf);
     memcpy(out, &__v, sizeof(__v));
+}
+
+void rl_LoadMusicStreamFromMemory(const uint8_t *fileType_ptr, size_t fileType_len, const uint8_t *data_ptr, size_t data_len, int32_t dataSize, uint8_t *out, size_t out_len) {
+    if (out_len != sizeof(Music)) return;
+    char *type_buf = (char *)malloc(fileType_len + 1);
+    if (!type_buf) return;
+    memcpy(type_buf, fileType_ptr, fileType_len);
+    type_buf[fileType_len] = '\0';
+    int size = (dataSize > 0) ? dataSize : (int)data_len;
+    Music m = LoadMusicStreamFromMemory((const char *)type_buf, (const unsigned char *)data_ptr, size);
+    free(type_buf);
+    memcpy(out, &m, sizeof(Music));
 }
 
 bool rl_IsMusicValid(const uint8_t *music_ptr, size_t music_len) {
