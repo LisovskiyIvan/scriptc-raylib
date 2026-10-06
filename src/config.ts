@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { join } from "node:path";
 
-export interface CraylibConfig {
+export interface RaylibConfig {
   /**
    * Path to the raylib library (e.g. .dylib on macOS, .so on Linux, .dll/.lib on Windows).
    * Can be set to "auto" to automatically discover raylib on the current operating system.
@@ -14,11 +14,6 @@ export interface CraylibConfig {
    * Path to raylib headers directory or raylib.h file.
    */
   headerPath?: string;
-
-  /**
-   * Base directory for game assets. Default: "./assets"
-   */
-  assetsDir?: string;
 
   /**
    * Path to raylib_ffi.json manifest.
@@ -35,6 +30,8 @@ export interface CraylibConfig {
    */
   resolvedHeaderPath?: string;
 }
+
+export type CraylibConfig = RaylibConfig;
 
 /**
  * Searches for libraylib across Linux, macOS, Windows, and local bundled assets.
@@ -162,9 +159,7 @@ export function findRaylibHeader(explicit?: string): string | null {
   return null;
 }
 
-let _config: CraylibConfig = {
-  assetsDir: "./assets",
-};
+let _config: RaylibConfig = {};
 
 /**
  * Configure craylib runtime settings or set a custom path to the raylib library.
@@ -179,14 +174,13 @@ let _config: CraylibConfig = {
  *   raylibPath: "/usr/lib/libraylib.so", // Linux
  *   // raylibPath: "/opt/homebrew/lib/libraylib.dylib", // macOS
  *   // raylibPath: "C:/raylib/raylib/src/raylib.dll", // Windows
- *   assetsDir: "./assets"
  * });
  *
  * // Or automatic cross-platform discovery:
  * Raylib.config({ raylibPath: "auto" });
  * ```
  */
-export function config(cfg?: CraylibConfig): CraylibConfig {
+export function config(cfg?: RaylibConfig): RaylibConfig {
   if (!cfg) {
     _config.resolvedRaylibPath = findRaylibLibrary() ?? undefined;
     _config.resolvedHeaderPath = findRaylibHeader() ?? undefined;

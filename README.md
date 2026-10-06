@@ -124,15 +124,18 @@ Raylib.closeWindow();
 
 ### Настройка пути к raylib: `Raylib.config`
 
-Функция `Raylib.config` (или `raylib.config`) позволяет задать путь к библиотеке raylib и директорию ассетов:
+Функция `Raylib.config` (принимает опции интерфейса `RaylibConfig`) позволяет явно задать путь к библиотеке raylib или выполнить автопоиск:
 
 ```ts
 import { Raylib } from "craylib";
 
+// Ручной путь (Linux, macOS или Windows):
 Raylib.config({
-  raylibPath: "/opt/homebrew/lib/libraylib.dylib", // путь к dylib/библиотеке
-  assetsDir: "./assets"                           // папка ассетов
+  raylibPath: "/opt/homebrew/lib/libraylib.dylib",
 });
+
+// Или автоматический поиск:
+Raylib.config({ raylibPath: "auto" });
 ```
 
 При указании `raylibPath` манифест `gen/raylib_ffi.json` автоматически настраивается на указанный путь, позволяя линкеру `scriptc` находить библиотеку без дополнительных переменных окружения.
