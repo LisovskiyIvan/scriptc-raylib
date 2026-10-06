@@ -28,7 +28,7 @@ raylib.h ──(tools/gen_bindings.ts)──► gen/raylib_ffi.json   маниф
                                   └─► gen/raylib.ts         типизированный API + енумы + структуры
                                         │
                                         ▼
-                                     index.ts               реэкспорты, COLORS, KEYS, Raylib
+                                     src/index.ts           реэкспорты, COLORS, KEYS, Raylib
                                         │
 demo/main.ts ──(scriptc build --ffi)───┴──────────────────► demo/demo (нативный бинарник)
 ```

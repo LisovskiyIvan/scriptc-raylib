@@ -3,21 +3,20 @@
   "version": "0.1.0",
   "description": "Fast typed raylib bindings for scriptc (TypeScript to native AOT)",
   "type": "module",
-  "main": "./index.ts",
-  "module": "./index.ts",
-  "types": "./index.ts",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "exports": {
-    ".": "./index.ts",
+    ".": "./src/index.ts",
     "./ffi": "./gen/raylib_ffi.json",
-    "./colors": "./colors.ts",
-    "./constants": "./constants.ts"
+    "./colors": "./src/colors.ts",
+    "./constants": "./src/constants.ts",
+    "./types": "./src/types.ts"
   },
   "files": [
-    "index.ts",
-    "colors.ts",
-    "constants.ts",
-    "gen",
     "src",
+    "gen",
+    "assets",
     "build.sh",
     "README.md",
     "LICENSE"

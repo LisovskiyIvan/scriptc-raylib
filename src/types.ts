@@ -1,3 +1,9 @@
+import type { Vector2, Vector3, Vector4 } from "../gen/raylib";
+
+export type Vec2 = Vector2;
+export type Vec3 = Vector3;
+export type Vec4 = Vector4;
+
 export type {
   Camera3D,
   Camera2D,
@@ -5,9 +11,6 @@ export type {
   Vector2,
   Vector3,
   Vector4,
-  Vec2,
-  Vec3,
-  Vec4,
   Matrix,
   Color,
   Rectangle,
@@ -41,4 +44,4 @@ export type {
   AutomationEvent,
   AutomationEventList,
   Quaternion,
-} from "../index";
+} from "../gen/raylib";

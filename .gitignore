@@ -3,6 +3,7 @@ node_modules/
 
 # Compilation outputs
 *.o
+*.a
 *.ll
 *.dSYM
 demo/demo
