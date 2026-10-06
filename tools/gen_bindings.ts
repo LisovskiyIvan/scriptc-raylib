@@ -838,6 +838,86 @@ const CUSTOM_HANDLERS: Record<string, () => Extract<FnPlan, { k: "custom" }>> = 
   }
 }`,
   }),
+  ImageClearBackground: () => ({
+    k: "custom",
+    tsName: "rl_ImageClearBackground",
+    symbol: "rl_ImageClearBackground",
+    manifestParams: ["mutable-bytes", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_ImageClearBackground(uint8_t *dst_ptr, size_t dst_len, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len != sizeof(Image)) return;
+    ImageClearBackground((Image *)dst_ptr, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_ImageClearBackground(dst: Uint8Array, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function ImageClearBackground(dst: Image, color: Color): void {
+  rl_ImageClearBackground(dst, color.r, color.g, color.b, color.a);
+}`,
+  }),
+  ImageDrawRectangle: () => ({
+    k: "custom",
+    tsName: "rl_ImageDrawRectangle",
+    symbol: "rl_ImageDrawRectangle",
+    manifestParams: ["mutable-bytes", "i32", "i32", "i32", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_ImageDrawRectangle(uint8_t *dst_ptr, size_t dst_len, int32_t posX, int32_t posY, int32_t width, int32_t height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len != sizeof(Image)) return;
+    ImageDrawRectangle((Image *)dst_ptr, posX, posY, width, height, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_ImageDrawRectangle(dst: Uint8Array, posX: number, posY: number, width: number, height: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function ImageDrawRectangle(dst: Image, posX: number, posY: number, width: number, height: number, color: Color): void {
+  rl_ImageDrawRectangle(dst, posX, posY, width, height, color.r, color.g, color.b, color.a);
+}`,
+  }),
+  ImageDrawCircle: () => ({
+    k: "custom",
+    tsName: "rl_ImageDrawCircle",
+    symbol: "rl_ImageDrawCircle",
+    manifestParams: ["mutable-bytes", "i32", "i32", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_ImageDrawCircle(uint8_t *dst_ptr, size_t dst_len, int32_t centerX, int32_t centerY, int32_t radius, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len != sizeof(Image)) return;
+    ImageDrawCircle((Image *)dst_ptr, centerX, centerY, radius, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_ImageDrawCircle(dst: Uint8Array, centerX: number, centerY: number, radius: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function ImageDrawCircle(dst: Image, centerX: number, centerY: number, radius: number, color: Color): void {
+  rl_ImageDrawCircle(dst, centerX, centerY, radius, color.r, color.g, color.b, color.a);
+}`,
+  }),
+  ImageDrawLine: () => ({
+    k: "custom",
+    tsName: "rl_ImageDrawLine",
+    symbol: "rl_ImageDrawLine",
+    manifestParams: ["mutable-bytes", "i32", "i32", "i32", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_ImageDrawLine(uint8_t *dst_ptr, size_t dst_len, int32_t startPosX, int32_t startPosY, int32_t endPosX, int32_t endPosY, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len != sizeof(Image)) return;
+    ImageDrawLine((Image *)dst_ptr, startPosX, startPosY, endPosX, endPosY, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_ImageDrawLine(dst: Uint8Array, startPosX: number, startPosY: number, endPosX: number, endPosY: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function ImageDrawLine(dst: Image, startPosX: number, startPosY: number, endPosX: number, endPosY: number, color: Color): void {
+  rl_ImageDrawLine(dst, startPosX, startPosY, endPosX, endPosY, color.r, color.g, color.b, color.a);
+}`,
+  }),
+  ImageDrawText: () => ({
+    k: "custom",
+    tsName: "rl_ImageDrawText",
+    symbol: "rl_ImageDrawText",
+    manifestParams: ["mutable-bytes", "string", "i32", "i32", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_ImageDrawText(uint8_t *dst_ptr, size_t dst_len, const uint8_t *text_ptr, size_t text_len, int32_t posX, int32_t posY, int32_t fontSize, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len != sizeof(Image)) return;
+    char *text_buf = (char *)malloc(text_len + 1);
+    if (!text_buf) return;
+    memcpy(text_buf, text_ptr, text_len);
+    text_buf[text_len] = '\\0';
+    ImageDrawText((Image *)dst_ptr, text_buf, posX, posY, fontSize, (Color){ r, g, b, a });
+    free(text_buf);
+}`,
+    ffiDecl: `export declare function rl_ImageDrawText(dst: Uint8Array, text: string, posX: number, posY: number, fontSize: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function ImageDrawText(dst: Image, text: string, posX: number, posY: number, fontSize: number, color: Color): void {
+  rl_ImageDrawText(dst, text, posX, posY, fontSize, color.r, color.g, color.b, color.a);
+}`,
+  }),
 };
 
 function classify(fn: RawFn): FnPlan {

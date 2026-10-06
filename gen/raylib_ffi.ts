@@ -261,6 +261,11 @@ export declare function rl_ImageText(text: string, fontSize: number, color_r: nu
 export declare function rl_ImageTextEx(font: Uint8Array, text: string, fontSize: number, spacing: number, tint_r: number, tint_g: number, tint_b: number, tint_a: number, __out: Uint8Array): void;
 export declare function rl_GetImageAlphaBorder(image: Uint8Array, threshold: number, __out: Uint8Array): void;
 export declare function rl_GetImageColor(image: Uint8Array, x: number, y: number, __out: Uint8Array): void;
+export declare function rl_ImageClearBackground(dst: Uint8Array, r: number, g: number, b: number, a: number): void;
+export declare function rl_ImageDrawLine(dst: Uint8Array, startPosX: number, startPosY: number, endPosX: number, endPosY: number, r: number, g: number, b: number, a: number): void;
+export declare function rl_ImageDrawCircle(dst: Uint8Array, centerX: number, centerY: number, radius: number, r: number, g: number, b: number, a: number): void;
+export declare function rl_ImageDrawRectangle(dst: Uint8Array, posX: number, posY: number, width: number, height: number, r: number, g: number, b: number, a: number): void;
+export declare function rl_ImageDrawText(dst: Uint8Array, text: string, posX: number, posY: number, fontSize: number, r: number, g: number, b: number, a: number): void;
 export declare function rl_LoadTexture(fileName: string, __out: Uint8Array): void;
 export declare function rl_LoadTextureFromImage(image: Uint8Array, __out: Uint8Array): void;
 export declare function rl_LoadTextureCubemap(image: Uint8Array, layout: number, __out: Uint8Array): void;

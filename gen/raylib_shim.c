@@ -1088,6 +1088,36 @@ void rl_GetImageColor(const uint8_t *image_ptr, size_t image_len, int32_t x, int
     memcpy(out, &__v, sizeof(__v));
 }
 
+void rl_ImageClearBackground(uint8_t *dst_ptr, size_t dst_len, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len != sizeof(Image)) return;
+    ImageClearBackground((Image *)dst_ptr, (Color){ r, g, b, a });
+}
+
+void rl_ImageDrawLine(uint8_t *dst_ptr, size_t dst_len, int32_t startPosX, int32_t startPosY, int32_t endPosX, int32_t endPosY, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len != sizeof(Image)) return;
+    ImageDrawLine((Image *)dst_ptr, startPosX, startPosY, endPosX, endPosY, (Color){ r, g, b, a });
+}
+
+void rl_ImageDrawCircle(uint8_t *dst_ptr, size_t dst_len, int32_t centerX, int32_t centerY, int32_t radius, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len != sizeof(Image)) return;
+    ImageDrawCircle((Image *)dst_ptr, centerX, centerY, radius, (Color){ r, g, b, a });
+}
+
+void rl_ImageDrawRectangle(uint8_t *dst_ptr, size_t dst_len, int32_t posX, int32_t posY, int32_t width, int32_t height, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len != sizeof(Image)) return;
+    ImageDrawRectangle((Image *)dst_ptr, posX, posY, width, height, (Color){ r, g, b, a });
+}
+
+void rl_ImageDrawText(uint8_t *dst_ptr, size_t dst_len, const uint8_t *text_ptr, size_t text_len, int32_t posX, int32_t posY, int32_t fontSize, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len != sizeof(Image)) return;
+    char *text_buf = (char *)malloc(text_len + 1);
+    if (!text_buf) return;
+    memcpy(text_buf, text_ptr, text_len);
+    text_buf[text_len] = '\0';
+    ImageDrawText((Image *)dst_ptr, text_buf, posX, posY, fontSize, (Color){ r, g, b, a });
+    free(text_buf);
+}
+
 void rl_LoadTexture(const uint8_t *fileName_ptr, size_t fileName_len, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(Texture)) { return; }
     char *fileName_buf = (char *)malloc(fileName_len + 1);

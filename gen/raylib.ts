@@ -262,6 +262,11 @@ import {
   rl_ImageTextEx,
   rl_GetImageAlphaBorder,
   rl_GetImageColor,
+  rl_ImageClearBackground,
+  rl_ImageDrawLine,
+  rl_ImageDrawCircle,
+  rl_ImageDrawRectangle,
+  rl_ImageDrawText,
   rl_LoadTexture,
   rl_LoadTextureFromImage,
   rl_LoadTextureCubemap,
@@ -2152,6 +2157,26 @@ export function GetImageColor(image: Uint8Array, x: number, y: number): Color {
   return __read_Color(__buf);
 }
 
+export function ImageClearBackground(dst: Image, color: Color): void {
+  rl_ImageClearBackground(dst, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawLine(dst: Image, startPosX: number, startPosY: number, endPosX: number, endPosY: number, color: Color): void {
+  rl_ImageDrawLine(dst, startPosX, startPosY, endPosX, endPosY, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawCircle(dst: Image, centerX: number, centerY: number, radius: number, color: Color): void {
+  rl_ImageDrawCircle(dst, centerX, centerY, radius, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawRectangle(dst: Image, posX: number, posY: number, width: number, height: number, color: Color): void {
+  rl_ImageDrawRectangle(dst, posX, posY, width, height, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawText(dst: Image, text: string, posX: number, posY: number, fontSize: number, color: Color): void {
+  rl_ImageDrawText(dst, text, posX, posY, fontSize, color.r, color.g, color.b, color.a);
+}
+
 export function LoadTexture(fileName: string): Texture {
   const __buf = new Uint8Array(20);
   rl_LoadTexture(fileName, __buf);
@@ -3501,6 +3526,16 @@ export const Raylib = {
   getImageAlphaBorder: GetImageAlphaBorder,
   GetImageColor,
   getImageColor: GetImageColor,
+  ImageClearBackground,
+  imageClearBackground: ImageClearBackground,
+  ImageDrawLine,
+  imageDrawLine: ImageDrawLine,
+  ImageDrawCircle,
+  imageDrawCircle: ImageDrawCircle,
+  ImageDrawRectangle,
+  imageDrawRectangle: ImageDrawRectangle,
+  ImageDrawText,
+  imageDrawText: ImageDrawText,
   LoadTexture,
   loadTexture: LoadTexture,
   LoadTextureFromImage,

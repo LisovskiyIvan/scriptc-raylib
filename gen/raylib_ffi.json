@@ -2763,6 +2763,81 @@
       "returns": "void"
     },
     {
+      "name": "rl_ImageClearBackground",
+      "symbol": "rl_ImageClearBackground",
+      "params": [
+        "mutable-bytes",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawLine",
+      "symbol": "rl_ImageDrawLine",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawCircle",
+      "symbol": "rl_ImageDrawCircle",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawRectangle",
+      "symbol": "rl_ImageDrawRectangle",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawText",
+      "symbol": "rl_ImageDrawText",
+      "params": [
+        "mutable-bytes",
+        "string",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_LoadTexture",
       "symbol": "rl_LoadTexture",
       "params": [
