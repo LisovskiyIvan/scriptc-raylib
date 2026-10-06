@@ -295,12 +295,29 @@
       "returns": "void"
     },
     {
+      "name": "rl_GetMonitorName",
+      "symbol": "rl_GetMonitorName",
+      "params": [
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "i32"
+    },
+    {
       "name": "rl_SetClipboardText",
       "symbol": "rl_SetClipboardText",
       "params": [
         "string"
       ],
       "returns": "void"
+    },
+    {
+      "name": "rl_GetClipboardText",
+      "symbol": "rl_GetClipboardText",
+      "params": [
+        "mutable-bytes"
+      ],
+      "returns": "i32"
     },
     {
       "name": "rl_GetClipboardImage",
@@ -1137,6 +1154,15 @@
       "returns": "bool"
     },
     {
+      "name": "rl_GetGamepadName",
+      "symbol": "rl_GetGamepadName",
+      "params": [
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "i32"
+    },
+    {
       "name": "rl_IsGamepadButtonPressed",
       "symbol": "IsGamepadButtonPressed",
       "params": [
@@ -1511,6 +1537,19 @@
         "f32",
         "f32",
         "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawLineStrip",
+      "symbol": "rl_DrawLineStrip",
+      "params": [
+        "bytes",
+        "i32",
         "u8",
         "u8",
         "u8",
@@ -2001,6 +2040,32 @@
       "returns": "void"
     },
     {
+      "name": "rl_DrawTriangleFan",
+      "symbol": "rl_DrawTriangleFan",
+      "params": [
+        "bytes",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTriangleStrip",
+      "symbol": "rl_DrawTriangleStrip",
+      "params": [
+        "bytes",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_DrawPoly",
       "symbol": "rl_DrawPoly",
       "params": [
@@ -2041,6 +2106,76 @@
         "i32",
         "f32",
         "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSplineLinear",
+      "symbol": "rl_DrawSplineLinear",
+      "params": [
+        "bytes",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSplineBasis",
+      "symbol": "rl_DrawSplineBasis",
+      "params": [
+        "bytes",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSplineCatmullRom",
+      "symbol": "rl_DrawSplineCatmullRom",
+      "params": [
+        "bytes",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSplineBezierQuadratic",
+      "symbol": "rl_DrawSplineBezierQuadratic",
+      "params": [
+        "bytes",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawSplineBezierCubic",
+      "symbol": "rl_DrawSplineBezierCubic",
+      "params": [
+        "bytes",
+        "i32",
         "f32",
         "u8",
         "u8",
@@ -3133,6 +3268,18 @@
       "returns": "void"
     },
     {
+      "name": "rl_LoadFontEx",
+      "symbol": "rl_LoadFontEx",
+      "params": [
+        "string",
+        "i32",
+        "bytes",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_LoadFontFromImage",
       "symbol": "rl_LoadFontFromImage",
       "params": [
@@ -3315,6 +3462,33 @@
       "returns": "i32"
     },
     {
+      "name": "rl_GetCodepoint",
+      "symbol": "rl_GetCodepoint",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetCodepointNext",
+      "symbol": "rl_GetCodepointNext",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "i32"
+    },
+    {
+      "name": "rl_GetCodepointPrevious",
+      "symbol": "rl_GetCodepointPrevious",
+      "params": [
+        "string",
+        "mutable-bytes"
+      ],
+      "returns": "i32"
+    },
+    {
       "name": "rl_TextIsEqual",
       "symbol": "rl_TextIsEqual",
       "params": [
@@ -3419,6 +3593,19 @@
         "f32",
         "f32",
         "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTriangleStrip3D",
+      "symbol": "rl_DrawTriangleStrip3D",
+      "params": [
+        "bytes",
+        "i32",
         "u8",
         "u8",
         "u8",

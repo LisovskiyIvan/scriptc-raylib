@@ -1,11 +1,13 @@
 import { Raylib, COLORS, KEYS } from "../src";
 import { join } from "path";
+import { existsSync } from "fs";
 
 Raylib.initWindow(1200, 800, "Audio Demo");
 Raylib.setTargetFPS(60);
 Raylib.initAudioDevice();
 
-const audioFile = join(import.meta.dir, "../assets/audio/Preview.ogg");
+const assetDir = existsSync("assets") ? "assets" : "../assets";
+const audioFile = join(assetDir, "audio/Preview.ogg");
 
 let wave = Raylib.loadWave(audioFile);
 let sound = Raylib.loadSound(audioFile);

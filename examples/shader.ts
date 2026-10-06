@@ -1,10 +1,11 @@
 import { Raylib, COLORS, KEYS } from "../src";
 import { join } from "path";
+import { existsSync } from "fs";
 
 Raylib.initWindow(1200, 800, "Shader Demo");
 Raylib.setTargetFPS(60);
 
-const fontDir = join(import.meta.dir, "../assets/fonts");
+const fontDir = existsSync("assets/fonts") ? "assets/fonts" : "../assets/fonts";
 const font = Raylib.loadFontEx(join(fontDir, "test.ttf"), 32);
 
 let time = 0;

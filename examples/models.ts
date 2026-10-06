@@ -1,11 +1,12 @@
 import { Raylib, COLORS, KEYS, CAMERA } from "../src";
 import type { Camera3D } from "../src/types";
 import { join } from "path";
+import { existsSync } from "fs";
 
 Raylib.initWindow(1200, 800, "Model Demo");
 Raylib.setTargetFPS(60);
 
-const dir = join(import.meta.dir, "../assets/models/GLB format");
+const dir = existsSync("assets/models/GLB format") ? "assets/models/GLB format" : "../assets/models/GLB format";
 
 const models = [
   { name: "Sedan", model: Raylib.loadModel(join(dir, "sedan.glb")) },

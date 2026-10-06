@@ -85,6 +85,17 @@ void rl_GetWindowScaleDPI(uint8_t *out, size_t out_len) {
     memcpy(out, &__v, sizeof(__v));
 }
 
+int32_t rl_GetMonitorName(int32_t monitor, uint8_t *out, size_t out_len) {
+    const char *s = GetMonitorName(monitor);
+    if (s == NULL) return 0;
+    size_t len = strlen(s);
+    if (out != NULL && out_len > 0) {
+        size_t c = len < out_len ? len : out_len;
+        memcpy(out, s, c);
+    }
+    return (int32_t)len;
+}
+
 void rl_SetClipboardText(const uint8_t *text_ptr, size_t text_len) {
     char *text_buf = (char *)malloc(text_len + 1);
     if (text_buf == NULL) return;
@@ -92,6 +103,17 @@ void rl_SetClipboardText(const uint8_t *text_ptr, size_t text_len) {
     text_buf[text_len] = '\0';
     SetClipboardText((const char *)text_buf);
     free(text_buf);
+}
+
+int32_t rl_GetClipboardText(uint8_t *out, size_t out_len) {
+    const char *s = GetClipboardText();
+    if (s == NULL) return 0;
+    size_t len = strlen(s);
+    if (out != NULL && out_len > 0) {
+        size_t c = len < out_len ? len : out_len;
+        memcpy(out, s, c);
+    }
+    return (int32_t)len;
 }
 
 void rl_GetClipboardImage(uint8_t *out, size_t out_len) {
@@ -147,66 +169,73 @@ void rl_UnloadVrStereoConfig(const uint8_t *config_ptr, size_t config_len) {
 }
 
 void rl_LoadShader(const uint8_t *vsFileName_ptr, size_t vsFileName_len, const uint8_t *fsFileName_ptr, size_t fsFileName_len, uint8_t *out, size_t out_len) {
-    if (out_len != (size_t)sizeof(Shader)) { return; }
-    char *vsFileName_buf = (char *)malloc(vsFileName_len + 1);
-    if (vsFileName_buf == NULL) return;
-    memcpy(vsFileName_buf, vsFileName_ptr, vsFileName_len);
-    vsFileName_buf[vsFileName_len] = '\0';
-    char *fsFileName_buf = (char *)malloc(fsFileName_len + 1);
-    if (fsFileName_buf == NULL) return;
-    memcpy(fsFileName_buf, fsFileName_ptr, fsFileName_len);
-    fsFileName_buf[fsFileName_len] = '\0';
-    Shader __v = LoadShader((const char *)vsFileName_buf, (const char *)fsFileName_buf);
-    free(vsFileName_buf);
-    free(fsFileName_buf);
+    if (out_len != (size_t)sizeof(Shader)) return;
+    char *vs_buf = NULL;
+    if (vsFileName_len > 0) {
+        vs_buf = (char *)malloc(vsFileName_len + 1);
+        if (vs_buf) { memcpy(vs_buf, vsFileName_ptr, vsFileName_len); vs_buf[vsFileName_len] = '\0'; }
+    }
+    char *fs_buf = NULL;
+    if (fsFileName_len > 0) {
+        fs_buf = (char *)malloc(fsFileName_len + 1);
+        if (fs_buf) { memcpy(fs_buf, fsFileName_ptr, fsFileName_len); fs_buf[fsFileName_len] = '\0'; }
+    }
+    Shader __v = LoadShader(vs_buf, fs_buf);
+    if (vs_buf) free(vs_buf);
+    if (fs_buf) free(fs_buf);
     memcpy(out, &__v, sizeof(__v));
 }
 
 void rl_LoadShaderFromMemory(const uint8_t *vsCode_ptr, size_t vsCode_len, const uint8_t *fsCode_ptr, size_t fsCode_len, uint8_t *out, size_t out_len) {
-    if (out_len != (size_t)sizeof(Shader)) { return; }
-    char *vsCode_buf = (char *)malloc(vsCode_len + 1);
-    if (vsCode_buf == NULL) return;
-    memcpy(vsCode_buf, vsCode_ptr, vsCode_len);
-    vsCode_buf[vsCode_len] = '\0';
-    char *fsCode_buf = (char *)malloc(fsCode_len + 1);
-    if (fsCode_buf == NULL) return;
-    memcpy(fsCode_buf, fsCode_ptr, fsCode_len);
-    fsCode_buf[fsCode_len] = '\0';
-    Shader __v = LoadShaderFromMemory((const char *)vsCode_buf, (const char *)fsCode_buf);
-    free(vsCode_buf);
-    free(fsCode_buf);
+    if (out_len != (size_t)sizeof(Shader)) return;
+    char *vs_buf = NULL;
+    if (vsCode_len > 0) {
+        vs_buf = (char *)malloc(vsCode_len + 1);
+        if (vs_buf) { memcpy(vs_buf, vsCode_ptr, vsCode_len); vs_buf[vsCode_len] = '\0'; }
+    }
+    char *fs_buf = NULL;
+    if (fsCode_len > 0) {
+        fs_buf = (char *)malloc(fsCode_len + 1);
+        if (fs_buf) { memcpy(fs_buf, fsCode_ptr, fsCode_len); fs_buf[fsCode_len] = '\0'; }
+    }
+    Shader __v = LoadShaderFromMemory(vs_buf, fs_buf);
+    if (vs_buf) free(vs_buf);
+    if (fs_buf) free(fs_buf);
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_IsShaderValid(const uint8_t *shader_ptr, size_t shader_len) {
-    if (shader_len != (size_t)sizeof(Shader)) { return; }
+bool rl_IsShaderValid(const uint8_t *shader_ptr, size_t shader_len) {
+    if (shader_len != (size_t)sizeof(Shader)) { return false; }
     Shader shader;
     memcpy(&shader, shader_ptr, sizeof(shader));
-    IsShaderValid(shader);
+    bool __ret = IsShaderValid(shader);
+    return __ret;
 }
 
-void rl_GetShaderLocation(const uint8_t *shader_ptr, size_t shader_len, const uint8_t *uniformName_ptr, size_t uniformName_len) {
-    if (shader_len != (size_t)sizeof(Shader)) { return; }
+int32_t rl_GetShaderLocation(const uint8_t *shader_ptr, size_t shader_len, const uint8_t *uniformName_ptr, size_t uniformName_len) {
+    if (shader_len != (size_t)sizeof(Shader)) { return 0; }
     char *uniformName_buf = (char *)malloc(uniformName_len + 1);
-    if (uniformName_buf == NULL) return;
+    if (uniformName_buf == NULL) return 0;
     memcpy(uniformName_buf, uniformName_ptr, uniformName_len);
     uniformName_buf[uniformName_len] = '\0';
     Shader shader;
     memcpy(&shader, shader_ptr, sizeof(shader));
-    GetShaderLocation(shader, (const char *)uniformName_buf);
+    int32_t __ret = GetShaderLocation(shader, (const char *)uniformName_buf);
     free(uniformName_buf);
+    return __ret;
 }
 
-void rl_GetShaderLocationAttrib(const uint8_t *shader_ptr, size_t shader_len, const uint8_t *attribName_ptr, size_t attribName_len) {
-    if (shader_len != (size_t)sizeof(Shader)) { return; }
+int32_t rl_GetShaderLocationAttrib(const uint8_t *shader_ptr, size_t shader_len, const uint8_t *attribName_ptr, size_t attribName_len) {
+    if (shader_len != (size_t)sizeof(Shader)) { return 0; }
     char *attribName_buf = (char *)malloc(attribName_len + 1);
-    if (attribName_buf == NULL) return;
+    if (attribName_buf == NULL) return 0;
     memcpy(attribName_buf, attribName_ptr, attribName_len);
     attribName_buf[attribName_len] = '\0';
     Shader shader;
     memcpy(&shader, shader_ptr, sizeof(shader));
-    GetShaderLocationAttrib(shader, (const char *)attribName_buf);
+    int32_t __ret = GetShaderLocationAttrib(shader, (const char *)attribName_buf);
     free(attribName_buf);
+    return __ret;
 }
 
 void rl_SetShaderValue(const uint8_t *shader_ptr, size_t shader_len, int32_t locIndex, const uint8_t *value_ptr, size_t value_len, int32_t uniformType) {
@@ -301,138 +330,149 @@ void rl_OpenURL(const uint8_t *url_ptr, size_t url_len) {
     free(url_buf);
 }
 
-void rl_FileRename(const uint8_t *fileName_ptr, size_t fileName_len, const uint8_t *fileRename_ptr, size_t fileRename_len) {
+int32_t rl_FileRename(const uint8_t *fileName_ptr, size_t fileName_len, const uint8_t *fileRename_ptr, size_t fileRename_len) {
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return 0;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
     char *fileRename_buf = (char *)malloc(fileRename_len + 1);
-    if (fileRename_buf == NULL) return;
+    if (fileRename_buf == NULL) return 0;
     memcpy(fileRename_buf, fileRename_ptr, fileRename_len);
     fileRename_buf[fileRename_len] = '\0';
-    FileRename((const char *)fileName_buf, (const char *)fileRename_buf);
+    int32_t __ret = FileRename((const char *)fileName_buf, (const char *)fileRename_buf);
     free(fileName_buf);
     free(fileRename_buf);
+    return __ret;
 }
 
-void rl_FileRemove(const uint8_t *fileName_ptr, size_t fileName_len) {
+int32_t rl_FileRemove(const uint8_t *fileName_ptr, size_t fileName_len) {
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return 0;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
-    FileRemove((const char *)fileName_buf);
+    int32_t __ret = FileRemove((const char *)fileName_buf);
     free(fileName_buf);
+    return __ret;
 }
 
-void rl_FileCopy(const uint8_t *srcPath_ptr, size_t srcPath_len, const uint8_t *dstPath_ptr, size_t dstPath_len) {
+int32_t rl_FileCopy(const uint8_t *srcPath_ptr, size_t srcPath_len, const uint8_t *dstPath_ptr, size_t dstPath_len) {
     char *srcPath_buf = (char *)malloc(srcPath_len + 1);
-    if (srcPath_buf == NULL) return;
+    if (srcPath_buf == NULL) return 0;
     memcpy(srcPath_buf, srcPath_ptr, srcPath_len);
     srcPath_buf[srcPath_len] = '\0';
     char *dstPath_buf = (char *)malloc(dstPath_len + 1);
-    if (dstPath_buf == NULL) return;
+    if (dstPath_buf == NULL) return 0;
     memcpy(dstPath_buf, dstPath_ptr, dstPath_len);
     dstPath_buf[dstPath_len] = '\0';
-    FileCopy((const char *)srcPath_buf, (const char *)dstPath_buf);
+    int32_t __ret = FileCopy((const char *)srcPath_buf, (const char *)dstPath_buf);
     free(srcPath_buf);
     free(dstPath_buf);
+    return __ret;
 }
 
-void rl_FileMove(const uint8_t *srcPath_ptr, size_t srcPath_len, const uint8_t *dstPath_ptr, size_t dstPath_len) {
+int32_t rl_FileMove(const uint8_t *srcPath_ptr, size_t srcPath_len, const uint8_t *dstPath_ptr, size_t dstPath_len) {
     char *srcPath_buf = (char *)malloc(srcPath_len + 1);
-    if (srcPath_buf == NULL) return;
+    if (srcPath_buf == NULL) return 0;
     memcpy(srcPath_buf, srcPath_ptr, srcPath_len);
     srcPath_buf[srcPath_len] = '\0';
     char *dstPath_buf = (char *)malloc(dstPath_len + 1);
-    if (dstPath_buf == NULL) return;
+    if (dstPath_buf == NULL) return 0;
     memcpy(dstPath_buf, dstPath_ptr, dstPath_len);
     dstPath_buf[dstPath_len] = '\0';
-    FileMove((const char *)srcPath_buf, (const char *)dstPath_buf);
+    int32_t __ret = FileMove((const char *)srcPath_buf, (const char *)dstPath_buf);
     free(srcPath_buf);
     free(dstPath_buf);
+    return __ret;
 }
 
-void rl_FileTextReplace(const uint8_t *fileName_ptr, size_t fileName_len, const uint8_t *search_ptr, size_t search_len, const uint8_t *replacement_ptr, size_t replacement_len) {
+int32_t rl_FileTextReplace(const uint8_t *fileName_ptr, size_t fileName_len, const uint8_t *search_ptr, size_t search_len, const uint8_t *replacement_ptr, size_t replacement_len) {
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return 0;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
     char *search_buf = (char *)malloc(search_len + 1);
-    if (search_buf == NULL) return;
+    if (search_buf == NULL) return 0;
     memcpy(search_buf, search_ptr, search_len);
     search_buf[search_len] = '\0';
     char *replacement_buf = (char *)malloc(replacement_len + 1);
-    if (replacement_buf == NULL) return;
+    if (replacement_buf == NULL) return 0;
     memcpy(replacement_buf, replacement_ptr, replacement_len);
     replacement_buf[replacement_len] = '\0';
-    FileTextReplace((const char *)fileName_buf, (const char *)search_buf, (const char *)replacement_buf);
+    int32_t __ret = FileTextReplace((const char *)fileName_buf, (const char *)search_buf, (const char *)replacement_buf);
     free(fileName_buf);
     free(search_buf);
     free(replacement_buf);
+    return __ret;
 }
 
-void rl_FileTextFindIndex(const uint8_t *fileName_ptr, size_t fileName_len, const uint8_t *search_ptr, size_t search_len) {
+int32_t rl_FileTextFindIndex(const uint8_t *fileName_ptr, size_t fileName_len, const uint8_t *search_ptr, size_t search_len) {
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return 0;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
     char *search_buf = (char *)malloc(search_len + 1);
-    if (search_buf == NULL) return;
+    if (search_buf == NULL) return 0;
     memcpy(search_buf, search_ptr, search_len);
     search_buf[search_len] = '\0';
-    FileTextFindIndex((const char *)fileName_buf, (const char *)search_buf);
+    int32_t __ret = FileTextFindIndex((const char *)fileName_buf, (const char *)search_buf);
     free(fileName_buf);
     free(search_buf);
+    return __ret;
 }
 
-void rl_IsFileExtension(const uint8_t *fileName_ptr, size_t fileName_len, const uint8_t *ext_ptr, size_t ext_len) {
+bool rl_IsFileExtension(const uint8_t *fileName_ptr, size_t fileName_len, const uint8_t *ext_ptr, size_t ext_len) {
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return false;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
     char *ext_buf = (char *)malloc(ext_len + 1);
-    if (ext_buf == NULL) return;
+    if (ext_buf == NULL) return false;
     memcpy(ext_buf, ext_ptr, ext_len);
     ext_buf[ext_len] = '\0';
-    IsFileExtension((const char *)fileName_buf, (const char *)ext_buf);
+    bool __ret = IsFileExtension((const char *)fileName_buf, (const char *)ext_buf);
     free(fileName_buf);
     free(ext_buf);
+    return __ret;
 }
 
-void rl_GetFileLength(const uint8_t *fileName_ptr, size_t fileName_len) {
+int32_t rl_GetFileLength(const uint8_t *fileName_ptr, size_t fileName_len) {
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return 0;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
-    GetFileLength((const char *)fileName_buf);
+    int32_t __ret = GetFileLength((const char *)fileName_buf);
     free(fileName_buf);
+    return __ret;
 }
 
-void rl_MakeDirectory(const uint8_t *dirPath_ptr, size_t dirPath_len) {
+int32_t rl_MakeDirectory(const uint8_t *dirPath_ptr, size_t dirPath_len) {
     char *dirPath_buf = (char *)malloc(dirPath_len + 1);
-    if (dirPath_buf == NULL) return;
+    if (dirPath_buf == NULL) return 0;
     memcpy(dirPath_buf, dirPath_ptr, dirPath_len);
     dirPath_buf[dirPath_len] = '\0';
-    MakeDirectory((const char *)dirPath_buf);
+    int32_t __ret = MakeDirectory((const char *)dirPath_buf);
     free(dirPath_buf);
+    return __ret;
 }
 
-void rl_IsPathFile(const uint8_t *path_ptr, size_t path_len) {
+bool rl_IsPathFile(const uint8_t *path_ptr, size_t path_len) {
     char *path_buf = (char *)malloc(path_len + 1);
-    if (path_buf == NULL) return;
+    if (path_buf == NULL) return false;
     memcpy(path_buf, path_ptr, path_len);
     path_buf[path_len] = '\0';
-    IsPathFile((const char *)path_buf);
+    bool __ret = IsPathFile((const char *)path_buf);
     free(path_buf);
+    return __ret;
 }
 
-void rl_IsFileNameValid(const uint8_t *fileName_ptr, size_t fileName_len) {
+bool rl_IsFileNameValid(const uint8_t *fileName_ptr, size_t fileName_len) {
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return false;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
-    IsFileNameValid((const char *)fileName_buf);
+    bool __ret = IsFileNameValid((const char *)fileName_buf);
     free(fileName_buf);
+    return __ret;
 }
 
 void rl_LoadDirectoryFiles(const uint8_t *dirPath_ptr, size_t dirPath_len, uint8_t *out, size_t out_len) {
@@ -469,27 +509,29 @@ void rl_UnloadDirectoryFiles(const uint8_t *files_ptr, size_t files_len) {
     UnloadDirectoryFiles(files);
 }
 
-void rl_GetDirectoryFileCount(const uint8_t *dirPath_ptr, size_t dirPath_len) {
+uint32_t rl_GetDirectoryFileCount(const uint8_t *dirPath_ptr, size_t dirPath_len) {
     char *dirPath_buf = (char *)malloc(dirPath_len + 1);
-    if (dirPath_buf == NULL) return;
+    if (dirPath_buf == NULL) return 0;
     memcpy(dirPath_buf, dirPath_ptr, dirPath_len);
     dirPath_buf[dirPath_len] = '\0';
-    GetDirectoryFileCount((const char *)dirPath_buf);
+    uint32_t __ret = GetDirectoryFileCount((const char *)dirPath_buf);
     free(dirPath_buf);
+    return __ret;
 }
 
-void rl_GetDirectoryFileCountEx(const uint8_t *basePath_ptr, size_t basePath_len, const uint8_t *filter_ptr, size_t filter_len, bool scanSubdirs) {
+uint32_t rl_GetDirectoryFileCountEx(const uint8_t *basePath_ptr, size_t basePath_len, const uint8_t *filter_ptr, size_t filter_len, bool scanSubdirs) {
     char *basePath_buf = (char *)malloc(basePath_len + 1);
-    if (basePath_buf == NULL) return;
+    if (basePath_buf == NULL) return 0;
     memcpy(basePath_buf, basePath_ptr, basePath_len);
     basePath_buf[basePath_len] = '\0';
     char *filter_buf = (char *)malloc(filter_len + 1);
-    if (filter_buf == NULL) return;
+    if (filter_buf == NULL) return 0;
     memcpy(filter_buf, filter_ptr, filter_len);
     filter_buf[filter_len] = '\0';
-    GetDirectoryFileCountEx((const char *)basePath_buf, (const char *)filter_buf, scanSubdirs);
+    uint32_t __ret = GetDirectoryFileCountEx((const char *)basePath_buf, (const char *)filter_buf, scanSubdirs);
     free(basePath_buf);
     free(filter_buf);
+    return __ret;
 }
 
 void rl_UnloadAutomationEventList(const uint8_t *list_ptr, size_t list_len) {
@@ -499,16 +541,17 @@ void rl_UnloadAutomationEventList(const uint8_t *list_ptr, size_t list_len) {
     UnloadAutomationEventList(list);
 }
 
-void rl_ExportAutomationEventList(const uint8_t *list_ptr, size_t list_len, const uint8_t *fileName_ptr, size_t fileName_len) {
-    if (list_len != (size_t)sizeof(AutomationEventList)) { return; }
+bool rl_ExportAutomationEventList(const uint8_t *list_ptr, size_t list_len, const uint8_t *fileName_ptr, size_t fileName_len) {
+    if (list_len != (size_t)sizeof(AutomationEventList)) { return false; }
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return false;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
     AutomationEventList list;
     memcpy(&list, list_ptr, sizeof(list));
-    ExportAutomationEventList(list, (const char *)fileName_buf);
+    bool __ret = ExportAutomationEventList(list, (const char *)fileName_buf);
     free(fileName_buf);
+    return __ret;
 }
 
 void rl_PlayAutomationEvent(const uint8_t *event_ptr, size_t event_len) {
@@ -518,13 +561,25 @@ void rl_PlayAutomationEvent(const uint8_t *event_ptr, size_t event_len) {
     PlayAutomationEvent(event);
 }
 
-void rl_SetGamepadMappings(const uint8_t *mappings_ptr, size_t mappings_len) {
+int32_t rl_GetGamepadName(int32_t gamepad, uint8_t *out, size_t out_len) {
+    const char *s = GetGamepadName(gamepad);
+    if (s == NULL) return 0;
+    size_t len = strlen(s);
+    if (out != NULL && out_len > 0) {
+        size_t c = len < out_len ? len : out_len;
+        memcpy(out, s, c);
+    }
+    return (int32_t)len;
+}
+
+int32_t rl_SetGamepadMappings(const uint8_t *mappings_ptr, size_t mappings_len) {
     char *mappings_buf = (char *)malloc(mappings_len + 1);
-    if (mappings_buf == NULL) return;
+    if (mappings_buf == NULL) return 0;
     memcpy(mappings_buf, mappings_ptr, mappings_len);
     mappings_buf[mappings_len] = '\0';
-    SetGamepadMappings((const char *)mappings_buf);
+    int32_t __ret = SetGamepadMappings((const char *)mappings_buf);
     free(mappings_buf);
+    return __ret;
 }
 
 void rl_GetMousePosition(uint8_t *out, size_t out_len) {
@@ -597,6 +652,10 @@ void rl_DrawLineV(float startPos_x, float startPos_y, float endPos_x, float endP
 
 void rl_DrawLineEx(float startPos_x, float startPos_y, float endPos_x, float endPos_y, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
     DrawLineEx((Vector2){ startPos_x, startPos_y }, (Vector2){ endPos_x, endPos_y }, thick, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawLineStrip(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawLineStrip((const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
 }
 
 void rl_DrawLineBezier(float startPos_x, float startPos_y, float endPos_x, float endPos_y, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
@@ -715,6 +774,14 @@ void rl_DrawTriangleLines(float v1_x, float v1_y, float v2_x, float v2_y, float 
     DrawTriangleLines((Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
 }
 
+void rl_DrawTriangleFan(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawTriangleFan((const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}
+
+void rl_DrawTriangleStrip(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawTriangleStrip((const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}
+
 void rl_DrawPoly(float center_x, float center_y, int32_t sides, float radius, float rotation, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
     DrawPoly((Vector2){ center_x, center_y }, sides, radius, rotation, (Color){ color_r, color_g, color_b, color_a });
 }
@@ -725,6 +792,26 @@ void rl_DrawPolyLines(float center_x, float center_y, int32_t sides, float radiu
 
 void rl_DrawPolyLinesEx(float center_x, float center_y, int32_t sides, float radius, float rotation, float lineThick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
     DrawPolyLinesEx((Vector2){ center_x, center_y }, sides, radius, rotation, lineThick, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawSplineLinear(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, float thick, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawSplineLinear((const Vector2 *)points_ptr, pointCount, thick, (Color){ r, g, b, a });
+}
+
+void rl_DrawSplineBasis(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, float thick, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawSplineBasis((const Vector2 *)points_ptr, pointCount, thick, (Color){ r, g, b, a });
+}
+
+void rl_DrawSplineCatmullRom(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, float thick, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawSplineCatmullRom((const Vector2 *)points_ptr, pointCount, thick, (Color){ r, g, b, a });
+}
+
+void rl_DrawSplineBezierQuadratic(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, float thick, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawSplineBezierQuadratic((const Vector2 *)points_ptr, pointCount, thick, (Color){ r, g, b, a });
+}
+
+void rl_DrawSplineBezierCubic(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, float thick, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawSplineBezierCubic((const Vector2 *)points_ptr, pointCount, thick, (Color){ r, g, b, a });
 }
 
 void rl_DrawSplineSegmentLinear(float p1_x, float p1_y, float p2_x, float p2_y, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
@@ -777,36 +864,44 @@ void rl_GetSplinePointBezierCubic(float p1_x, float p1_y, float c2_x, float c2_y
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_CheckCollisionRecs(float rec1_x, float rec1_y, float rec1_width, float rec1_height, float rec2_x, float rec2_y, float rec2_width, float rec2_height) {
-    CheckCollisionRecs((Rectangle){ rec1_x, rec1_y, rec1_width, rec1_height }, (Rectangle){ rec2_x, rec2_y, rec2_width, rec2_height });
+bool rl_CheckCollisionRecs(float rec1_x, float rec1_y, float rec1_width, float rec1_height, float rec2_x, float rec2_y, float rec2_width, float rec2_height) {
+    bool __ret = CheckCollisionRecs((Rectangle){ rec1_x, rec1_y, rec1_width, rec1_height }, (Rectangle){ rec2_x, rec2_y, rec2_width, rec2_height });
+    return __ret;
 }
 
-void rl_CheckCollisionCircles(float center1_x, float center1_y, float radius1, float center2_x, float center2_y, float radius2) {
-    CheckCollisionCircles((Vector2){ center1_x, center1_y }, radius1, (Vector2){ center2_x, center2_y }, radius2);
+bool rl_CheckCollisionCircles(float center1_x, float center1_y, float radius1, float center2_x, float center2_y, float radius2) {
+    bool __ret = CheckCollisionCircles((Vector2){ center1_x, center1_y }, radius1, (Vector2){ center2_x, center2_y }, radius2);
+    return __ret;
 }
 
-void rl_CheckCollisionCircleRec(float center_x, float center_y, float radius, float rec_x, float rec_y, float rec_width, float rec_height) {
-    CheckCollisionCircleRec((Vector2){ center_x, center_y }, radius, (Rectangle){ rec_x, rec_y, rec_width, rec_height });
+bool rl_CheckCollisionCircleRec(float center_x, float center_y, float radius, float rec_x, float rec_y, float rec_width, float rec_height) {
+    bool __ret = CheckCollisionCircleRec((Vector2){ center_x, center_y }, radius, (Rectangle){ rec_x, rec_y, rec_width, rec_height });
+    return __ret;
 }
 
-void rl_CheckCollisionCircleLine(float center_x, float center_y, float radius, float p1_x, float p1_y, float p2_x, float p2_y) {
-    CheckCollisionCircleLine((Vector2){ center_x, center_y }, radius, (Vector2){ p1_x, p1_y }, (Vector2){ p2_x, p2_y });
+bool rl_CheckCollisionCircleLine(float center_x, float center_y, float radius, float p1_x, float p1_y, float p2_x, float p2_y) {
+    bool __ret = CheckCollisionCircleLine((Vector2){ center_x, center_y }, radius, (Vector2){ p1_x, p1_y }, (Vector2){ p2_x, p2_y });
+    return __ret;
 }
 
-void rl_CheckCollisionPointRec(float point_x, float point_y, float rec_x, float rec_y, float rec_width, float rec_height) {
-    CheckCollisionPointRec((Vector2){ point_x, point_y }, (Rectangle){ rec_x, rec_y, rec_width, rec_height });
+bool rl_CheckCollisionPointRec(float point_x, float point_y, float rec_x, float rec_y, float rec_width, float rec_height) {
+    bool __ret = CheckCollisionPointRec((Vector2){ point_x, point_y }, (Rectangle){ rec_x, rec_y, rec_width, rec_height });
+    return __ret;
 }
 
-void rl_CheckCollisionPointCircle(float point_x, float point_y, float center_x, float center_y, float radius) {
-    CheckCollisionPointCircle((Vector2){ point_x, point_y }, (Vector2){ center_x, center_y }, radius);
+bool rl_CheckCollisionPointCircle(float point_x, float point_y, float center_x, float center_y, float radius) {
+    bool __ret = CheckCollisionPointCircle((Vector2){ point_x, point_y }, (Vector2){ center_x, center_y }, radius);
+    return __ret;
 }
 
-void rl_CheckCollisionPointTriangle(float point_x, float point_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y) {
-    CheckCollisionPointTriangle((Vector2){ point_x, point_y }, (Vector2){ p1_x, p1_y }, (Vector2){ p2_x, p2_y }, (Vector2){ p3_x, p3_y });
+bool rl_CheckCollisionPointTriangle(float point_x, float point_y, float p1_x, float p1_y, float p2_x, float p2_y, float p3_x, float p3_y) {
+    bool __ret = CheckCollisionPointTriangle((Vector2){ point_x, point_y }, (Vector2){ p1_x, p1_y }, (Vector2){ p2_x, p2_y }, (Vector2){ p3_x, p3_y });
+    return __ret;
 }
 
-void rl_CheckCollisionPointLine(float point_x, float point_y, float p1_x, float p1_y, float p2_x, float p2_y, int32_t threshold) {
-    CheckCollisionPointLine((Vector2){ point_x, point_y }, (Vector2){ p1_x, p1_y }, (Vector2){ p2_x, p2_y }, threshold);
+bool rl_CheckCollisionPointLine(float point_x, float point_y, float p1_x, float p1_y, float p2_x, float p2_y, int32_t threshold) {
+    bool __ret = CheckCollisionPointLine((Vector2){ point_x, point_y }, (Vector2){ p1_x, p1_y }, (Vector2){ p2_x, p2_y }, threshold);
+    return __ret;
 }
 
 void rl_GetCollisionRec(float rec1_x, float rec1_y, float rec1_width, float rec1_height, float rec2_x, float rec2_y, float rec2_width, float rec2_height, uint8_t *out, size_t out_len) {
@@ -849,11 +944,12 @@ void rl_LoadImageFromScreen(uint8_t *out, size_t out_len) {
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_IsImageValid(const uint8_t *image_ptr, size_t image_len) {
-    if (image_len != (size_t)sizeof(Image)) { return; }
+bool rl_IsImageValid(const uint8_t *image_ptr, size_t image_len) {
+    if (image_len != (size_t)sizeof(Image)) { return false; }
     Image image;
     memcpy(&image, image_ptr, sizeof(image));
-    IsImageValid(image);
+    bool __ret = IsImageValid(image);
+    return __ret;
 }
 
 void rl_UnloadImage(const uint8_t *image_ptr, size_t image_len) {
@@ -1027,16 +1123,18 @@ void rl_LoadRenderTexture(int32_t width, int32_t height, uint8_t *out, size_t ou
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_IsTextureValid(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format) {
-    IsTextureValid((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format });
+bool rl_IsTextureValid(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format) {
+    bool __ret = IsTextureValid((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format });
+    return __ret;
 }
 
 void rl_UnloadTexture(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format) {
     UnloadTexture((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format });
 }
 
-void rl_IsRenderTextureValid(uint32_t target_id, uint32_t target_texture_id, int32_t target_texture_width, int32_t target_texture_height, int32_t target_texture_mipmaps, int32_t target_texture_format, uint32_t target_depth_id, int32_t target_depth_width, int32_t target_depth_height, int32_t target_depth_mipmaps, int32_t target_depth_format) {
-    IsRenderTextureValid((RenderTexture){ target_id, (Texture){ target_texture_id, target_texture_width, target_texture_height, target_texture_mipmaps, target_texture_format }, (Texture){ target_depth_id, target_depth_width, target_depth_height, target_depth_mipmaps, target_depth_format } });
+bool rl_IsRenderTextureValid(uint32_t target_id, uint32_t target_texture_id, int32_t target_texture_width, int32_t target_texture_height, int32_t target_texture_mipmaps, int32_t target_texture_format, uint32_t target_depth_id, int32_t target_depth_width, int32_t target_depth_height, int32_t target_depth_mipmaps, int32_t target_depth_format) {
+    bool __ret = IsRenderTextureValid((RenderTexture){ target_id, (Texture){ target_texture_id, target_texture_width, target_texture_height, target_texture_mipmaps, target_texture_format }, (Texture){ target_depth_id, target_depth_width, target_depth_height, target_depth_mipmaps, target_depth_format } });
+    return __ret;
 }
 
 void rl_UnloadRenderTexture(uint32_t target_id, uint32_t target_texture_id, int32_t target_texture_width, int32_t target_texture_height, int32_t target_texture_mipmaps, int32_t target_texture_format, uint32_t target_depth_id, int32_t target_depth_width, int32_t target_depth_height, int32_t target_depth_mipmaps, int32_t target_depth_format) {
@@ -1083,8 +1181,9 @@ void rl_DrawTextureNPatch(uint32_t texture_id, int32_t texture_width, int32_t te
     DrawTextureNPatch((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (NPatchInfo){ (Rectangle){ nPatchInfo_source_x, nPatchInfo_source_y, nPatchInfo_source_width, nPatchInfo_source_height }, nPatchInfo_left, nPatchInfo_top, nPatchInfo_right, nPatchInfo_bottom, nPatchInfo_layout }, (Rectangle){ dest_x, dest_y, dest_width, dest_height }, (Vector2){ origin_x, origin_y }, rotation, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
-void rl_ColorIsEqual(uint8_t col1_r, uint8_t col1_g, uint8_t col1_b, uint8_t col1_a, uint8_t col2_r, uint8_t col2_g, uint8_t col2_b, uint8_t col2_a) {
-    ColorIsEqual((Color){ col1_r, col1_g, col1_b, col1_a }, (Color){ col2_r, col2_g, col2_b, col2_a });
+bool rl_ColorIsEqual(uint8_t col1_r, uint8_t col1_g, uint8_t col1_b, uint8_t col1_a, uint8_t col2_r, uint8_t col2_g, uint8_t col2_b, uint8_t col2_a) {
+    bool __ret = ColorIsEqual((Color){ col1_r, col1_g, col1_b, col1_a }, (Color){ col2_r, col2_g, col2_b, col2_a });
+    return __ret;
 }
 
 void rl_Fade(uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a, float alpha, uint8_t *out, size_t out_len) {
@@ -1093,8 +1192,9 @@ void rl_Fade(uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a,
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_ColorToInt(uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    ColorToInt((Color){ color_r, color_g, color_b, color_a });
+int32_t rl_ColorToInt(uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    int32_t __ret = ColorToInt((Color){ color_r, color_g, color_b, color_a });
+    return __ret;
 }
 
 void rl_ColorNormalize(uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a, uint8_t *out, size_t out_len) {
@@ -1180,6 +1280,18 @@ void rl_LoadFont(const uint8_t *fileName_ptr, size_t fileName_len, uint8_t *out,
     memcpy(out, &__v, sizeof(__v));
 }
 
+void rl_LoadFontEx(const uint8_t *fileName_ptr, size_t fileName_len, int32_t fontSize, const uint8_t *codepoints_ptr, size_t codepoints_len, int32_t codepointCount, uint8_t *out, size_t out_len) {
+    if (out_len != (size_t)sizeof(Font)) return;
+    char *fileName_buf = (char *)malloc(fileName_len + 1);
+    if (fileName_buf == NULL) return;
+    memcpy(fileName_buf, fileName_ptr, fileName_len);
+    fileName_buf[fileName_len] = '\0';
+    int *cp = (codepointCount > 0 && codepoints_ptr != NULL) ? (int *)codepoints_ptr : NULL;
+    Font __v = LoadFontEx((const char *)fileName_buf, fontSize, cp, codepointCount);
+    free(fileName_buf);
+    memcpy(out, &__v, sizeof(__v));
+}
+
 void rl_LoadFontFromImage(const uint8_t *image_ptr, size_t image_len, uint8_t key_r, uint8_t key_g, uint8_t key_b, uint8_t key_a, int32_t firstChar, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(Font)) { return; }
     if (image_len != (size_t)sizeof(Image)) { return; }
@@ -1189,11 +1301,12 @@ void rl_LoadFontFromImage(const uint8_t *image_ptr, size_t image_len, uint8_t ke
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_IsFontValid(const uint8_t *font_ptr, size_t font_len) {
-    if (font_len != (size_t)sizeof(Font)) { return; }
+bool rl_IsFontValid(const uint8_t *font_ptr, size_t font_len) {
+    if (font_len != (size_t)sizeof(Font)) { return false; }
     Font font;
     memcpy(&font, font_ptr, sizeof(font));
-    IsFontValid(font);
+    bool __ret = IsFontValid(font);
+    return __ret;
 }
 
 void rl_UnloadFont(const uint8_t *font_ptr, size_t font_len) {
@@ -1203,16 +1316,17 @@ void rl_UnloadFont(const uint8_t *font_ptr, size_t font_len) {
     UnloadFont(font);
 }
 
-void rl_ExportFontAsCode(const uint8_t *font_ptr, size_t font_len, const uint8_t *fileName_ptr, size_t fileName_len) {
-    if (font_len != (size_t)sizeof(Font)) { return; }
+bool rl_ExportFontAsCode(const uint8_t *font_ptr, size_t font_len, const uint8_t *fileName_ptr, size_t fileName_len) {
+    if (font_len != (size_t)sizeof(Font)) { return false; }
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return false;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
     Font font;
     memcpy(&font, font_ptr, sizeof(font));
-    ExportFontAsCode(font, (const char *)fileName_buf);
+    bool __ret = ExportFontAsCode(font, (const char *)fileName_buf);
     free(fileName_buf);
+    return __ret;
 }
 
 void rl_DrawText(const uint8_t *text_ptr, size_t text_len, int32_t posX, int32_t posY, int32_t fontSize, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
@@ -1255,13 +1369,14 @@ void rl_DrawTextCodepoint(const uint8_t *font_ptr, size_t font_len, int32_t code
     DrawTextCodepoint(font, codepoint, (Vector2){ position_x, position_y }, fontSize, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
-void rl_MeasureText(const uint8_t *text_ptr, size_t text_len, int32_t fontSize) {
+int32_t rl_MeasureText(const uint8_t *text_ptr, size_t text_len, int32_t fontSize) {
     char *text_buf = (char *)malloc(text_len + 1);
-    if (text_buf == NULL) return;
+    if (text_buf == NULL) return 0;
     memcpy(text_buf, text_ptr, text_len);
     text_buf[text_len] = '\0';
-    MeasureText((const char *)text_buf, fontSize);
+    int32_t __ret = MeasureText((const char *)text_buf, fontSize);
     free(text_buf);
+    return __ret;
 }
 
 void rl_MeasureTextEx(const uint8_t *font_ptr, size_t font_len, const uint8_t *text_ptr, size_t text_len, float fontSize, float spacing, uint8_t *out, size_t out_len) {
@@ -1278,16 +1393,16 @@ void rl_MeasureTextEx(const uint8_t *font_ptr, size_t font_len, const uint8_t *t
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_GetGlyphIndex(const uint8_t *font_ptr, size_t font_len, int32_t codepoint) {
-    if (font_len != (size_t)sizeof(Font)) { return; }
+int32_t rl_GetGlyphIndex(const uint8_t *font_ptr, size_t font_len, int32_t codepoint) {
+    if (font_len != (size_t)sizeof(Font)) { return 0; }
     Font font;
     memcpy(&font, font_ptr, sizeof(font));
-    GetGlyphIndex(font, codepoint);
+    int32_t __ret = GetGlyphIndex(font, codepoint);
+    return __ret;
 }
 
 void rl_GetGlyphInfo(const uint8_t *font_ptr, size_t font_len, int32_t codepoint, uint8_t *out, size_t out_len) {
-    if (out_len != (size_t)sizeof(GlyphInfo)) { return; }
-    if (font_len != (size_t)sizeof(Font)) { return; }
+    if (out_len != (size_t)sizeof(GlyphInfo)) return;
     Font font;
     memcpy(&font, font_ptr, sizeof(font));
     GlyphInfo __v = GetGlyphInfo(font, codepoint);
@@ -1303,68 +1418,116 @@ void rl_GetGlyphAtlasRec(const uint8_t *font_ptr, size_t font_len, int32_t codep
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_GetCodepointCount(const uint8_t *text_ptr, size_t text_len) {
+int32_t rl_GetCodepointCount(const uint8_t *text_ptr, size_t text_len) {
     char *text_buf = (char *)malloc(text_len + 1);
-    if (text_buf == NULL) return;
+    if (text_buf == NULL) return 0;
     memcpy(text_buf, text_ptr, text_len);
     text_buf[text_len] = '\0';
-    GetCodepointCount((const char *)text_buf);
+    int32_t __ret = GetCodepointCount((const char *)text_buf);
     free(text_buf);
+    return __ret;
 }
 
-void rl_TextIsEqual(const uint8_t *text1_ptr, size_t text1_len, const uint8_t *text2_ptr, size_t text2_len) {
+int32_t rl_GetCodepoint(const uint8_t *text_ptr, size_t text_len, uint8_t *size_out, size_t size_out_len) {
+    char *text_buf = (char *)malloc(text_len + 1);
+    if (text_buf == NULL) return 0;
+    memcpy(text_buf, text_ptr, text_len);
+    text_buf[text_len] = '\0';
+    int size = 0;
+    int cp = GetCodepoint(text_buf, &size);
+    free(text_buf);
+    if (size_out != NULL && size_out_len >= 4) {
+        memcpy(size_out, &size, 4);
+    }
+    return cp;
+}
+
+int32_t rl_GetCodepointNext(const uint8_t *text_ptr, size_t text_len, uint8_t *size_out, size_t size_out_len) {
+    char *text_buf = (char *)malloc(text_len + 1);
+    if (text_buf == NULL) return 0;
+    memcpy(text_buf, text_ptr, text_len);
+    text_buf[text_len] = '\0';
+    int size = 0;
+    int cp = GetCodepointNext(text_buf, &size);
+    free(text_buf);
+    if (size_out != NULL && size_out_len >= 4) {
+        memcpy(size_out, &size, 4);
+    }
+    return cp;
+}
+
+int32_t rl_GetCodepointPrevious(const uint8_t *text_ptr, size_t text_len, uint8_t *size_out, size_t size_out_len) {
+    char *text_buf = (char *)malloc(text_len + 1);
+    if (text_buf == NULL) return 0;
+    memcpy(text_buf, text_ptr, text_len);
+    text_buf[text_len] = '\0';
+    int size = 0;
+    int cp = GetCodepointPrevious(text_buf, &size);
+    free(text_buf);
+    if (size_out != NULL && size_out_len >= 4) {
+        memcpy(size_out, &size, 4);
+    }
+    return cp;
+}
+
+bool rl_TextIsEqual(const uint8_t *text1_ptr, size_t text1_len, const uint8_t *text2_ptr, size_t text2_len) {
     char *text1_buf = (char *)malloc(text1_len + 1);
-    if (text1_buf == NULL) return;
+    if (text1_buf == NULL) return false;
     memcpy(text1_buf, text1_ptr, text1_len);
     text1_buf[text1_len] = '\0';
     char *text2_buf = (char *)malloc(text2_len + 1);
-    if (text2_buf == NULL) return;
+    if (text2_buf == NULL) return false;
     memcpy(text2_buf, text2_ptr, text2_len);
     text2_buf[text2_len] = '\0';
-    TextIsEqual((const char *)text1_buf, (const char *)text2_buf);
+    bool __ret = TextIsEqual((const char *)text1_buf, (const char *)text2_buf);
     free(text1_buf);
     free(text2_buf);
+    return __ret;
 }
 
-void rl_TextLength(const uint8_t *text_ptr, size_t text_len) {
+uint32_t rl_TextLength(const uint8_t *text_ptr, size_t text_len) {
     char *text_buf = (char *)malloc(text_len + 1);
-    if (text_buf == NULL) return;
+    if (text_buf == NULL) return 0;
     memcpy(text_buf, text_ptr, text_len);
     text_buf[text_len] = '\0';
-    TextLength((const char *)text_buf);
+    uint32_t __ret = TextLength((const char *)text_buf);
     free(text_buf);
+    return __ret;
 }
 
-void rl_TextFindIndex(const uint8_t *text_ptr, size_t text_len, const uint8_t *search_ptr, size_t search_len) {
+int32_t rl_TextFindIndex(const uint8_t *text_ptr, size_t text_len, const uint8_t *search_ptr, size_t search_len) {
     char *text_buf = (char *)malloc(text_len + 1);
-    if (text_buf == NULL) return;
+    if (text_buf == NULL) return 0;
     memcpy(text_buf, text_ptr, text_len);
     text_buf[text_len] = '\0';
     char *search_buf = (char *)malloc(search_len + 1);
-    if (search_buf == NULL) return;
+    if (search_buf == NULL) return 0;
     memcpy(search_buf, search_ptr, search_len);
     search_buf[search_len] = '\0';
-    TextFindIndex((const char *)text_buf, (const char *)search_buf);
+    int32_t __ret = TextFindIndex((const char *)text_buf, (const char *)search_buf);
     free(text_buf);
     free(search_buf);
+    return __ret;
 }
 
-void rl_TextToInteger(const uint8_t *text_ptr, size_t text_len) {
+int32_t rl_TextToInteger(const uint8_t *text_ptr, size_t text_len) {
     char *text_buf = (char *)malloc(text_len + 1);
-    if (text_buf == NULL) return;
+    if (text_buf == NULL) return 0;
     memcpy(text_buf, text_ptr, text_len);
     text_buf[text_len] = '\0';
-    TextToInteger((const char *)text_buf);
+    int32_t __ret = TextToInteger((const char *)text_buf);
     free(text_buf);
+    return __ret;
 }
 
-void rl_TextToFloat(const uint8_t *text_ptr, size_t text_len) {
+float rl_TextToFloat(const uint8_t *text_ptr, size_t text_len) {
     char *text_buf = (char *)malloc(text_len + 1);
-    if (text_buf == NULL) return;
+    if (text_buf == NULL) return 0;
     memcpy(text_buf, text_ptr, text_len);
     text_buf[text_len] = '\0';
-    TextToFloat((const char *)text_buf);
+    float __ret = TextToFloat((const char *)text_buf);
     free(text_buf);
+    return __ret;
 }
 
 void rl_DrawLine3D(float startPos_x, float startPos_y, float startPos_z, float endPos_x, float endPos_y, float endPos_z, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
@@ -1381,6 +1544,10 @@ void rl_DrawCircle3D(float center_x, float center_y, float center_z, float radiu
 
 void rl_DrawTriangle3D(float v1_x, float v1_y, float v1_z, float v2_x, float v2_y, float v2_z, float v3_x, float v3_y, float v3_z, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
     DrawTriangle3D((Vector3){ v1_x, v1_y, v1_z }, (Vector3){ v2_x, v2_y, v2_z }, (Vector3){ v3_x, v3_y, v3_z }, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawTriangleStrip3D(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawTriangleStrip3D((const Vector3 *)points_ptr, pointCount, (Color){ r, g, b, a });
 }
 
 void rl_DrawCube(float position_x, float position_y, float position_z, float width, float height, float length, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
@@ -1463,11 +1630,12 @@ void rl_LoadModelFromMesh(const uint8_t *mesh_ptr, size_t mesh_len, uint8_t *out
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_IsModelValid(const uint8_t *model_ptr, size_t model_len) {
-    if (model_len != (size_t)sizeof(Model)) { return; }
+bool rl_IsModelValid(const uint8_t *model_ptr, size_t model_len) {
+    if (model_len != (size_t)sizeof(Model)) { return false; }
     Model model;
     memcpy(&model, model_ptr, sizeof(model));
-    IsModelValid(model);
+    bool __ret = IsModelValid(model);
+    return __ret;
 }
 
 void rl_UnloadModel(const uint8_t *model_ptr, size_t model_len) {
@@ -1563,16 +1731,17 @@ void rl_GetMeshBoundingBox(const uint8_t *mesh_ptr, size_t mesh_len, uint8_t *ou
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_ExportMeshAsCode(const uint8_t *mesh_ptr, size_t mesh_len, const uint8_t *fileName_ptr, size_t fileName_len) {
-    if (mesh_len != (size_t)sizeof(Mesh)) { return; }
+bool rl_ExportMeshAsCode(const uint8_t *mesh_ptr, size_t mesh_len, const uint8_t *fileName_ptr, size_t fileName_len) {
+    if (mesh_len != (size_t)sizeof(Mesh)) { return false; }
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return false;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
     Mesh mesh;
     memcpy(&mesh, mesh_ptr, sizeof(mesh));
-    ExportMeshAsCode(mesh, (const char *)fileName_buf);
+    bool __ret = ExportMeshAsCode(mesh, (const char *)fileName_buf);
     free(fileName_buf);
+    return __ret;
 }
 
 void rl_GenMeshPoly(int32_t sides, float radius, uint8_t *out, size_t out_len) {
@@ -1653,11 +1822,12 @@ void rl_LoadMaterialDefault(uint8_t *out, size_t out_len) {
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_IsMaterialValid(const uint8_t *material_ptr, size_t material_len) {
-    if (material_len != (size_t)sizeof(Material)) { return; }
+bool rl_IsMaterialValid(const uint8_t *material_ptr, size_t material_len) {
+    if (material_len != (size_t)sizeof(Material)) { return false; }
     Material material;
     memcpy(&material, material_ptr, sizeof(material));
-    IsMaterialValid(material);
+    bool __ret = IsMaterialValid(material);
+    return __ret;
 }
 
 void rl_UnloadMaterial(const uint8_t *material_ptr, size_t material_len) {
@@ -1690,26 +1860,30 @@ void rl_UpdateModelAnimationEx(const uint8_t *model_ptr, size_t model_len, const
     UpdateModelAnimationEx(model, animA, frameA, animB, frameB, blend);
 }
 
-void rl_IsModelAnimationValid(const uint8_t *model_ptr, size_t model_len, const uint8_t *anim_ptr, size_t anim_len) {
-    if (model_len != (size_t)sizeof(Model)) { return; }
-    if (anim_len != (size_t)sizeof(ModelAnimation)) { return; }
+bool rl_IsModelAnimationValid(const uint8_t *model_ptr, size_t model_len, const uint8_t *anim_ptr, size_t anim_len) {
+    if (model_len != (size_t)sizeof(Model)) { return false; }
+    if (anim_len != (size_t)sizeof(ModelAnimation)) { return false; }
     Model model;
     memcpy(&model, model_ptr, sizeof(model));
     ModelAnimation anim;
     memcpy(&anim, anim_ptr, sizeof(anim));
-    IsModelAnimationValid(model, anim);
+    bool __ret = IsModelAnimationValid(model, anim);
+    return __ret;
 }
 
-void rl_CheckCollisionSpheres(float center1_x, float center1_y, float center1_z, float radius1, float center2_x, float center2_y, float center2_z, float radius2) {
-    CheckCollisionSpheres((Vector3){ center1_x, center1_y, center1_z }, radius1, (Vector3){ center2_x, center2_y, center2_z }, radius2);
+bool rl_CheckCollisionSpheres(float center1_x, float center1_y, float center1_z, float radius1, float center2_x, float center2_y, float center2_z, float radius2) {
+    bool __ret = CheckCollisionSpheres((Vector3){ center1_x, center1_y, center1_z }, radius1, (Vector3){ center2_x, center2_y, center2_z }, radius2);
+    return __ret;
 }
 
-void rl_CheckCollisionBoxes(float box1_min_x, float box1_min_y, float box1_min_z, float box1_max_x, float box1_max_y, float box1_max_z, float box2_min_x, float box2_min_y, float box2_min_z, float box2_max_x, float box2_max_y, float box2_max_z) {
-    CheckCollisionBoxes((BoundingBox){ (Vector3){ box1_min_x, box1_min_y, box1_min_z }, (Vector3){ box1_max_x, box1_max_y, box1_max_z } }, (BoundingBox){ (Vector3){ box2_min_x, box2_min_y, box2_min_z }, (Vector3){ box2_max_x, box2_max_y, box2_max_z } });
+bool rl_CheckCollisionBoxes(float box1_min_x, float box1_min_y, float box1_min_z, float box1_max_x, float box1_max_y, float box1_max_z, float box2_min_x, float box2_min_y, float box2_min_z, float box2_max_x, float box2_max_y, float box2_max_z) {
+    bool __ret = CheckCollisionBoxes((BoundingBox){ (Vector3){ box1_min_x, box1_min_y, box1_min_z }, (Vector3){ box1_max_x, box1_max_y, box1_max_z } }, (BoundingBox){ (Vector3){ box2_min_x, box2_min_y, box2_min_z }, (Vector3){ box2_max_x, box2_max_y, box2_max_z } });
+    return __ret;
 }
 
-void rl_CheckCollisionBoxSphere(float box_min_x, float box_min_y, float box_min_z, float box_max_x, float box_max_y, float box_max_z, float center_x, float center_y, float center_z, float radius) {
-    CheckCollisionBoxSphere((BoundingBox){ (Vector3){ box_min_x, box_min_y, box_min_z }, (Vector3){ box_max_x, box_max_y, box_max_z } }, (Vector3){ center_x, center_y, center_z }, radius);
+bool rl_CheckCollisionBoxSphere(float box_min_x, float box_min_y, float box_min_z, float box_max_x, float box_max_y, float box_max_z, float center_x, float center_y, float center_z, float radius) {
+    bool __ret = CheckCollisionBoxSphere((BoundingBox){ (Vector3){ box_min_x, box_min_y, box_min_z }, (Vector3){ box_max_x, box_max_y, box_max_z } }, (Vector3){ center_x, center_y, center_z }, radius);
+    return __ret;
 }
 
 void rl_GetRayCollisionSphere(float ray_position_x, float ray_position_y, float ray_position_z, float ray_direction_x, float ray_direction_y, float ray_direction_z, float center_x, float center_y, float center_z, float radius, uint8_t *out, size_t out_len) {
@@ -1756,11 +1930,12 @@ void rl_LoadWave(const uint8_t *fileName_ptr, size_t fileName_len, uint8_t *out,
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_IsWaveValid(const uint8_t *wave_ptr, size_t wave_len) {
-    if (wave_len != (size_t)sizeof(Wave)) { return; }
+bool rl_IsWaveValid(const uint8_t *wave_ptr, size_t wave_len) {
+    if (wave_len != (size_t)sizeof(Wave)) { return false; }
     Wave wave;
     memcpy(&wave, wave_ptr, sizeof(wave));
-    IsWaveValid(wave);
+    bool __ret = IsWaveValid(wave);
+    return __ret;
 }
 
 void rl_LoadSound(const uint8_t *fileName_ptr, size_t fileName_len, uint8_t *out, size_t out_len) {
@@ -1792,11 +1967,12 @@ void rl_LoadSoundAlias(const uint8_t *source_ptr, size_t source_len, uint8_t *ou
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_IsSoundValid(const uint8_t *sound_ptr, size_t sound_len) {
-    if (sound_len != (size_t)sizeof(Sound)) { return; }
+bool rl_IsSoundValid(const uint8_t *sound_ptr, size_t sound_len) {
+    if (sound_len != (size_t)sizeof(Sound)) { return false; }
     Sound sound;
     memcpy(&sound, sound_ptr, sizeof(sound));
-    IsSoundValid(sound);
+    bool __ret = IsSoundValid(sound);
+    return __ret;
 }
 
 void rl_UpdateSound(const uint8_t *sound_ptr, size_t sound_len, const uint8_t *data_ptr, size_t data_len, int32_t sampleCount) {
@@ -1827,28 +2003,30 @@ void rl_UnloadSoundAlias(const uint8_t *alias_ptr, size_t alias_len) {
     UnloadSoundAlias(alias);
 }
 
-void rl_ExportWave(const uint8_t *wave_ptr, size_t wave_len, const uint8_t *fileName_ptr, size_t fileName_len) {
-    if (wave_len != (size_t)sizeof(Wave)) { return; }
+bool rl_ExportWave(const uint8_t *wave_ptr, size_t wave_len, const uint8_t *fileName_ptr, size_t fileName_len) {
+    if (wave_len != (size_t)sizeof(Wave)) { return false; }
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return false;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
     Wave wave;
     memcpy(&wave, wave_ptr, sizeof(wave));
-    ExportWave(wave, (const char *)fileName_buf);
+    bool __ret = ExportWave(wave, (const char *)fileName_buf);
     free(fileName_buf);
+    return __ret;
 }
 
-void rl_ExportWaveAsCode(const uint8_t *wave_ptr, size_t wave_len, const uint8_t *fileName_ptr, size_t fileName_len) {
-    if (wave_len != (size_t)sizeof(Wave)) { return; }
+bool rl_ExportWaveAsCode(const uint8_t *wave_ptr, size_t wave_len, const uint8_t *fileName_ptr, size_t fileName_len) {
+    if (wave_len != (size_t)sizeof(Wave)) { return false; }
     char *fileName_buf = (char *)malloc(fileName_len + 1);
-    if (fileName_buf == NULL) return;
+    if (fileName_buf == NULL) return false;
     memcpy(fileName_buf, fileName_ptr, fileName_len);
     fileName_buf[fileName_len] = '\0';
     Wave wave;
     memcpy(&wave, wave_ptr, sizeof(wave));
-    ExportWaveAsCode(wave, (const char *)fileName_buf);
+    bool __ret = ExportWaveAsCode(wave, (const char *)fileName_buf);
     free(fileName_buf);
+    return __ret;
 }
 
 void rl_PlaySound(const uint8_t *sound_ptr, size_t sound_len) {
@@ -1879,11 +2057,12 @@ void rl_ResumeSound(const uint8_t *sound_ptr, size_t sound_len) {
     ResumeSound(sound);
 }
 
-void rl_IsSoundPlaying(const uint8_t *sound_ptr, size_t sound_len) {
-    if (sound_len != (size_t)sizeof(Sound)) { return; }
+bool rl_IsSoundPlaying(const uint8_t *sound_ptr, size_t sound_len) {
+    if (sound_len != (size_t)sizeof(Sound)) { return false; }
     Sound sound;
     memcpy(&sound, sound_ptr, sizeof(sound));
-    IsSoundPlaying(sound);
+    bool __ret = IsSoundPlaying(sound);
+    return __ret;
 }
 
 void rl_SetSoundVolume(const uint8_t *sound_ptr, size_t sound_len, float volume) {
@@ -1927,11 +2106,12 @@ void rl_LoadMusicStream(const uint8_t *fileName_ptr, size_t fileName_len, uint8_
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_IsMusicValid(const uint8_t *music_ptr, size_t music_len) {
-    if (music_len != (size_t)sizeof(Music)) { return; }
+bool rl_IsMusicValid(const uint8_t *music_ptr, size_t music_len) {
+    if (music_len != (size_t)sizeof(Music)) { return false; }
     Music music;
     memcpy(&music, music_ptr, sizeof(music));
-    IsMusicValid(music);
+    bool __ret = IsMusicValid(music);
+    return __ret;
 }
 
 void rl_UnloadMusicStream(const uint8_t *music_ptr, size_t music_len) {
@@ -1948,11 +2128,12 @@ void rl_PlayMusicStream(const uint8_t *music_ptr, size_t music_len) {
     PlayMusicStream(music);
 }
 
-void rl_IsMusicStreamPlaying(const uint8_t *music_ptr, size_t music_len) {
-    if (music_len != (size_t)sizeof(Music)) { return; }
+bool rl_IsMusicStreamPlaying(const uint8_t *music_ptr, size_t music_len) {
+    if (music_len != (size_t)sizeof(Music)) { return false; }
     Music music;
     memcpy(&music, music_ptr, sizeof(music));
-    IsMusicStreamPlaying(music);
+    bool __ret = IsMusicStreamPlaying(music);
+    return __ret;
 }
 
 void rl_UpdateMusicStream(const uint8_t *music_ptr, size_t music_len) {
@@ -2011,18 +2192,20 @@ void rl_SetMusicPan(const uint8_t *music_ptr, size_t music_len, float pan) {
     SetMusicPan(music, pan);
 }
 
-void rl_GetMusicTimeLength(const uint8_t *music_ptr, size_t music_len) {
-    if (music_len != (size_t)sizeof(Music)) { return; }
+float rl_GetMusicTimeLength(const uint8_t *music_ptr, size_t music_len) {
+    if (music_len != (size_t)sizeof(Music)) { return 0; }
     Music music;
     memcpy(&music, music_ptr, sizeof(music));
-    GetMusicTimeLength(music);
+    float __ret = GetMusicTimeLength(music);
+    return __ret;
 }
 
-void rl_GetMusicTimePlayed(const uint8_t *music_ptr, size_t music_len) {
-    if (music_len != (size_t)sizeof(Music)) { return; }
+float rl_GetMusicTimePlayed(const uint8_t *music_ptr, size_t music_len) {
+    if (music_len != (size_t)sizeof(Music)) { return 0; }
     Music music;
     memcpy(&music, music_ptr, sizeof(music));
-    GetMusicTimePlayed(music);
+    float __ret = GetMusicTimePlayed(music);
+    return __ret;
 }
 
 void rl_LoadAudioStream(uint32_t sampleRate, uint32_t sampleSize, uint32_t channels, uint8_t *out, size_t out_len) {
@@ -2031,11 +2214,12 @@ void rl_LoadAudioStream(uint32_t sampleRate, uint32_t sampleSize, uint32_t chann
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_IsAudioStreamValid(const uint8_t *stream_ptr, size_t stream_len) {
-    if (stream_len != (size_t)sizeof(AudioStream)) { return; }
+bool rl_IsAudioStreamValid(const uint8_t *stream_ptr, size_t stream_len) {
+    if (stream_len != (size_t)sizeof(AudioStream)) { return false; }
     AudioStream stream;
     memcpy(&stream, stream_ptr, sizeof(stream));
-    IsAudioStreamValid(stream);
+    bool __ret = IsAudioStreamValid(stream);
+    return __ret;
 }
 
 void rl_UnloadAudioStream(const uint8_t *stream_ptr, size_t stream_len) {
@@ -2052,11 +2236,12 @@ void rl_UpdateAudioStream(const uint8_t *stream_ptr, size_t stream_len, const ui
     UpdateAudioStream(stream, (const void *)data_ptr, frameCount);
 }
 
-void rl_IsAudioStreamProcessed(const uint8_t *stream_ptr, size_t stream_len) {
-    if (stream_len != (size_t)sizeof(AudioStream)) { return; }
+bool rl_IsAudioStreamProcessed(const uint8_t *stream_ptr, size_t stream_len) {
+    if (stream_len != (size_t)sizeof(AudioStream)) { return false; }
     AudioStream stream;
     memcpy(&stream, stream_ptr, sizeof(stream));
-    IsAudioStreamProcessed(stream);
+    bool __ret = IsAudioStreamProcessed(stream);
+    return __ret;
 }
 
 void rl_PlayAudioStream(const uint8_t *stream_ptr, size_t stream_len) {
@@ -2080,11 +2265,12 @@ void rl_ResumeAudioStream(const uint8_t *stream_ptr, size_t stream_len) {
     ResumeAudioStream(stream);
 }
 
-void rl_IsAudioStreamPlaying(const uint8_t *stream_ptr, size_t stream_len) {
-    if (stream_len != (size_t)sizeof(AudioStream)) { return; }
+bool rl_IsAudioStreamPlaying(const uint8_t *stream_ptr, size_t stream_len) {
+    if (stream_len != (size_t)sizeof(AudioStream)) { return false; }
     AudioStream stream;
     memcpy(&stream, stream_ptr, sizeof(stream));
-    IsAudioStreamPlaying(stream);
+    bool __ret = IsAudioStreamPlaying(stream);
+    return __ret;
 }
 
 void rl_StopAudioStream(const uint8_t *stream_ptr, size_t stream_len) {

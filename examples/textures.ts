@@ -1,10 +1,11 @@
 import { Raylib, COLORS, KEYS } from "../src";
 import { join } from "path";
+import { existsSync } from "fs";
 
 Raylib.initWindow(1200, 800, "Texture Demo");
 Raylib.setTargetFPS(60);
 
-const dir = join(import.meta.dir, "../assets/textures");
+const dir = existsSync("assets/textures") ? "assets/textures" : "../assets/textures";
 
 const textures = [
   Raylib.loadTexture(join(dir, "texture_01.png")),

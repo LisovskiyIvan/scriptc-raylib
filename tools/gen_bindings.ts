@@ -408,11 +408,386 @@ type FnPlan =
       k: "wrap"; tsName: string; symbol: string; params: ParamPlan[]; ret: RetPlan;
       cParams: string[]; cBody: string[]; cCall: string; manifestParams: string[]; tsParams: Array<{ name: string; ts: string }>;
     }
+  | {
+      k: "custom"; tsName: string; symbol: string;
+      manifestParams: string[]; manifestRet: string;
+      cCode: string; ffiDecl: string; apiCode: string;
+    }
   | { k: "skip"; reason: string };
 
 function primClass(p: Prim): string { return p === "bool" ? "bool" : p; }
 
+function makeSplineHandler(name: string): () => Extract<FnPlan, { k: "custom" }> {
+  return () => ({
+    k: "custom",
+    tsName: `rl_${name}`,
+    symbol: `rl_${name}`,
+    manifestParams: ["bytes", "i32", "f32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_${name}(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, float thick, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    ${name}((const Vector2 *)points_ptr, pointCount, thick, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_${name}(points: Uint8Array, pointCount: number, thick: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function ${name}(points: Float32Array | Uint8Array | Vector2[], thick: number, color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_${name}(__b, pointCount !== undefined ? pointCount : __cnt, thick, color.r, color.g, color.b, color.a);
+}`,
+  });
+}
+
+const CUSTOM_HANDLERS: Record<string, () => Extract<FnPlan, { k: "custom" }>> = {
+  DrawLineStrip: () => ({
+    k: "custom",
+    tsName: "rl_DrawLineStrip",
+    symbol: "rl_DrawLineStrip",
+    manifestParams: ["bytes", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_DrawLineStrip(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawLineStrip((const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_DrawLineStrip(points: Uint8Array, pointCount: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function DrawLineStrip(points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawLineStrip(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}`,
+  }),
+  DrawTriangleFan: () => ({
+    k: "custom",
+    tsName: "rl_DrawTriangleFan",
+    symbol: "rl_DrawTriangleFan",
+    manifestParams: ["bytes", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_DrawTriangleFan(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawTriangleFan((const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_DrawTriangleFan(points: Uint8Array, pointCount: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function DrawTriangleFan(points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawTriangleFan(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}`,
+  }),
+  DrawTriangleStrip: () => ({
+    k: "custom",
+    tsName: "rl_DrawTriangleStrip",
+    symbol: "rl_DrawTriangleStrip",
+    manifestParams: ["bytes", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_DrawTriangleStrip(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawTriangleStrip((const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_DrawTriangleStrip(points: Uint8Array, pointCount: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function DrawTriangleStrip(points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawTriangleStrip(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}`,
+  }),
+  DrawTriangleStrip3D: () => ({
+    k: "custom",
+    tsName: "rl_DrawTriangleStrip3D",
+    symbol: "rl_DrawTriangleStrip3D",
+    manifestParams: ["bytes", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_DrawTriangleStrip3D(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawTriangleStrip3D((const Vector3 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_DrawTriangleStrip3D(points: Uint8Array, pointCount: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function DrawTriangleStrip3D(points: Float32Array | Uint8Array | Vector3[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector3Bytes(points);
+  rl_DrawTriangleStrip3D(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}`,
+  }),
+  DrawSplineLinear: makeSplineHandler("DrawSplineLinear"),
+  DrawSplineBasis: makeSplineHandler("DrawSplineBasis"),
+  DrawSplineCatmullRom: makeSplineHandler("DrawSplineCatmullRom"),
+  DrawSplineBezierQuadratic: makeSplineHandler("DrawSplineBezierQuadratic"),
+  DrawSplineBezierCubic: makeSplineHandler("DrawSplineBezierCubic"),
+  GetMonitorName: () => ({
+    k: "custom",
+    tsName: "rl_GetMonitorName",
+    symbol: "rl_GetMonitorName",
+    manifestParams: ["i32", "mutable-bytes"],
+    manifestRet: "i32",
+    cCode: `int32_t rl_GetMonitorName(int32_t monitor, uint8_t *out, size_t out_len) {
+    const char *s = GetMonitorName(monitor);
+    if (s == NULL) return 0;
+    size_t len = strlen(s);
+    if (out != NULL && out_len > 0) {
+        size_t c = len < out_len ? len : out_len;
+        memcpy(out, s, c);
+    }
+    return (int32_t)len;
+}`,
+    ffiDecl: `export declare function rl_GetMonitorName(monitor: number, __out: Uint8Array): number;`,
+    apiCode: `export function GetMonitorName(monitor: number): string {
+  const __buf = new Uint8Array(256);
+  const __len = rl_GetMonitorName(monitor, __buf);
+  if (__len <= 0) return "";
+  return new TextDecoder().decode(__buf.subarray(0, Math.min(__len, 256)));
+}`,
+  }),
+  GetClipboardText: () => ({
+    k: "custom",
+    tsName: "rl_GetClipboardText",
+    symbol: "rl_GetClipboardText",
+    manifestParams: ["mutable-bytes"],
+    manifestRet: "i32",
+    cCode: `int32_t rl_GetClipboardText(uint8_t *out, size_t out_len) {
+    const char *s = GetClipboardText();
+    if (s == NULL) return 0;
+    size_t len = strlen(s);
+    if (out != NULL && out_len > 0) {
+        size_t c = len < out_len ? len : out_len;
+        memcpy(out, s, c);
+    }
+    return (int32_t)len;
+}`,
+    ffiDecl: `export declare function rl_GetClipboardText(__out: Uint8Array): number;`,
+    apiCode: `export function GetClipboardText(): string {
+  const __buf = new Uint8Array(1024);
+  const __len = rl_GetClipboardText(__buf);
+  if (__len <= 0) return "";
+  if (__len <= __buf.length) return new TextDecoder().decode(__buf.subarray(0, __len));
+  const __big = new Uint8Array(__len);
+  rl_GetClipboardText(__big);
+  return new TextDecoder().decode(__big);
+}`,
+  }),
+  GetGamepadName: () => ({
+    k: "custom",
+    tsName: "rl_GetGamepadName",
+    symbol: "rl_GetGamepadName",
+    manifestParams: ["i32", "mutable-bytes"],
+    manifestRet: "i32",
+    cCode: `int32_t rl_GetGamepadName(int32_t gamepad, uint8_t *out, size_t out_len) {
+    const char *s = GetGamepadName(gamepad);
+    if (s == NULL) return 0;
+    size_t len = strlen(s);
+    if (out != NULL && out_len > 0) {
+        size_t c = len < out_len ? len : out_len;
+        memcpy(out, s, c);
+    }
+    return (int32_t)len;
+}`,
+    ffiDecl: `export declare function rl_GetGamepadName(gamepad: number, __out: Uint8Array): number;`,
+    apiCode: `export function GetGamepadName(gamepad: number): string {
+  const __buf = new Uint8Array(256);
+  const __len = rl_GetGamepadName(gamepad, __buf);
+  if (__len <= 0) return "";
+  return new TextDecoder().decode(__buf.subarray(0, Math.min(__len, 256)));
+}`,
+  }),
+  LoadFontEx: () => ({
+    k: "custom",
+    tsName: "rl_LoadFontEx",
+    symbol: "rl_LoadFontEx",
+    manifestParams: ["string", "i32", "bytes", "i32", "mutable-bytes"],
+    manifestRet: "void",
+    cCode: `void rl_LoadFontEx(const uint8_t *fileName_ptr, size_t fileName_len, int32_t fontSize, const uint8_t *codepoints_ptr, size_t codepoints_len, int32_t codepointCount, uint8_t *out, size_t out_len) {
+    if (out_len != (size_t)sizeof(Font)) return;
+    char *fileName_buf = (char *)malloc(fileName_len + 1);
+    if (fileName_buf == NULL) return;
+    memcpy(fileName_buf, fileName_ptr, fileName_len);
+    fileName_buf[fileName_len] = '\\0';
+    int *cp = (codepointCount > 0 && codepoints_ptr != NULL) ? (int *)codepoints_ptr : NULL;
+    Font __v = LoadFontEx((const char *)fileName_buf, fontSize, cp, codepointCount);
+    free(fileName_buf);
+    memcpy(out, &__v, sizeof(__v));
+}`,
+    ffiDecl: `export declare function rl_LoadFontEx(fileName: string, fontSize: number, codepoints: Uint8Array, codepointCount: number, __out: Uint8Array): void;`,
+    apiCode: `export function LoadFontEx(fileName: string, fontSize: number, codepoints?: Int32Array | null, codepointCount?: number): Font {
+  const __buf = new Uint8Array(32);
+  const cpBytes = codepoints ? new Uint8Array(codepoints.buffer, codepoints.byteOffset, codepoints.byteLength) : new Uint8Array(0);
+  const count = codepointCount !== undefined ? codepointCount : (codepoints ? codepoints.length : 0);
+  rl_LoadFontEx(fileName, fontSize, cpBytes, count, __buf);
+  return __buf;
+}`,
+  }),
+  GetCodepoint: () => ({
+    k: "custom",
+    tsName: "rl_GetCodepoint",
+    symbol: "rl_GetCodepoint",
+    manifestParams: ["string", "mutable-bytes"],
+    manifestRet: "i32",
+    cCode: `int32_t rl_GetCodepoint(const uint8_t *text_ptr, size_t text_len, uint8_t *size_out, size_t size_out_len) {
+    char *text_buf = (char *)malloc(text_len + 1);
+    if (text_buf == NULL) return 0;
+    memcpy(text_buf, text_ptr, text_len);
+    text_buf[text_len] = '\\0';
+    int size = 0;
+    int cp = GetCodepoint(text_buf, &size);
+    free(text_buf);
+    if (size_out != NULL && size_out_len >= 4) {
+        memcpy(size_out, &size, 4);
+    }
+    return cp;
+}`,
+    ffiDecl: `export declare function rl_GetCodepoint(text: string, __size_out: Uint8Array): number;`,
+    apiCode: `export function GetCodepoint(text: string): { codepoint: number; size: number } {
+  const sizeBuf = new Uint8Array(4);
+  const cp = rl_GetCodepoint(text, sizeBuf);
+  const dv = new DataView(sizeBuf.buffer, sizeBuf.byteOffset, 4);
+  return { codepoint: cp, size: dv.getInt32(0, true) };
+}`,
+  }),
+  GetCodepointNext: () => ({
+    k: "custom",
+    tsName: "rl_GetCodepointNext",
+    symbol: "rl_GetCodepointNext",
+    manifestParams: ["string", "mutable-bytes"],
+    manifestRet: "i32",
+    cCode: `int32_t rl_GetCodepointNext(const uint8_t *text_ptr, size_t text_len, uint8_t *size_out, size_t size_out_len) {
+    char *text_buf = (char *)malloc(text_len + 1);
+    if (text_buf == NULL) return 0;
+    memcpy(text_buf, text_ptr, text_len);
+    text_buf[text_len] = '\\0';
+    int size = 0;
+    int cp = GetCodepointNext(text_buf, &size);
+    free(text_buf);
+    if (size_out != NULL && size_out_len >= 4) {
+        memcpy(size_out, &size, 4);
+    }
+    return cp;
+}`,
+    ffiDecl: `export declare function rl_GetCodepointNext(text: string, __size_out: Uint8Array): number;`,
+    apiCode: `export function GetCodepointNext(text: string): { codepoint: number; size: number } {
+  const sizeBuf = new Uint8Array(4);
+  const cp = rl_GetCodepointNext(text, sizeBuf);
+  const dv = new DataView(sizeBuf.buffer, sizeBuf.byteOffset, 4);
+  return { codepoint: cp, size: dv.getInt32(0, true) };
+}`,
+  }),
+  GetCodepointPrevious: () => ({
+    k: "custom",
+    tsName: "rl_GetCodepointPrevious",
+    symbol: "rl_GetCodepointPrevious",
+    manifestParams: ["string", "mutable-bytes"],
+    manifestRet: "i32",
+    cCode: `int32_t rl_GetCodepointPrevious(const uint8_t *text_ptr, size_t text_len, uint8_t *size_out, size_t size_out_len) {
+    char *text_buf = (char *)malloc(text_len + 1);
+    if (text_buf == NULL) return 0;
+    memcpy(text_buf, text_ptr, text_len);
+    text_buf[text_len] = '\\0';
+    int size = 0;
+    int cp = GetCodepointPrevious(text_buf, &size);
+    free(text_buf);
+    if (size_out != NULL && size_out_len >= 4) {
+        memcpy(size_out, &size, 4);
+    }
+    return cp;
+}`,
+    ffiDecl: `export declare function rl_GetCodepointPrevious(text: string, __size_out: Uint8Array): number;`,
+    apiCode: `export function GetCodepointPrevious(text: string): { codepoint: number; size: number } {
+  const sizeBuf = new Uint8Array(4);
+  const cp = rl_GetCodepointPrevious(text, sizeBuf);
+  const dv = new DataView(sizeBuf.buffer, sizeBuf.byteOffset, 4);
+  return { codepoint: cp, size: dv.getInt32(0, true) };
+}`,
+  }),
+  LoadShader: () => ({
+    k: "custom",
+    tsName: "rl_LoadShader",
+    symbol: "rl_LoadShader",
+    manifestParams: ["string", "string", "mutable-bytes"],
+    manifestRet: "void",
+    cCode: `void rl_LoadShader(const uint8_t *vsFileName_ptr, size_t vsFileName_len, const uint8_t *fsFileName_ptr, size_t fsFileName_len, uint8_t *out, size_t out_len) {
+    if (out_len != (size_t)sizeof(Shader)) return;
+    char *vs_buf = NULL;
+    if (vsFileName_len > 0) {
+        vs_buf = (char *)malloc(vsFileName_len + 1);
+        if (vs_buf) { memcpy(vs_buf, vsFileName_ptr, vsFileName_len); vs_buf[vsFileName_len] = '\\0'; }
+    }
+    char *fs_buf = NULL;
+    if (fsFileName_len > 0) {
+        fs_buf = (char *)malloc(fsFileName_len + 1);
+        if (fs_buf) { memcpy(fs_buf, fsFileName_ptr, fsFileName_len); fs_buf[fsFileName_len] = '\\0'; }
+    }
+    Shader __v = LoadShader(vs_buf, fs_buf);
+    if (vs_buf) free(vs_buf);
+    if (fs_buf) free(fs_buf);
+    memcpy(out, &__v, sizeof(__v));
+}`,
+    ffiDecl: `export declare function rl_LoadShader(vsFileName: string, fsFileName: string, __out: Uint8Array): void;`,
+    apiCode: `export function LoadShader(vsFileName?: string | null, fsFileName?: string | null): Shader {
+  const __buf = new Uint8Array(16);
+  rl_LoadShader(vsFileName ?? "", fsFileName ?? "", __buf);
+  return __buf;
+}`,
+  }),
+  LoadShaderFromMemory: () => ({
+    k: "custom",
+    tsName: "rl_LoadShaderFromMemory",
+    symbol: "rl_LoadShaderFromMemory",
+    manifestParams: ["string", "string", "mutable-bytes"],
+    manifestRet: "void",
+    cCode: `void rl_LoadShaderFromMemory(const uint8_t *vsCode_ptr, size_t vsCode_len, const uint8_t *fsCode_ptr, size_t fsCode_len, uint8_t *out, size_t out_len) {
+    if (out_len != (size_t)sizeof(Shader)) return;
+    char *vs_buf = NULL;
+    if (vsCode_len > 0) {
+        vs_buf = (char *)malloc(vsCode_len + 1);
+        if (vs_buf) { memcpy(vs_buf, vsCode_ptr, vsCode_len); vs_buf[vsCode_len] = '\\0'; }
+    }
+    char *fs_buf = NULL;
+    if (fsCode_len > 0) {
+        fs_buf = (char *)malloc(fsCode_len + 1);
+        if (fs_buf) { memcpy(fs_buf, fsCode_ptr, fsCode_len); fs_buf[fsCode_len] = '\\0'; }
+    }
+    Shader __v = LoadShaderFromMemory(vs_buf, fs_buf);
+    if (vs_buf) free(vs_buf);
+    if (fs_buf) free(fs_buf);
+    memcpy(out, &__v, sizeof(__v));
+}`,
+    ffiDecl: `export declare function rl_LoadShaderFromMemory(vsCode: string, fsCode: string, __out: Uint8Array): void;`,
+    apiCode: `export function LoadShaderFromMemory(vsCode?: string | null, fsCode?: string | null): Shader {
+  const __buf = new Uint8Array(16);
+  rl_LoadShaderFromMemory(vsCode ?? "", fsCode ?? "", __buf);
+  return __buf;
+}`,
+  }),
+  GetGlyphInfo: () => ({
+    k: "custom",
+    tsName: "rl_GetGlyphInfo",
+    symbol: "rl_GetGlyphInfo",
+    manifestParams: ["bytes", "i32", "mutable-bytes"],
+    manifestRet: "void",
+    cCode: `void rl_GetGlyphInfo(const uint8_t *font_ptr, size_t font_len, int32_t codepoint, uint8_t *out, size_t out_len) {
+    if (out_len != (size_t)sizeof(GlyphInfo)) return;
+    Font font;
+    memcpy(&font, font_ptr, sizeof(font));
+    GlyphInfo __v = GetGlyphInfo(font, codepoint);
+    memcpy(out, &__v, sizeof(__v));
+}`,
+    ffiDecl: `export declare function rl_GetGlyphInfo(font: Uint8Array, codepoint: number, __out: Uint8Array): void;`,
+    apiCode: `export function GetGlyphInfo(font: Font, codepoint: number): GlyphInfo {
+  const __buf = new Uint8Array(40);
+  rl_GetGlyphInfo(font, codepoint, __buf);
+  return __read_GlyphInfo(__buf);
+}`,
+  }),
+  DrawCircleGradient: () => ({
+    k: "custom",
+    tsName: "rl_DrawCircleGradient",
+    symbol: "rl_DrawCircleGradient",
+    manifestParams: ["f32", "f32", "f32", "u8", "u8", "u8", "u8", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_DrawCircleGradient(float center_x, float center_y, float radius, uint8_t inner_r, uint8_t inner_g, uint8_t inner_b, uint8_t inner_a, uint8_t outer_r, uint8_t outer_g, uint8_t outer_b, uint8_t outer_a) {
+    DrawCircleGradient((Vector2){ center_x, center_y }, radius, (Color){ inner_r, inner_g, inner_b, inner_a }, (Color){ outer_r, outer_g, outer_b, outer_a });
+}`,
+    ffiDecl: `export declare function rl_DrawCircleGradient(center_x: number, center_y: number, radius: number, inner_r: number, inner_g: number, inner_b: number, inner_a: number, outer_r: number, outer_g: number, outer_b: number, outer_a: number): void;`,
+    apiCode: `export function DrawCircleGradient(a: Vector2 | number, b: number, c: number | Color, d?: Color, e?: Color): void {
+  if (typeof a === "object") {
+    rl_DrawCircleGradient((a as Vector2).x, (a as Vector2).y, b, (c as Color).r, (c as Color).g, (c as Color).b, (c as Color).a, d!.r, d!.g, d!.b, d!.a);
+  } else {
+    rl_DrawCircleGradient(a as number, b, c as number, d!.r, d!.g, d!.b, d!.a, e!.r, e!.g, e!.b, e!.a);
+  }
+}`,
+  }),
+};
+
 function classify(fn: RawFn): FnPlan {
+  if (CUSTOM_HANDLERS[fn.name]) {
+    return CUSTOM_HANDLERS[fn.name]();
+  }
+
   const tsName = `rl_${fn.name}`;
 
   for (const re of SKIP_FILE_IO) if (re.test(fn.name)) return { k: "skip", reason: "file-io" };
@@ -489,6 +864,8 @@ function classify(fn: RawFn): FnPlan {
   const locals: string[] = []; // opaque struct locals
   const frees: string[] = [];
 
+  const earlyRet = ret.k === "scalar" ? (ret.prim === "bool" ? "return false;" : "return 0;") : "return;";
+
   for (const p of params) {
     if (p.k === "scalar") {
       cParams.push(`${PRIM_C[p.prim]} ${p.name}`);
@@ -501,7 +878,7 @@ function classify(fn: RawFn): FnPlan {
       tsParams.push({ name: p.name, ts: "string" });
       allocs.push(
         `char *${p.name}_buf = (char *)malloc(${p.name}_len + 1);`,
-        `if (${p.name}_buf == NULL) return;`,
+        `if (${p.name}_buf == NULL) ${earlyRet}`,
         `memcpy(${p.name}_buf, ${p.name}_ptr, ${p.name}_len);`,
         `${p.name}_buf[${p.name}_len] = '\\0';`,
       );
@@ -516,7 +893,7 @@ function classify(fn: RawFn): FnPlan {
       cParams.push(`const uint8_t *${p.name}_ptr`, `size_t ${p.name}_len`);
       manifestParams.push("bytes");
       tsParams.push({ name: p.name, ts: "Uint8Array" });
-      pre.push(`if (${p.name}_len != (size_t)sizeof(${p.structName})) { return; }`);
+      pre.push(`if (${p.name}_len != (size_t)sizeof(${p.structName})) { ${earlyRet} }`);
       locals.push(`${p.structName} ${p.name};`, `memcpy(&${p.name}, ${p.name}_ptr, sizeof(${p.name}));`);
       callArgs.push(p.name);
     } else {
@@ -539,6 +916,9 @@ function classify(fn: RawFn): FnPlan {
     pre.unshift(`if (out_len != (size_t)sizeof(${ret.structName})) { return; }`);
     cCall = `${ret.structName} __v = ${fn.name}(${callArgs.join(", ")});`;
     frees.push("memcpy(out, &__v, sizeof(__v));");
+  } else if (ret.k === "scalar") {
+    cCall = `${PRIM_C[ret.prim]} __ret = ${fn.name}(${callArgs.join(", ")});`;
+    frees.push("return __ret;");
   } else {
     cCall = `${fn.name}(${callArgs.join(", ")});`;
   }
@@ -648,6 +1028,9 @@ function main(): void {
       if (plan.k === "direct") {
         return { name: plan.tsName, symbol: plan.symbol, params: plan.params.map((p) => p.cls), returns: plan.ret };
       }
+      if (plan.k === "custom") {
+        return { name: plan.tsName, symbol: plan.symbol, params: plan.manifestParams, returns: plan.manifestRet };
+      }
       return {
         name: plan.tsName, symbol: plan.symbol,
         params: plan.manifestParams,
@@ -670,8 +1053,14 @@ function main(): void {
   }
   shim.push(``);
   for (const { fn, plan } of bound) {
+    if (plan.k === "custom") {
+      shim.push(plan.cCode);
+      shim.push("");
+      continue;
+    }
     if (plan.k !== "wrap") continue;
-    shim.push(`void ${plan.symbol}(${plan.cParams.join(", ")}) {`);
+    const cRetType = plan.ret.k === "scalar" ? PRIM_C[plan.ret.prim] : "void";
+    shim.push(`${cRetType} ${plan.symbol}(${plan.cParams.join(", ")}) {`);
     for (const line of plan.cBody) shim.push(`    ${line}`);
     shim.push(`}`, ``);
   }
@@ -684,6 +1073,10 @@ function main(): void {
   decls.push(`   implementations come from gen/raylib_ffi.json at link time. */`);
   decls.push(``);
   for (const { plan } of bound) {
+    if (plan.k === "custom") {
+      decls.push(plan.ffiDecl);
+      continue;
+    }
     // Declarations must match the manifest ABI exactly: flattened structs
     // appear as individual scalar params (same naming as the C shim).
     const params: string[] = [];
@@ -721,8 +1114,13 @@ function main(): void {
     const def = ctx.structs.get(name)!;
     if (def.fields.length === 0) continue;
     const lay = layoutStruct(name);
-    if (lay.flat && !ctx.aliases.has(name)) api.push(interfaceDecl(name));
-    else if (!ctx.aliases.has(name)) api.push(`export type ${name} = Uint8Array;`);
+    if (name === "GlyphInfo") {
+      api.push(`export interface GlyphInfo {\n  value: number;\n  offsetX: number;\n  offsetY: number;\n  advanceX: number;\n  image: Image;\n}`);
+    } else if (lay.flat && !ctx.aliases.has(name)) {
+      api.push(interfaceDecl(name));
+    } else if (!ctx.aliases.has(name)) {
+      api.push(`export type ${name} = Uint8Array;`);
+    }
   }
   for (const [alias, { target }] of ctx.aliases) {
     if (alias === "ModelAnimPose") continue; // pointer alias — internal
@@ -733,10 +1131,52 @@ function main(): void {
     const def = ctx.structs.get(name)!;
     if (def.fields.length === 0) continue;
     const lay = layoutStruct(name);
-    if (lay.flat && !ctx.aliases.has(name)) api.push(readerFn(name));
+    if (name === "GlyphInfo") {
+      api.push(`export function __read_GlyphInfo(__b: Uint8Array): GlyphInfo {\n  const __dv = new DataView(__b.buffer, __b.byteOffset, __b.byteLength);\n  return {\n    value: __dv.getInt32(0, true),\n    offsetX: __dv.getInt32(4, true),\n    offsetY: __dv.getInt32(8, true),\n    advanceX: __dv.getInt32(12, true),\n    image: new Uint8Array(__b.buffer, __b.byteOffset + 16, 24),\n  };\n}`);
+    } else if (lay.flat && !ctx.aliases.has(name)) {
+      api.push(readerFn(name));
+    }
   }
   api.push(``);
+  api.push(`export function __toVector2Bytes(points: Float32Array | Uint8Array | Vector2[]): [Uint8Array, number] {
+  if (points instanceof Float32Array) {
+    return [new Uint8Array(points.buffer, points.byteOffset, points.byteLength), Math.floor(points.length / 2)];
+  }
+  if (points instanceof Uint8Array) {
+    return [points, Math.floor(points.byteLength / 8)];
+  }
+  const arr = points as Vector2[];
+  const f = new Float32Array(arr.length * 2);
+  for (let i = 0; i < arr.length; i++) {
+    f[i * 2] = arr[i].x;
+    f[i * 2 + 1] = arr[i].y;
+  }
+  return [new Uint8Array(f.buffer), arr.length];
+}
+
+export function __toVector3Bytes(points: Float32Array | Uint8Array | Vector3[]): [Uint8Array, number] {
+  if (points instanceof Float32Array) {
+    return [new Uint8Array(points.buffer, points.byteOffset, points.byteLength), Math.floor(points.length / 3)];
+  }
+  if (points instanceof Uint8Array) {
+    return [points, Math.floor(points.byteLength / 12)];
+  }
+  const arr = points as Vector3[];
+  const f = new Float32Array(arr.length * 3);
+  for (let i = 0; i < arr.length; i++) {
+    f[i * 3] = arr[i].x;
+    f[i * 3 + 1] = arr[i].y;
+    f[i * 3 + 2] = arr[i].z;
+  }
+  return [new Uint8Array(f.buffer), arr.length];
+}`);
+  api.push(``);
   for (const { fn, plan } of bound) {
+    if (plan.k === "custom") {
+      api.push(plan.apiCode);
+      api.push("");
+      continue;
+    }
     if (plan.k === "direct") {
       const args = plan.params.map((_, i) => `a${i}`).join(", ");
       const ret = plan.retTs === "void" ? "" : `: ${plan.retTs}`;

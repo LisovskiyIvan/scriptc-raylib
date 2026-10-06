@@ -44,7 +44,9 @@ import {
   rl_GetMonitorRefreshRate,
   rl_GetWindowPosition,
   rl_GetWindowScaleDPI,
+  rl_GetMonitorName,
   rl_SetClipboardText,
+  rl_GetClipboardText,
   rl_GetClipboardImage,
   rl_EnableEventWaiting,
   rl_DisableEventWaiting,
@@ -134,6 +136,7 @@ import {
   rl_GetCharPressed,
   rl_SetExitKey,
   rl_IsGamepadAvailable,
+  rl_GetGamepadName,
   rl_IsGamepadButtonPressed,
   rl_IsGamepadButtonDown,
   rl_IsGamepadButtonReleased,
@@ -178,6 +181,7 @@ import {
   rl_DrawLine,
   rl_DrawLineV,
   rl_DrawLineEx,
+  rl_DrawLineStrip,
   rl_DrawLineBezier,
   rl_DrawLineDashed,
   rl_DrawCircle,
@@ -207,9 +211,16 @@ import {
   rl_DrawRectangleRoundedLinesEx,
   rl_DrawTriangle,
   rl_DrawTriangleLines,
+  rl_DrawTriangleFan,
+  rl_DrawTriangleStrip,
   rl_DrawPoly,
   rl_DrawPolyLines,
   rl_DrawPolyLinesEx,
+  rl_DrawSplineLinear,
+  rl_DrawSplineBasis,
+  rl_DrawSplineCatmullRom,
+  rl_DrawSplineBezierQuadratic,
+  rl_DrawSplineBezierCubic,
   rl_DrawSplineSegmentLinear,
   rl_DrawSplineSegmentBasis,
   rl_DrawSplineSegmentCatmullRom,
@@ -286,6 +297,7 @@ import {
   rl_GetPixelDataSize,
   rl_GetFontDefault,
   rl_LoadFont,
+  rl_LoadFontEx,
   rl_LoadFontFromImage,
   rl_IsFontValid,
   rl_UnloadFont,
@@ -302,6 +314,9 @@ import {
   rl_GetGlyphInfo,
   rl_GetGlyphAtlasRec,
   rl_GetCodepointCount,
+  rl_GetCodepoint,
+  rl_GetCodepointNext,
+  rl_GetCodepointPrevious,
   rl_TextIsEqual,
   rl_TextLength,
   rl_TextFindIndex,
@@ -311,6 +326,7 @@ import {
   rl_DrawPoint3D,
   rl_DrawCircle3D,
   rl_DrawTriangle3D,
+  rl_DrawTriangleStrip3D,
   rl_DrawCube,
   rl_DrawCubeV,
   rl_DrawCubeWires,
@@ -799,7 +815,13 @@ export interface NPatchInfo {
   bottom: number;
   layout: number;
 }
-export type GlyphInfo = Uint8Array;
+export interface GlyphInfo {
+  value: number;
+  offsetX: number;
+  offsetY: number;
+  advanceX: number;
+  image: Image;
+}
 export type Font = Uint8Array;
 export interface Camera3D {
   position: Vector3;
@@ -896,6 +918,16 @@ export function __read_NPatchInfo(__b: Uint8Array): NPatchInfo {
   const __dv = new DataView(__b.buffer, __b.byteOffset, __b.byteLength);
   return { source: __read_Rectangle(new Uint8Array(__b.buffer, __b.byteOffset + 0, 16)), left: __dv.getInt32(16, true), top: __dv.getInt32(20, true), right: __dv.getInt32(24, true), bottom: __dv.getInt32(28, true), layout: __dv.getInt32(32, true) };
 }
+export function __read_GlyphInfo(__b: Uint8Array): GlyphInfo {
+  const __dv = new DataView(__b.buffer, __b.byteOffset, __b.byteLength);
+  return {
+    value: __dv.getInt32(0, true),
+    offsetX: __dv.getInt32(4, true),
+    offsetY: __dv.getInt32(8, true),
+    advanceX: __dv.getInt32(12, true),
+    image: new Uint8Array(__b.buffer, __b.byteOffset + 16, 24),
+  };
+}
 export function __read_Camera3D(__b: Uint8Array): Camera3D {
   const __dv = new DataView(__b.buffer, __b.byteOffset, __b.byteLength);
   return { position: __read_Vector3(new Uint8Array(__b.buffer, __b.byteOffset + 0, 12)), target: __read_Vector3(new Uint8Array(__b.buffer, __b.byteOffset + 12, 12)), up: __read_Vector3(new Uint8Array(__b.buffer, __b.byteOffset + 24, 12)), fovy: __dv.getFloat32(36, true), projection: __dv.getInt32(40, true) };
@@ -923,6 +955,39 @@ export function __read_RayCollision(__b: Uint8Array): RayCollision {
 export function __read_BoundingBox(__b: Uint8Array): BoundingBox {
   const __dv = new DataView(__b.buffer, __b.byteOffset, __b.byteLength);
   return { min: __read_Vector3(new Uint8Array(__b.buffer, __b.byteOffset + 0, 12)), max: __read_Vector3(new Uint8Array(__b.buffer, __b.byteOffset + 12, 12)) };
+}
+
+export function __toVector2Bytes(points: Float32Array | Uint8Array | Vector2[]): [Uint8Array, number] {
+  if (points instanceof Float32Array) {
+    return [new Uint8Array(points.buffer, points.byteOffset, points.byteLength), Math.floor(points.length / 2)];
+  }
+  if (points instanceof Uint8Array) {
+    return [points, Math.floor(points.byteLength / 8)];
+  }
+  const arr = points as Vector2[];
+  const f = new Float32Array(arr.length * 2);
+  for (let i = 0; i < arr.length; i++) {
+    f[i * 2] = arr[i].x;
+    f[i * 2 + 1] = arr[i].y;
+  }
+  return [new Uint8Array(f.buffer), arr.length];
+}
+
+export function __toVector3Bytes(points: Float32Array | Uint8Array | Vector3[]): [Uint8Array, number] {
+  if (points instanceof Float32Array) {
+    return [new Uint8Array(points.buffer, points.byteOffset, points.byteLength), Math.floor(points.length / 3)];
+  }
+  if (points instanceof Uint8Array) {
+    return [points, Math.floor(points.byteLength / 12)];
+  }
+  const arr = points as Vector3[];
+  const f = new Float32Array(arr.length * 3);
+  for (let i = 0; i < arr.length; i++) {
+    f[i * 3] = arr[i].x;
+    f[i * 3 + 1] = arr[i].y;
+    f[i * 3 + 2] = arr[i].z;
+  }
+  return [new Uint8Array(f.buffer), arr.length];
 }
 
 export function InitWindow(width: number, height: number, title: string): void {
@@ -1095,8 +1160,25 @@ export function GetWindowScaleDPI(): Vector2 {
   return __read_Vector2(__buf);
 }
 
+export function GetMonitorName(monitor: number): string {
+  const __buf = new Uint8Array(256);
+  const __len = rl_GetMonitorName(monitor, __buf);
+  if (__len <= 0) return "";
+  return new TextDecoder().decode(__buf.subarray(0, Math.min(__len, 256)));
+}
+
 export function SetClipboardText(text: string): void {
   rl_SetClipboardText(text);
+}
+
+export function GetClipboardText(): string {
+  const __buf = new Uint8Array(1024);
+  const __len = rl_GetClipboardText(__buf);
+  if (__len <= 0) return "";
+  if (__len <= __buf.length) return new TextDecoder().decode(__buf.subarray(0, __len));
+  const __big = new Uint8Array(__len);
+  rl_GetClipboardText(__big);
+  return new TextDecoder().decode(__big);
 }
 
 export function GetClipboardImage(): Image {
@@ -1215,15 +1297,15 @@ export function UnloadVrStereoConfig(config: Uint8Array): void {
   rl_UnloadVrStereoConfig(config);
 }
 
-export function LoadShader(vsFileName: string, fsFileName: string): Shader {
+export function LoadShader(vsFileName?: string | null, fsFileName?: string | null): Shader {
   const __buf = new Uint8Array(16);
-  rl_LoadShader(vsFileName, fsFileName, __buf);
+  rl_LoadShader(vsFileName ?? "", fsFileName ?? "", __buf);
   return __buf;
 }
 
-export function LoadShaderFromMemory(vsCode: string, fsCode: string): Shader {
+export function LoadShaderFromMemory(vsCode?: string | null, fsCode?: string | null): Shader {
   const __buf = new Uint8Array(16);
-  rl_LoadShaderFromMemory(vsCode, fsCode, __buf);
+  rl_LoadShaderFromMemory(vsCode ?? "", fsCode ?? "", __buf);
   return __buf;
 }
 
@@ -1483,6 +1565,13 @@ export function IsGamepadAvailable(a0: number): boolean {
   return rl_IsGamepadAvailable(a0);
 }
 
+export function GetGamepadName(gamepad: number): string {
+  const __buf = new Uint8Array(256);
+  const __len = rl_GetGamepadName(gamepad, __buf);
+  if (__len <= 0) return "";
+  return new TextDecoder().decode(__buf.subarray(0, Math.min(__len, 256)));
+}
+
 export function IsGamepadButtonPressed(a0: number, a1: number): boolean {
   return rl_IsGamepadButtonPressed(a0, a1);
 }
@@ -1675,6 +1764,11 @@ export function DrawLineEx(startPos: Vector2, endPos: Vector2, thick: number, co
   rl_DrawLineEx(startPos.x, startPos.y, endPos.x, endPos.y, thick, color.r, color.g, color.b, color.a);
 }
 
+export function DrawLineStrip(points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawLineStrip(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}
+
 export function DrawLineBezier(startPos: Vector2, endPos: Vector2, thick: number, color: Color): void {
   rl_DrawLineBezier(startPos.x, startPos.y, endPos.x, endPos.y, thick, color.r, color.g, color.b, color.a);
 }
@@ -1691,8 +1785,12 @@ export function DrawCircleV(center: Vector2, radius: number, color: Color): void
   rl_DrawCircleV(center.x, center.y, radius, color.r, color.g, color.b, color.a);
 }
 
-export function DrawCircleGradient(center: Vector2, radius: number, inner: Color, outer: Color): void {
-  rl_DrawCircleGradient(center.x, center.y, radius, inner.r, inner.g, inner.b, inner.a, outer.r, outer.g, outer.b, outer.a);
+export function DrawCircleGradient(a: Vector2 | number, b: number, c: number | Color, d?: Color, e?: Color): void {
+  if (typeof a === "object") {
+    rl_DrawCircleGradient((a as Vector2).x, (a as Vector2).y, b, (c as Color).r, (c as Color).g, (c as Color).b, (c as Color).a, d!.r, d!.g, d!.b, d!.a);
+  } else {
+    rl_DrawCircleGradient(a as number, b, c as number, d!.r, d!.g, d!.b, d!.a, e!.r, e!.g, e!.b, e!.a);
+  }
 }
 
 export function DrawCircleSector(center: Vector2, radius: number, startAngle: number, endAngle: number, segments: number, color: Color): void {
@@ -1791,6 +1889,16 @@ export function DrawTriangleLines(v1: Vector2, v2: Vector2, v3: Vector2, color: 
   rl_DrawTriangleLines(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
 }
 
+export function DrawTriangleFan(points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawTriangleFan(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}
+
+export function DrawTriangleStrip(points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawTriangleStrip(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}
+
 export function DrawPoly(center: Vector2, sides: number, radius: number, rotation: number, color: Color): void {
   rl_DrawPoly(center.x, center.y, sides, radius, rotation, color.r, color.g, color.b, color.a);
 }
@@ -1801,6 +1909,31 @@ export function DrawPolyLines(center: Vector2, sides: number, radius: number, ro
 
 export function DrawPolyLinesEx(center: Vector2, sides: number, radius: number, rotation: number, lineThick: number, color: Color): void {
   rl_DrawPolyLinesEx(center.x, center.y, sides, radius, rotation, lineThick, color.r, color.g, color.b, color.a);
+}
+
+export function DrawSplineLinear(points: Float32Array | Uint8Array | Vector2[], thick: number, color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawSplineLinear(__b, pointCount !== undefined ? pointCount : __cnt, thick, color.r, color.g, color.b, color.a);
+}
+
+export function DrawSplineBasis(points: Float32Array | Uint8Array | Vector2[], thick: number, color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawSplineBasis(__b, pointCount !== undefined ? pointCount : __cnt, thick, color.r, color.g, color.b, color.a);
+}
+
+export function DrawSplineCatmullRom(points: Float32Array | Uint8Array | Vector2[], thick: number, color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawSplineCatmullRom(__b, pointCount !== undefined ? pointCount : __cnt, thick, color.r, color.g, color.b, color.a);
+}
+
+export function DrawSplineBezierQuadratic(points: Float32Array | Uint8Array | Vector2[], thick: number, color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawSplineBezierQuadratic(__b, pointCount !== undefined ? pointCount : __cnt, thick, color.r, color.g, color.b, color.a);
+}
+
+export function DrawSplineBezierCubic(points: Float32Array | Uint8Array | Vector2[], thick: number, color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawSplineBezierCubic(__b, pointCount !== undefined ? pointCount : __cnt, thick, color.r, color.g, color.b, color.a);
 }
 
 export function DrawSplineSegmentLinear(p1: Vector2, p2: Vector2, thick: number, color: Color): void {
@@ -2195,6 +2328,14 @@ export function LoadFont(fileName: string): Font {
   return __buf;
 }
 
+export function LoadFontEx(fileName: string, fontSize: number, codepoints?: Int32Array | null, codepointCount?: number): Font {
+  const __buf = new Uint8Array(32);
+  const cpBytes = codepoints ? new Uint8Array(codepoints.buffer, codepoints.byteOffset, codepoints.byteLength) : new Uint8Array(0);
+  const count = codepointCount !== undefined ? codepointCount : (codepoints ? codepoints.length : 0);
+  rl_LoadFontEx(fileName, fontSize, cpBytes, count, __buf);
+  return __buf;
+}
+
 export function LoadFontFromImage(image: Uint8Array, key: Color, firstChar: number): Font {
   const __buf = new Uint8Array(48);
   rl_LoadFontFromImage(image, key.r, key.g, key.b, key.a, firstChar, __buf);
@@ -2251,10 +2392,10 @@ export function GetGlyphIndex(font: Uint8Array, codepoint: number): number {
   return rl_GetGlyphIndex(font, codepoint);
 }
 
-export function GetGlyphInfo(font: Uint8Array, codepoint: number): GlyphInfo {
+export function GetGlyphInfo(font: Font, codepoint: number): GlyphInfo {
   const __buf = new Uint8Array(40);
   rl_GetGlyphInfo(font, codepoint, __buf);
-  return __buf;
+  return __read_GlyphInfo(__buf);
 }
 
 export function GetGlyphAtlasRec(font: Uint8Array, codepoint: number): Rectangle {
@@ -2265,6 +2406,27 @@ export function GetGlyphAtlasRec(font: Uint8Array, codepoint: number): Rectangle
 
 export function GetCodepointCount(text: string): number {
   return rl_GetCodepointCount(text);
+}
+
+export function GetCodepoint(text: string): { codepoint: number; size: number } {
+  const sizeBuf = new Uint8Array(4);
+  const cp = rl_GetCodepoint(text, sizeBuf);
+  const dv = new DataView(sizeBuf.buffer, sizeBuf.byteOffset, 4);
+  return { codepoint: cp, size: dv.getInt32(0, true) };
+}
+
+export function GetCodepointNext(text: string): { codepoint: number; size: number } {
+  const sizeBuf = new Uint8Array(4);
+  const cp = rl_GetCodepointNext(text, sizeBuf);
+  const dv = new DataView(sizeBuf.buffer, sizeBuf.byteOffset, 4);
+  return { codepoint: cp, size: dv.getInt32(0, true) };
+}
+
+export function GetCodepointPrevious(text: string): { codepoint: number; size: number } {
+  const sizeBuf = new Uint8Array(4);
+  const cp = rl_GetCodepointPrevious(text, sizeBuf);
+  const dv = new DataView(sizeBuf.buffer, sizeBuf.byteOffset, 4);
+  return { codepoint: cp, size: dv.getInt32(0, true) };
 }
 
 export function TextIsEqual(text1: string, text2: string): boolean {
@@ -2301,6 +2463,11 @@ export function DrawCircle3D(center: Vector3, radius: number, rotationAxis: Vect
 
 export function DrawTriangle3D(v1: Vector3, v2: Vector3, v3: Vector3, color: Color): void {
   rl_DrawTriangle3D(v1.x, v1.y, v1.z, v2.x, v2.y, v2.z, v3.x, v3.y, v3.z, color.r, color.g, color.b, color.a);
+}
+
+export function DrawTriangleStrip3D(points: Float32Array | Uint8Array | Vector3[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector3Bytes(points);
+  rl_DrawTriangleStrip3D(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
 }
 
 export function DrawCube(position: Vector3, width: number, height: number, length: number, color: Color): void {
@@ -2898,8 +3065,12 @@ export const Raylib = {
   getWindowPosition: GetWindowPosition,
   GetWindowScaleDPI,
   getWindowScaleDPI: GetWindowScaleDPI,
+  GetMonitorName,
+  getMonitorName: GetMonitorName,
   SetClipboardText,
   setClipboardText: SetClipboardText,
+  GetClipboardText,
+  getClipboardText: GetClipboardText,
   GetClipboardImage,
   getClipboardImage: GetClipboardImage,
   EnableEventWaiting,
@@ -3078,6 +3249,8 @@ export const Raylib = {
   setExitKey: SetExitKey,
   IsGamepadAvailable,
   isGamepadAvailable: IsGamepadAvailable,
+  GetGamepadName,
+  getGamepadName: GetGamepadName,
   IsGamepadButtonPressed,
   isGamepadButtonPressed: IsGamepadButtonPressed,
   IsGamepadButtonDown,
@@ -3166,6 +3339,8 @@ export const Raylib = {
   drawLineV: DrawLineV,
   DrawLineEx,
   drawLineEx: DrawLineEx,
+  DrawLineStrip,
+  drawLineStrip: DrawLineStrip,
   DrawLineBezier,
   drawLineBezier: DrawLineBezier,
   DrawLineDashed,
@@ -3224,12 +3399,26 @@ export const Raylib = {
   drawTriangle: DrawTriangle,
   DrawTriangleLines,
   drawTriangleLines: DrawTriangleLines,
+  DrawTriangleFan,
+  drawTriangleFan: DrawTriangleFan,
+  DrawTriangleStrip,
+  drawTriangleStrip: DrawTriangleStrip,
   DrawPoly,
   drawPoly: DrawPoly,
   DrawPolyLines,
   drawPolyLines: DrawPolyLines,
   DrawPolyLinesEx,
   drawPolyLinesEx: DrawPolyLinesEx,
+  DrawSplineLinear,
+  drawSplineLinear: DrawSplineLinear,
+  DrawSplineBasis,
+  drawSplineBasis: DrawSplineBasis,
+  DrawSplineCatmullRom,
+  drawSplineCatmullRom: DrawSplineCatmullRom,
+  DrawSplineBezierQuadratic,
+  drawSplineBezierQuadratic: DrawSplineBezierQuadratic,
+  DrawSplineBezierCubic,
+  drawSplineBezierCubic: DrawSplineBezierCubic,
   DrawSplineSegmentLinear,
   drawSplineSegmentLinear: DrawSplineSegmentLinear,
   DrawSplineSegmentBasis,
@@ -3382,6 +3571,8 @@ export const Raylib = {
   getFontDefault: GetFontDefault,
   LoadFont,
   loadFont: LoadFont,
+  LoadFontEx,
+  loadFontEx: LoadFontEx,
   LoadFontFromImage,
   loadFontFromImage: LoadFontFromImage,
   IsFontValid,
@@ -3414,6 +3605,12 @@ export const Raylib = {
   getGlyphAtlasRec: GetGlyphAtlasRec,
   GetCodepointCount,
   getCodepointCount: GetCodepointCount,
+  GetCodepoint,
+  getCodepoint: GetCodepoint,
+  GetCodepointNext,
+  getCodepointNext: GetCodepointNext,
+  GetCodepointPrevious,
+  getCodepointPrevious: GetCodepointPrevious,
   TextIsEqual,
   textIsEqual: TextIsEqual,
   TextLength,
@@ -3432,6 +3629,8 @@ export const Raylib = {
   drawCircle3D: DrawCircle3D,
   DrawTriangle3D,
   drawTriangle3D: DrawTriangle3D,
+  DrawTriangleStrip3D,
+  drawTriangleStrip3D: DrawTriangleStrip3D,
   DrawCube,
   drawCube: DrawCube,
   DrawCubeV,
