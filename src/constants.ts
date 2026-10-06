@@ -319,3 +319,5 @@ export const BLEND = {
   CUSTOM: BLEND_CUSTOM,
   CUSTOM_SEPARATE: BLEND_CUSTOM_SEPARATE,
 } as const;
+
+export { ConfigFlags, CONFIG_FLAGS, FLAGS, FLAG } from "../gen/raylib";

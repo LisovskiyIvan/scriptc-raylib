@@ -1514,7 +1514,24 @@ function main(): void {
   api.push(``);
   for (const e of enums) {
     for (const v of e.values) api.push(`export const ${v.name} = ${v.value};`);
+    if (e.name === "bool") continue;
+    api.push(`export const ${e.name} = {`);
+    for (const v of e.values) {
+      api.push(`  ${v.name}: ${v.value},`);
+    }
+    if (e.name === "ConfigFlags") {
+      for (const v of e.values) {
+        if (v.name.startsWith("FLAG_")) {
+          api.push(`  ${v.name.slice(5)}: ${v.value},`);
+        }
+      }
+    }
+    api.push(`} as const;`);
+    api.push(`export type ${e.name} = number;`);
   }
+  api.push(`export const CONFIG_FLAGS = ConfigFlags;`);
+  api.push(`export const FLAGS = ConfigFlags;`);
+  api.push(`export const FLAG = ConfigFlags;`);
   api.push(``);
   for (const name of ctx.structs.keys()) {
     const def = ctx.structs.get(name)!;
@@ -1675,6 +1692,19 @@ export function UnloadModelAnimation(anim: ModelAnimation): void {
   api.push(`  GetModelAnimationName,`);
   api.push(`  unloadModelAnimation: UnloadModelAnimation,`);
   api.push(`  UnloadModelAnimation,`);
+  for (const e of enums) {
+    if (e.name === "bool") continue;
+    api.push(`  ${e.name},`);
+  }
+  api.push(`  CONFIG_FLAGS: ConfigFlags,`);
+  api.push(`  FLAGS: ConfigFlags,`);
+  api.push(`  FLAG: ConfigFlags,`);
+  const configEnum = enums.find((e) => e.name === "ConfigFlags");
+  if (configEnum) {
+    for (const v of configEnum.values) {
+      api.push(`  ${v.name},`);
+    }
+  }
   api.push(`};`);
   api.push(``);
   const apiTs = api.join("\n");

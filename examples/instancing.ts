@@ -7,6 +7,7 @@ import {
   DrawMeshInstanced,
   CheckCollisionLines,
   LoadImageFromMemory,
+  ConfigFlags,
 } from "../src";
 import type { Camera3D, Matrix, Vector2 } from "../src/types";
 import { readFileSync, existsSync } from "fs";
@@ -15,6 +16,7 @@ import { join } from "path";
 const SCREEN_WIDTH = 1200;
 const SCREEN_HEIGHT = 800;
 
+Raylib.setConfigFlags(ConfigFlags.FLAG_MSAA_4X_HINT | ConfigFlags.FLAG_WINDOW_RESIZABLE);
 Raylib.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Mesh Instancing & Intersection Demo");
 Raylib.setTargetFPS(60);
 

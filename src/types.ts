@@ -44,4 +44,5 @@ export type {
   AutomationEvent,
   AutomationEventList,
   Quaternion,
+  ConfigFlags,
 } from "../gen/raylib";
