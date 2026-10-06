@@ -6,8 +6,9 @@
 set -e
 cd "$(dirname "$0")"
 
-RAYLIB_H="${RAYLIB_H:-$(pkg-config --variable=includedir raylib)/raylib.h}"
+RAYLIB_H="${RAYLIB_H:-$(pkg-config --variable=includedir raylib 2>/dev/null)/raylib.h}"
 [ -f "$RAYLIB_H" ] || RAYLIB_H=/opt/homebrew/include/raylib.h
+[ -f "$RAYLIB_H" ] || RAYLIB_H="$(dirname "$0")/assets/include/raylib.h"
 echo "== header: $RAYLIB_H"
 
 bun tools/gen_bindings.ts "$RAYLIB_H" gen
