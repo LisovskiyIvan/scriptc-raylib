@@ -1403,6 +1403,7 @@ int32_t rl_GetGlyphIndex(const uint8_t *font_ptr, size_t font_len, int32_t codep
 
 void rl_GetGlyphInfo(const uint8_t *font_ptr, size_t font_len, int32_t codepoint, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(GlyphInfo)) return;
+    if (font_len != (size_t)sizeof(Font)) return;
     Font font;
     memcpy(&font, font_ptr, sizeof(font));
     GlyphInfo __v = GetGlyphInfo(font, codepoint);

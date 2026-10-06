@@ -651,7 +651,7 @@ const CUSTOM_HANDLERS: Record<string, () => Extract<FnPlan, { k: "custom" }>> = 
 }`,
     ffiDecl: `export declare function rl_LoadFontEx(fileName: string, fontSize: number, codepoints: Uint8Array, codepointCount: number, __out: Uint8Array): void;`,
     apiCode: `export function LoadFontEx(fileName: string, fontSize: number, codepoints?: Int32Array | null, codepointCount?: number): Font {
-  const __buf = new Uint8Array(32);
+  const __buf = new Uint8Array(48);
   const cpBytes = codepoints ? new Uint8Array(codepoints.buffer, codepoints.byteOffset, codepoints.byteLength) : new Uint8Array(0);
   const count = codepointCount !== undefined ? codepointCount : (codepoints ? codepoints.length : 0);
   rl_LoadFontEx(fileName, fontSize, cpBytes, count, __buf);
@@ -807,6 +807,7 @@ const CUSTOM_HANDLERS: Record<string, () => Extract<FnPlan, { k: "custom" }>> = 
     manifestRet: "void",
     cCode: `void rl_GetGlyphInfo(const uint8_t *font_ptr, size_t font_len, int32_t codepoint, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(GlyphInfo)) return;
+    if (font_len != (size_t)sizeof(Font)) return;
     Font font;
     memcpy(&font, font_ptr, sizeof(font));
     GlyphInfo __v = GetGlyphInfo(font, codepoint);

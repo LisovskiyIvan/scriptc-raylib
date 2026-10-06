@@ -2329,7 +2329,7 @@ export function LoadFont(fileName: string): Font {
 }
 
 export function LoadFontEx(fileName: string, fontSize: number, codepoints?: Int32Array | null, codepointCount?: number): Font {
-  const __buf = new Uint8Array(32);
+  const __buf = new Uint8Array(48);
   const cpBytes = codepoints ? new Uint8Array(codepoints.buffer, codepoints.byteOffset, codepoints.byteLength) : new Uint8Array(0);
   const count = codepointCount !== undefined ? codepointCount : (codepoints ? codepoints.length : 0);
   rl_LoadFontEx(fileName, fontSize, cpBytes, count, __buf);
