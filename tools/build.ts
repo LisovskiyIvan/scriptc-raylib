@@ -5,9 +5,8 @@
  */
 
 import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { findRaylibHeader, findRaylibLibrary } from "../src/config";
+import { dirname } from "node:path";
+import { findRaylibHeader, findRaylibLinkDir } from "./resolve_raylib";
 
 const header = findRaylibHeader(process.argv[2]);
 if (!header) {
@@ -37,13 +36,21 @@ execSync(`${cc} -O2 -c gen/raylib_shim.c -o gen/raylib_shim.o ${cflags}`, { stdi
 execSync(`${ar} rcs gen/libraylib_shim.a gen/raylib_shim.o`, { stdio: "inherit" });
 
 // 3. Scriptc build
+// The manifest links raylib as a system library, so its directory is supplied
+// here through LIBRARY_PATH instead of being baked into the manifest.
 console.log("== scriptc");
 const outName = isWindows ? "demo/demo.exe" : "demo/demo";
-const libPath = findRaylibLibrary();
 
 const env = { ...process.env };
-if (libPath && !env.LIBRARY_PATH) {
-  env.LIBRARY_PATH = dirname(libPath);
+if (!env.LIBRARY_PATH) {
+  const linkDir = findRaylibLinkDir();
+  if (!linkDir) {
+    console.error("Error: raylib library not found.");
+    console.error("Install raylib, or set LIBRARY_PATH=/path/to/raylib/lib.");
+    process.exit(1);
+  }
+  env.LIBRARY_PATH = linkDir;
+  console.log(`== library path: ${env.LIBRARY_PATH}`);
 }
 
 execSync(`scriptc build demo/main.ts --ffi gen/raylib_ffi.json -o ${outName}`, {

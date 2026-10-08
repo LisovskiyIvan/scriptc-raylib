@@ -83,61 +83,7 @@ function findRaylibHeader(explicit?: string): string {
   return "/opt/homebrew/include/raylib.h";
 }
 
-function findRaylibLibrary(explicit?: string): string | null {
-  if (explicit && existsSync(explicit)) return explicit;
 
-  if (process.env.RAYLIB_LIB && existsSync(process.env.RAYLIB_LIB)) {
-    return process.env.RAYLIB_LIB;
-  }
-
-  if (process.env.RAYLIB_PATH) {
-    for (const sub of [
-      "lib/libraylib.dylib", "lib/libraylib.so", "lib/raylib.dll", "lib/raylib.lib",
-      "src/libraylib.dylib", "src/libraylib.so", "src/raylib.dll",
-      "libraylib.dylib", "libraylib.so", "raylib.dll",
-    ]) {
-      const p = join(process.env.RAYLIB_PATH, sub);
-      if (existsSync(p)) return p;
-    }
-  }
-
-  // pkg-config check (Linux, macOS, MSYS2)
-  try {
-    const pcLibDir = execSync("pkg-config --variable=libdir raylib 2>/dev/null", { encoding: "utf-8" }).trim();
-    if (pcLibDir) {
-      for (const name of ["libraylib.dylib", "libraylib.so", "libraylib.a", "raylib.lib", "raylib.dll"]) {
-        const p = join(pcLibDir, name);
-        if (existsSync(p)) return p;
-      }
-    }
-  } catch {}
-
-  const candidates = [
-    // macOS
-    "/opt/homebrew/lib/libraylib.dylib",
-    "/usr/local/lib/libraylib.dylib",
-    "/opt/local/lib/libraylib.dylib",
-    // Linux
-    "/usr/lib/libraylib.so",
-    "/usr/lib64/libraylib.so",
-    "/usr/local/lib/libraylib.so",
-    "/usr/lib/x86_64-linux-gnu/libraylib.so",
-    "/usr/lib/aarch64-linux-gnu/libraylib.so",
-    // Windows
-    "C:/raylib/raylib/src/raylib.dll",
-    "C:/msys64/mingw64/bin/raylib.dll",
-    "C:/vcpkg/installed/x64-windows/bin/raylib.dll",
-    // Bundled fallback
-    resolve("assets/lib/libraylib.dylib"),
-    resolve("assets/lib/libraylib.so"),
-  ];
-
-  for (const c of candidates) {
-    if (existsSync(c)) return c;
-  }
-
-  return null;
-}
 
 const headerPath = findRaylibHeader(process.argv[2]);
 const outDir = process.argv[3] ?? "gen";
@@ -1362,7 +1308,10 @@ function interfaceDecl(name: string): string {
   const lines = def.fields.map((f) => {
     // Flat structs only contain scalar and nested-scalar fields (no arrays/pointers).
     const t = resolveType(f.type, ctx);
-    const ts = t.base.t === "prim" ? PRIM_TS[t.base.prim] : t.base.name;
+    let ts: string;
+    if (t.base.t === "prim") ts = PRIM_TS[t.base.prim];
+    else if (t.base.t === "struct" || t.base.t === "fnptr" || t.base.t === "unknown") ts = t.base.name;
+    else throw new Error(`interface ${name}: field ${f.name} has non-flat type ${f.type}`);
     return `  ${tsIdent(f.name)}: ${ts};`;
   });
   return `export interface ${name} {\n${lines.join("\n")}\n}`;
@@ -1397,11 +1346,14 @@ function readerExpr(def: StructDef, dv: string): string {
           : `${dv}.${PRIM_DV[p]}(${offset}, true)`;
       chunks.push(`${tsIdent(f.name)}: ${read}`);
       offset += PRIM_SIZE[p];
-    } else {
-      const sub = ctx.structs.get(t.base.name)!;
+    } else if (t.base.t === "struct") {
       // Recursion needs absolute offsets — build a shifted DataView view instead.
       chunks.push(`${tsIdent(f.name)}: __read_${t.base.name}(new Uint8Array(__b.buffer, __b.byteOffset + ${offset}, ${lay!.size}))`);
       offset += lay!.size;
+    } else {
+      // Only scalar and nested-scalar fields reach the flat-struct path; anything
+      // else is handled as an opaque byte buffer instead.
+      throw new Error(`struct reader: ${def.name}.${f.name} has non-flat type`);
     }
   }
   return `{ ${chunks.join(", ")} }`;
@@ -1421,8 +1373,15 @@ function main(): void {
 
   const plans = functions.map((fn) => ({ fn, plan: classify(fn) }));
 
-  const bound = plans.filter((p) => p.plan.k !== "skip");
-  const skipped = plans.filter((p) => p.plan.k === "skip") as Array<{ fn: RawFn; plan: Extract<FnPlan, { k: "skip" }> }>;
+  // Type predicates rather than plain filters: every consumer below reaches for
+  // plan.tsName / plan.ret / plan.params without re-checking plan.k.
+  type BoundPlan = { fn: RawFn; plan: Exclude<FnPlan, { k: "skip" }> };
+  const isBound = (p: { fn: RawFn; plan: FnPlan }): p is BoundPlan => p.plan.k !== "skip";
+  const isSkipped = (p: { fn: RawFn; plan: FnPlan }): p is { fn: RawFn; plan: Extract<FnPlan, { k: "skip" }> } =>
+    p.plan.k === "skip";
+
+  const bound = plans.filter(isBound);
+  const skipped = plans.filter(isSkipped);
 
   // ---------- raylib_ffi.json ----------
   const manifest = {
@@ -1440,11 +1399,12 @@ function main(): void {
         returns: plan.ret.k === "scalar" ? primClass(plan.ret.prim) : "void",
       };
     }),
-    libraries: (() => {
-      const resolved = findRaylibLibrary();
-      return resolved ? ["./libraylib_shim.a", resolved] : ["./libraylib_shim.a"];
-    })(),
-    system_libraries: findRaylibLibrary() ? [] : ["raylib"],
+    // Portable by design: only the shim archive is named here, with a path
+    // relative to this manifest. raylib itself is linked as a system library so
+    // it gets resolved at build time from LIBRARY_PATH, instead of being baked
+    // in as a machine-specific absolute path that breaks every other install.
+    libraries: ["./libraylib_shim.a"],
+    system_libraries: ["raylib"],
   };
 
   // ---------- raylib_shim.c ----------

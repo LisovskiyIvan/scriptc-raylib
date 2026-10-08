@@ -1,7 +1,7 @@
 {
   "name": "craylib",
   "version": "0.1.0",
-  "description": "Fast typed raylib bindings for scriptc (TypeScript to native AOT)",
+  "description": "Typed raylib bindings for scriptc — 501 native FFI functions, no JS engine in the binary",
   "type": "module",
   "main": "./src/index.ts",
   "module": "./src/index.ts",
@@ -13,10 +13,16 @@
     "./constants": "./src/constants.ts",
     "./types": "./src/types.ts"
   },
+  "bin": {
+    "craylib": "./lib/craylib.mjs"
+  },
   "files": [
     "src",
-    "gen",
-    "assets",
+    "lib",
+    "gen/raylib_ffi.json",
+    "gen/raylib_ffi.ts",
+    "gen/raylib.ts",
+    "gen/raylib_shim.c",
     "build.sh",
     "build.ps1",
     "README.md",
@@ -28,21 +34,49 @@
     "gen": "bun tools/gen_bindings.ts",
     "demo": "bun run build && ./demo/demo",
     "example": "bun tools/run_example.ts",
-    "run": "bun tools/run_example.ts"
+    "run": "bun tools/run_example.ts",
+    "test": "bun run test:coverage && bun run test:package",
+    "test:coverage": "bun tools/test_coverage.ts",
+    "test:package": "bun tools/test_package.ts",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run typecheck && bun run test"
   },
   "keywords": [
     "raylib",
     "scriptc",
+    "ffi",
+    "bindings",
     "game",
     "gamedev",
     "graphics",
     "native",
-    "typescript",
-    "bindings"
+    "aot",
+    "typescript"
   ],
   "author": "Lisovskii Ivan <daymedead.dev@gmail.com>",
   "license": "Zlib",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/USER/craylib.git"
+  },
+  "bugs": {
+    "url": "https://github.com/USER/craylib/issues"
+  },
+  "homepage": "https://github.com/USER/craylib#readme",
+  "engines": {
+    "node": ">=24"
+  },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.2",
+    "@types/node": "^26.6.4",
+    "typescript": "^5.9.3"
   }
 }

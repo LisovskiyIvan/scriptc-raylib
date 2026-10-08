@@ -51,23 +51,31 @@ cc -O2 -c gen/raylib_shim.c -o gen/raylib_shim.o $CFLAGS
 ar rcs gen/libraylib_shim.a gen/raylib_shim.o
 
 echo "== scriptc"
-# Search library path for the native linker (macOS, Linux)
+# Resolve the raylib library directory for the native linker. The manifest links
+# raylib as a system library, so this is the only place the path is supplied.
 if [ -z "$LIBRARY_PATH" ]; then
   if command -v pkg-config >/dev/null 2>&1 && pkg-config --exists raylib 2>/dev/null; then
     LIBRARY_PATH="$(pkg-config --variable=libdir raylib)"
-  elif [ -d "/opt/homebrew/lib" ]; then
-    LIBRARY_PATH="/opt/homebrew/lib"
-  elif [ -d "/usr/local/lib" ]; then
-    LIBRARY_PATH="/usr/local/lib"
-  elif [ -d "/usr/lib/x86_64-linux-gnu" ]; then
-    LIBRARY_PATH="/usr/lib/x86_64-linux-gnu"
-  elif [ -d "/usr/lib/aarch64-linux-gnu" ]; then
-    LIBRARY_PATH="/usr/lib/aarch64-linux-gnu"
-  elif [ -d "./assets/lib" ]; then
-    LIBRARY_PATH="$(pwd)/assets/lib"
+  else
+    for d in \
+      "/opt/homebrew/lib" "/usr/local/lib" "/opt/local/lib" \
+      "/usr/lib" "/usr/lib64" "/usr/lib/x86_64-linux-gnu" "/usr/lib/aarch64-linux-gnu"
+    do
+      if [ -f "$d/libraylib.dylib" ] || [ -f "$d/libraylib.so" ] || [ -f "$d/libraylib.a" ]; then
+        LIBRARY_PATH="$d"
+        break
+      fi
+    done
   fi
 fi
 
+if [ -z "$LIBRARY_PATH" ]; then
+  echo "error: raylib library not found." >&2
+  echo "  install raylib, or set LIBRARY_PATH=/path/to/raylib/lib" >&2
+  exit 1
+fi
+
+echo "== library path: $LIBRARY_PATH"
 LIBRARY_PATH="$LIBRARY_PATH" scriptc build demo/main.ts --ffi gen/raylib_ffi.json -o demo/demo
 
 echo "== done: demo/demo"

@@ -60,9 +60,11 @@ demo/main.ts ──(scriptc build --ffi)───┴─────────�
    - **Linux (Ubuntu/Debian)**: `sudo apt install libraylib-dev`
    - **Linux (Arch Linux)**: `sudo pacman -S raylib`
    - **Linux (Fedora)**: `sudo dnf install raylib-devel`
-   - **Windows**: MSYS2 (`pacman -S mingw-w64-x86_64-raylib`), vcpkg (`vcpkg install raylib:x64-windows`), официальный инсталлятор [raylib Windows Installer](https://www.raylib.com) или заголовок из `assets/include/raylib.h`.
-2. Компилятор **scriptc** (версия 0.2.3 или новее).
+   - **Windows**: MSYS2 (`pacman -S mingw-w64-x86_64-raylib`), vcpkg (`vcpkg install raylib:x64-windows`) или официальный инсталлятор [raylib Windows Installer](https://www.raylib.com).
+   - Библиотека raylib должна совпадать по версии с заголовком: биндинги 6.0 не линкуются с raylib 5.5. Если raylib не установлен, используйте `assets/include/raylib.h` и `bun run gen`, чтобы сгенерировать биндинги под свою версию.
+2. Компилятор **scriptc** (версия 0.2.3 или новее): `npm install -g scriptc`.
 3. **Bun** (для кодогенерации и кроссплатформенной сборки).
+4. Компилятор **C** (`cc`) — им собирается шим `gen/libraylib_shim.a`.
 
 ### Использование в проекте
 
@@ -71,6 +73,25 @@ npm install craylib
 # или
 bun add craylib
 ```
+
+Пакет поставляет TypeScript-исходники биндингов, FFI-манифест и C-шим, но **не**
+предсобранную библиотеку `libraylib_shim.a`: она зависит от архитектуры, компилятора и
+версии raylib. Соберите её один раз в каталоге проекта:
+
+```sh
+npx craylib shim      # -> gen/libraylib_shim.a
+npx craylib paths     # показать, где найдены raylib.h и библиотека
+```
+
+Затем собирайте игру обычным `scriptc`:
+
+```sh
+LIBRARY_PATH=/opt/homebrew/lib \
+  scriptc build src/main.ts --ffi gen/raylib_ffi.json -o game
+```
+
+`scriptc` не умеет сам находить нативный манифест внутри npm-пакета, поэтому `--ffi`
+с путём к `gen/raylib_ffi.json` нужно указывать явно.
 
 ---
 
@@ -149,23 +170,33 @@ scriptc build examples/instancing.ts --ffi gen/raylib_ffi.json -o examples/insta
 ./examples/instancing
 ```
 
-### Настройка пути к raylib: `Raylib.config`
+### Указание пути к raylib: `LIBRARY_PATH`
 
-Функция `Raylib.config` (принимает опции интерфейса `RaylibConfig`) позволяет явно задать путь к библиотеке raylib или выполнить автопоиск:
+Линковка raylib происходит **на этапе сборки**, поэтому путь задаётся переменной окружения,
+а не вызовом из игрового кода. Манифест `gen/raylib_ffi.json` намеренно не содержит
+абсолютных путей — иначе пакет не работал бы на чужой машине. Вместо этого raylib указан
+там как системная библиотека (`system_libraries: ["raylib"]`), а каталог с ней передаётся
+линкеру через `LIBRARY_PATH`:
 
-```ts
-import { Raylib } from "craylib";
+```sh
+# macOS (Homebrew)
+LIBRARY_PATH=/opt/homebrew/lib scriptc build src/main.ts --ffi gen/raylib_ffi.json -o game
 
-// Ручной путь (Linux, macOS или Windows):
-Raylib.config({
-  raylibPath: "/opt/homebrew/lib/libraylib.dylib",
-});
-
-// Или автоматический поиск:
-Raylib.config({ raylibPath: "auto" });
+# Linux
+LIBRARY_PATH=/usr/lib/x86_64-linux-gnu scriptc build src/main.ts --ffi gen/raylib_ffi.json -o game
 ```
 
-При указании `raylibPath` манифест `gen/raylib_ffi.json` автоматически настраивается на указанный путь, позволяя линкеру `scriptc` находить библиотеку без дополнительных переменных окружения.
+Автоматический поиск (pkg-config, Homebrew, системные каталоги, MSYS2/vcpkg, `assets/`)
+выполняют `bun run build` и `bun run example`. Проверить, что и где нашлось:
+
+```sh
+bun run build                      # сам найдёт raylib и подставит LIBRARY_PATH
+npx craylib paths                  # только показать найденные пути (из установленного пакета)
+```
+
+`Raylib.config()` остаётся как хранилище настроек времени выполнения и **не** трогает
+манифест: файловая система и `child_process` в игровом бинарнике не нужны, а их импорт
+раздувал бы каждый бинарник примерно на 190 КБ.
 
 ---
 
@@ -1017,6 +1048,28 @@ bun tools/build.ts
 LIBRARY_PATH="$(pkg-config --variable=libdir raylib)" scriptc build examples/shapes3d.ts --ffi gen/raylib_ffi.json -o examples/shapes3d
 ./examples/shapes3d
 ```
+
+Либо через раннер, который сам найдёт raylib и подставит `--ffi`:
+```sh
+bun run example shapes3d
+```
+
+### Проверки
+
+```sh
+bun run typecheck        # tsc --noEmit по src/, gen/, tools/, demo/, examples/
+bun run test:coverage    # каждый пример и демо собираются на 100% статически
+bun run test:package     # npm pack → установка → сборка игры из tarball
+bun run test             # typecheck + обе проверки
+```
+
+`test:package` — главная из них: она ставит распакованный tarball в отдельный каталог,
+собирает из него игру и проверяет, что манифест не содержит машинно-зависимых путей.
+Именно такая проверка ловит регрессию, при которой пакет работает в репозитории, но
+не собирается ни у кого больше.
+
+CI (`.github/workflows/ci.yml`) прогоняет typecheck, проверку актуальности `gen/`,
+статическое покрытие и пакетный тест на macOS, Linux и Windows.
 
 ---
 

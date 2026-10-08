@@ -11,15 +11,8 @@ demo/demo
 demo/*.ll
 
 # Built example binaries (scriptc outputs binary with same name as .ts without ext)
-examples/audio
-examples/fonts
-examples/image
-examples/index
-examples/models
-examples/shader
-examples/shapes
-examples/shapes3d
-examples/textures
+examples/*
+!examples/*.ts
 examples/*.ll
 
 # Caches and logs
@@ -30,3 +23,6 @@ examples/*.ll
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Packaged tarballs
+*.tgz
