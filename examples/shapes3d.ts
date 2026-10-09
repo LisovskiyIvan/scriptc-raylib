@@ -1,6 +1,7 @@
-import { Raylib, COLORS, KEYS, CAMERA } from "../src";
+import { Raylib, COLORS, KEYS, CAMERA, ConfigFlags } from "../src";
 import type { Camera3D } from "../src/types";
 
+Raylib.setConfigFlags(ConfigFlags.MSAA_4X_HINT);
 Raylib.initWindow(1200, 800, "3D Shapes Demo");
 Raylib.setTargetFPS(300);
 
@@ -65,7 +66,7 @@ while (!Raylib.windowShouldClose()) {
   Raylib.drawCapsule({ x: 8, y: 1, z: -6 }, { x: 8, y: 3, z: -6 }, 0.8, 8, 8, COLORS.RED);
   Raylib.drawCapsuleWires({ x: 8, y: 1, z: -2 }, { x: 8, y: 3, z: -2 }, 0.8, 8, 8, COLORS.YELLOW);
 
-  Raylib.drawPlane({ x: 0, y: 0, z: 8 }, { x: 6, y: 6 }, COLORS.GRAY);
+  Raylib.drawPlane({ x: 0, y: 1, z: 8 }, { x: 6, y: 6 }, COLORS.GRAY);
   Raylib.drawRay({ position: { x: 8, y: 5, z: 8 }, direction: { x: -2, y: -1, z: -1 } }, COLORS.YELLOW);
 
   Raylib.endMode3D();

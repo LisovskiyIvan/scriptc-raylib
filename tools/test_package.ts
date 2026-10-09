@@ -82,13 +82,13 @@ try {
   // The shim archive is arch- and ABI-specific, so the published package ships
   // C source plus a CLI to compile it. A fresh install has no .a yet.
   console.log("== consumer shim");
-  const shim = spawnSync(process.execPath, [join(pkgDir, "lib", "craylib.mjs"), "shim"], {
+  const shim = spawnSync(process.execPath, [join(pkgDir, "lib", "createshim.mjs")], {
     cwd: pkgDir,
     encoding: "utf-8",
     env: { ...process.env, LIBRARY_PATH: linkDir },
   });
   if (shim.status !== 0) {
-    console.error("FAIL  craylib shim failed");
+    console.error("FAIL  createshim failed");
     console.error(
       `${shim.stdout ?? ""}${shim.stderr ?? ""}`
         .split("\n")
@@ -100,7 +100,7 @@ try {
     process.exit(1);
   }
   if (!existsSync(join(pkgDir, "gen", "libraylib_shim.a"))) {
-    console.error("FAIL  craylib shim did not produce gen/libraylib_shim.a");
+    console.error("FAIL  createshim did not produce gen/libraylib_shim.a");
     process.exit(1);
   }
   console.log("   gen/libraylib_shim.a built");
@@ -109,10 +109,11 @@ try {
   writeFileSync(
     appPath,
     [
-      'import { InitWindow, CloseWindow, DrawText, GetScreenWidth } from "./src/index";',
+      'import { InitWindow, CloseWindow, DrawText, GetScreenWidth, Raylib } from "./src/index";',
       "",
-      'InitWindow(320, 240, "craylib package test");',
-      'DrawText("craylib", 16, 16, 20, { r: 255, g: 255, b: 255, a: 255 });',
+      "Raylib.config();",
+      'InitWindow(320, 240, "scriptc-raylib package test");',
+      'DrawText("scriptc-raylib", 16, 16, 20, { r: 255, g: 255, b: 255, a: 255 });',
       "console.log(`WIDTH ${GetScreenWidth()}`);",
       "CloseWindow();",
       "",

@@ -1,4 +1,4 @@
-# craylib — raylib bindings for scriptc
+# @dayme/scriptc-raylib — raylib bindings for scriptc
 
 TypeScript-биндинги для [raylib 6.0](https://www.raylib.com), генерируемые из оригинального Си-заголовка
 и линкуемые через нативный FFI [scriptc](https://scriptc.dev).
@@ -51,7 +51,7 @@ demo/main.ts ──(scriptc build --ffi)───┴─────────�
 
 ---
 
-## 📦 Установка и настройка
+## 📦 Установка и быстрый старт
 
 ### Предварительные требования
 
@@ -61,41 +61,81 @@ demo/main.ts ──(scriptc build --ffi)───┴─────────�
    - **Linux (Arch Linux)**: `sudo pacman -S raylib`
    - **Linux (Fedora)**: `sudo dnf install raylib-devel`
    - **Windows**: MSYS2 (`pacman -S mingw-w64-x86_64-raylib`), vcpkg (`vcpkg install raylib:x64-windows`) или официальный инсталлятор [raylib Windows Installer](https://www.raylib.com).
-   - Библиотека raylib должна совпадать по версии с заголовком: биндинги 6.0 не линкуются с raylib 5.5. Если raylib не установлен, используйте `assets/include/raylib.h` и `bun run gen`, чтобы сгенерировать биндинги под свою версию.
 2. Компилятор **scriptc** (версия 0.2.3 или новее): `npm install -g scriptc`.
-3. **Bun** (для кодогенерации и кроссплатформенной сборки).
-4. Компилятор **C** (`cc`) — им собирается шим `gen/libraylib_shim.a`.
+3. Компилятор **C** (`cc` / `gcc` / `clang`) — для сборки платформенного шима.
 
-### Использование в проекте
+### Шаг 1. Установка пакета
 
 ```sh
-npm install craylib
+npm install @dayme/scriptc-raylib
 # или
-bun add craylib
+bun add @dayme/scriptc-raylib
 ```
 
-Пакет поставляет TypeScript-исходники биндингов, FFI-манифест и C-шим, но **не**
-предсобранную библиотеку `libraylib_shim.a`: она зависит от архитектуры, компилятора и
-версии raylib. Соберите её один раз в каталоге проекта:
+### Шаг 2. Сборка C-шима (обязательный шаг)
+
+Библиотека `libraylib_shim.a` не поставляется предсобранной, так как зависит от архитектуры процессора, ABI компилятора и установленной версии raylib. Пользователь запускает сборку шима сам:
 
 ```sh
-npx craylib shim      # -> gen/libraylib_shim.a
-npx craylib paths     # показать, где найдены raylib.h и библиотека
+npx createshim
 ```
 
-Затем собирайте игру обычным `scriptc`:
+Команда скомпилирует `gen/raylib_shim.c` в `gen/libraylib_shim.a` рядом с FFI-манифестом и выведет пути. Проверить, где в системе найдены библиотека и заголовочные файлы:
 
 ```sh
-LIBRARY_PATH=/opt/homebrew/lib \
-  scriptc build src/main.ts --ffi gen/raylib_ffi.json -o game
+npx createshim paths
 ```
 
-`scriptc` не умеет сам находить нативный манифест внутри npm-пакета, поэтому `--ffi`
-с путём к `gen/raylib_ffi.json` нужно указывать явно.
+### Шаг 3. Код приложения (`Raylib.config`)
+
+В коде игры вызовите `Raylib.config(raylibpath)` — можно передать конкретный путь к библиотеке raylib либо вызвать без аргументов, чтобы библиотека нашлась автоматически по стандартным системным путям (Homebrew на macOS, `/usr/lib` и `/usr/local/lib` на Linux, MSYS2/vcpkg на Windows):
+
+```ts
+import { Raylib, COLORS } from "@dayme/scriptc-raylib";
+
+// Автоматический поиск raylib по путям по умолчанию (Homebrew, pkg-config, /usr/lib, MSYS2...):
+Raylib.config();
+
+// Или с явным указанием пути:
+// Raylib.config("/opt/homebrew/lib");
+// Raylib.config("C:/raylib/raylib/src");
+
+Raylib.initWindow(800, 450, "@dayme/scriptc-raylib demo");
+Raylib.setTargetFPS(60);
+
+while (!Raylib.windowShouldClose()) {
+  Raylib.beginDrawing();
+  Raylib.clearBackground(COLORS.DARKGRAY);
+  Raylib.drawText("Hello from @dayme/scriptc-raylib!", 190, 200, 20, COLORS.RAYWHITE);
+  Raylib.endDrawing();
+}
+
+Raylib.closeWindow();
+```
 
 ---
 
-## 🚀 Примеры использования
+## 🚀 Шаг 4. Запуск и сборка через `scriptc`
+
+Запуск и сборка выполняются полной командой `scriptc` с явным указанием пути к FFI-манифесту пакета `--ffi` и пути линковки `LIBRARY_PATH` (значение каталога библиотеки выводится командой `npx createshim paths`):
+
+```sh
+# Запуск игры:
+LIBRARY_PATH=/opt/homebrew/lib scriptc run src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json
+
+# Сборка автономного исполняемого файла:
+LIBRARY_PATH=/opt/homebrew/lib scriptc build src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json -o game
+./game
+```
+
+> **Примечание:** Если `LIBRARY_PATH` уже экспортирован в вашей системе (`export LIBRARY_PATH=/opt/homebrew/lib`), указывать его перед каждой командой не требуется:
+> ```sh
+> scriptc run src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json
+> ```
+
+---
+
+## 🎨 Примеры использования
 
 ### Вариант 1. Прямой импорт функций (рекомендуется)
 
@@ -112,16 +152,19 @@ import {
   COLORS,
   KEY_ESCAPE,
   IsKeyDown,
-} from "craylib";
+  Raylib,
+} from "@dayme/scriptc-raylib";
 
-InitWindow(800, 450, "craylib demo");
+Raylib.config();
+
+InitWindow(800, 450, "scriptc-raylib demo");
 
 while (!WindowShouldClose()) {
   if (IsKeyDown(KEY_ESCAPE)) break;
 
   BeginDrawing();
   ClearBackground(COLORS.DARKGRAY);
-  DrawText("Привет из craylib!", 100, 200, 24, COLORS.RAYWHITE);
+  DrawText("Привет из @dayme/scriptc-raylib!", 100, 200, 24, COLORS.RAYWHITE);
   DrawFPS(10, 10);
   EndDrawing();
 }
@@ -132,9 +175,10 @@ CloseWindow();
 ### Вариант 2. Через объект `Raylib` и camelCase
 
 ```ts
-import { Raylib, COLORS, KEYS } from "craylib";
+import { Raylib, COLORS, KEYS } from "@dayme/scriptc-raylib";
 
-Raylib.initWindow(800, 450, "craylib demo");
+Raylib.config();
+Raylib.initWindow(800, 450, "scriptc-raylib demo");
 Raylib.setTargetFPS(60);
 
 while (!Raylib.windowShouldClose()) {
@@ -191,12 +235,10 @@ LIBRARY_PATH=/usr/lib/x86_64-linux-gnu scriptc build src/main.ts --ffi gen/rayli
 
 ```sh
 bun run build                      # сам найдёт raylib и подставит LIBRARY_PATH
-npx craylib paths                  # только показать найденные пути (из установленного пакета)
+npx createshim paths               # показать найденные пути
 ```
 
-`Raylib.config()` остаётся как хранилище настроек времени выполнения и **не** трогает
-манифест: файловая система и `child_process` в игровом бинарнике не нужны, а их импорт
-раздувал бы каждый бинарник примерно на 190 КБ.
+В коде приложения `Raylib.config(raylibpath)` находит библиотеку по путям по умолчанию или по указанному пути, подставляя её в окружение линковщика.
 
 ---
 

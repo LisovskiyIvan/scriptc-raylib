@@ -1,8 +1,11 @@
 {
-  "name": "craylib",
+  "name": "@dayme/scriptc-raylib",
   "version": "0.1.0",
   "description": "Typed raylib bindings for scriptc — 501 native FFI functions, no JS engine in the binary",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "types": "./src/index.ts",
@@ -14,7 +17,7 @@
     "./types": "./src/types.ts"
   },
   "bin": {
-    "craylib": "./lib/craylib.mjs"
+    "createshim": "./lib/createshim.mjs"
   },
   "files": [
     "src",
