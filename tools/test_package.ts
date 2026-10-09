@@ -88,7 +88,7 @@ try {
     env: { ...process.env, LIBRARY_PATH: linkDir },
   });
   if (shim.status !== 0) {
-    console.error("FAIL  createshim failed");
+    console.error("FAIL  @dayme/scriptc-raylib cli failed");
     console.error(
       `${shim.stdout ?? ""}${shim.stderr ?? ""}`
         .split("\n")
@@ -100,7 +100,7 @@ try {
     process.exit(1);
   }
   if (!existsSync(join(pkgDir, "gen", "libraylib_shim.a"))) {
-    console.error("FAIL  createshim did not produce gen/libraylib_shim.a");
+    console.error("FAIL  cli did not produce gen/libraylib_shim.a");
     process.exit(1);
   }
   console.log("   gen/libraylib_shim.a built");
