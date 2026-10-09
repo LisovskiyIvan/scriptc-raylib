@@ -1,102 +1,102 @@
 # @dayme/scriptc-raylib — raylib bindings for scriptc
 
-TypeScript-биндинги для [raylib 6.0](https://www.raylib.com), генерируемые из оригинального Си-заголовка
-и линкуемые через нативный FFI [scriptc](https://scriptc.dev).
+TypeScript bindings for [raylib 6.0](https://www.raylib.com), generated from the original C header
+and linked via native [scriptc](https://scriptc.dev) FFI.
 
-Никакого Node.js, V8 или JIT внутри — на выходе получается компактный, автономный статический исполняемый файл с прямой машинной скоростью.
-
----
-
-## ⚡ Особенности
-
-- **🚀 Нативная производительность**: Вызовы идут напрямую в библиотеку raylib по системному ABI без посредников.
-- **📦 Готов к использованию как npm-пакет**: Удобные реэкспорты через `index.ts`, типы, манифест FFI и готовая библиотека-шим.
-- **🎨 Встроенные цвета и константы**: Полная палитра `COLORS` (включая `RAYWHITE`, `RED`, `DARKGRAY` и др.), математические константы (`PI`, `DEG2RAD`, `RAD2DEG`) и удобные группы энумов (`KEYS`, `MOUSE`, `CAMERA`, `BLEND`).
-- **🔄 Двойной стиль API**:
-  - Прямые функции C-стиля (`InitWindow`, `BeginDrawing`, `ClearBackground`, `DrawCircle`).
-  - Пространство имён `Raylib` с поддержкой camelCase (`Raylib.initWindow`, `Raylib.beginDrawing`, `Raylib.drawCircle`).
-- **🛡️ 501 функция raylib**: 116 прямых скалярных вызовов + 355 обёрнутых через C-шим с проверками layout на этапе компиляции (`_Static_assert`) + 30 кастомных FFI-адаптеров (83.5% от всего raylib).
+No Node.js, V8, or JIT engine inside — produces a compact, standalone static executable running at native machine speed.
 
 ---
 
-## 🏗️ Как это устроено
+## ⚡ Features
+
+- **🚀 Native Performance**: Direct calls into raylib using the system ABI with zero intermediary overhead.
+- **📦 npm-Ready**: Clean re-exports via `index.ts`, TypeScript typings, FFI manifest, and native C shim.
+- **🎨 Built-in Colors and Constants**: Full `COLORS` palette (including `RAYWHITE`, `RED`, `DARKGRAY`, etc.), mathematical constants (`PI`, `DEG2RAD`, `RAD2DEG`), and enum namespaces (`KEYS`, `MOUSE`, `CAMERA`, `BLEND`).
+- **🔄 Dual API Style**:
+  - Direct C-style functions (`InitWindow`, `BeginDrawing`, `ClearBackground`, `DrawCircle`).
+  - `Raylib` namespace with camelCase support (`Raylib.initWindow`, `Raylib.beginDrawing`, `Raylib.drawCircle`).
+- **🛡️ 501 raylib Functions**: 116 direct scalar calls + 355 wrapped via C shim with compile-time layout checks (`_Static_assert`) + 30 custom FFI adapters (83.5% of raylib).
+
+---
+
+## 🏗️ Architecture & How It Works
 
 ```
-raylib.h ──(tools/gen_bindings.ts)──► gen/raylib_ffi.json   манифест FFI (format 6)
-                                  ├─► gen/raylib_shim.c     C-обёртки ──► libraylib_shim.a
-                                  ├─► gen/raylib_ffi.ts     сырые declare rl_*
-                                  └─► gen/raylib.ts         типизированный API + енумы + структуры
+raylib.h ──(tools/gen_bindings.ts)──► gen/raylib_ffi.json   FFI manifest (format 6)
+                                  ├─► gen/raylib_shim.c     C wrappers ──► libraylib_shim.a
+                                  ├─► gen/raylib_ffi.ts     raw declare rl_*
+                                  └─► gen/raylib.ts         typed API + enums + structs
                                         │
                                         ▼
-                                     src/index.ts           реэкспорты, COLORS, KEYS, Raylib
+                                     src/index.ts           re-exports, COLORS, KEYS, Raylib
                                         │
-demo/main.ts ──(scriptc build --ffi)───┴──────────────────► demo/demo (нативный бинарник)
+demo/main.ts ──(scriptc build --ffi)───┴──────────────────► demo/demo (native binary)
 ```
 
-Генератор классифицирует каждую из 600 функций raylib:
+The generator classifies each of the 600 raylib functions into three groups:
 
-1. **direct (116)** — сигнатура состоит только из скаляров: линкуется напрямую на оригинальный символ raylib без C-кода.
-2. **wrapped (355) + custom (30)** — функции, требующие Си-шима или специализированных адаптеров:
-   - `const char*` → класс `string` (ptr + len): шим копирует в NUL-terminated буфер;
-   - структуру по значению с одними скалярами (`Vector2`, `Color`, `Camera3D`, `Texture`, `Matrix`...) → разворачивается в отдельные скалярные аргументы, шим собирает структуру композитным литералом;
-   - структуру с указателями внутри (`Image`, `Sound`, `Music`, `Shader`, `Model`...) → TS держит `Uint8Array` с байтами структуры и передаёт буфером (класс `bytes`), шим делает memcpy;
-   - возврат структуры → шим копирует её в хвостовой out-буфер `Uint8Array` (класс `mutable-bytes`), TS читает поля через `DataView` по офсетам, проверенным `_Static_assert(sizeof(...))`;
-   - строковые возвраты (`GetMonitorName`, `GetClipboardText`, `GetGamepadName`) → через буфер `mutable-bytes` с раскодированием через `TextDecoder`;
-   - массивы вершин (`DrawLineStrip`, `DrawTriangleFan`, `DrawTriangleStrip`, `DrawSpline*`, `DrawTriangleStrip3D`) → через байтовые буферы `Float32Array | Uint8Array | Vector2[]/Vector3[]`;
-   - **инстансинг мешей (`DrawMeshInstanced`)** — принимает массив матриц трансформации (`Float32Array | Uint8Array | Matrix[]`) и автоматически подключает встроенный инстансинг-шейдер;
-   - **пересечение отрезков (`CheckCollisionLines`)** — возвращает структурированный объект `{ collision: boolean, point: Vector2 }`;
-   - **загрузка из памяти (`LoadImageFromMemory`, `LoadWaveFromMemory`, `LoadMusicStreamFromMemory`)** — декодирование форматов png/jpg/wav/ogg/mp3 напрямую из буферов байтов `Uint8Array`;
-   - **анимации моделей (`LoadModelAnimations`, `UnloadModelAnimations`)** — загрузка последовательностей анимаций скелета в массив `ModelAnimation[]`.
-3. **skipped (99)** — функции, не поддерживаемые архитектурой FFI (см. подробный разбор ниже).
+1. **direct (116)** — scalar-only signature: links directly to the original raylib symbol without intermediate C code.
+2. **wrapped (355) + custom (30)** — functions requiring a C shim or specialized adapters:
+   - `const char*` → `string` class (ptr + len): shim copies into a NUL-terminated buffer;
+   - value struct with scalar-only fields (`Vector2`, `Color`, `Camera3D`, `Texture`, `Matrix`...) → unpacked into individual scalar arguments, shim reconstructs struct with a compound literal;
+   - struct with internal pointers (`Image`, `Sound`, `Music`, `Shader`, `Model`...) → TS holds a `Uint8Array` of struct bytes and passes it as a buffer (`bytes` class), shim performs memcpy;
+   - struct return → shim copies it into a trailing out-buffer `Uint8Array` (`mutable-bytes` class), TS unpacks fields via `DataView` at offsets validated with `_Static_assert(sizeof(...))`;
+   - string returns (`GetMonitorName`, `GetClipboardText`, `GetGamepadName`) → returned via `mutable-bytes` buffer decoded using `TextDecoder`;
+   - vertex arrays (`DrawLineStrip`, `DrawTriangleFan`, `DrawTriangleStrip`, `DrawSpline*`, `DrawTriangleStrip3D`) → byte buffers of `Float32Array | Uint8Array | Vector2[]/Vector3[]`;
+   - **mesh instancing (`DrawMeshInstanced`)** — takes transformation matrix array (`Float32Array | Uint8Array | Matrix[]`) and automatically binds the built-in instancing shader;
+   - **line collision check (`CheckCollisionLines`)** — returns a structured object `{ collision: boolean, point: Vector2 }`;
+   - **memory loading (`LoadImageFromMemory`, `LoadWaveFromMemory`, `LoadMusicStreamFromMemory`)** — decodes png/jpg/wav/ogg/mp3 directly from `Uint8Array` byte buffers;
+   - **model animations (`LoadModelAnimations`, `UnloadModelAnimations`)** — loads skeletal animation sequences into a `ModelAnimation[]` array.
+3. **skipped (99)** — functions unsupported due to FFI architecture constraints (see detailed breakdown below).
 
 ---
 
-## 📦 Установка и быстрый старт
+## 📦 Installation & Quick Start
 
-### Предварительные требования
+### Prerequisites
 
 1. **raylib 5.5 / 6.0**:
-   - **macOS**: `brew install raylib` (или MacPorts: `sudo port install raylib`)
+   - **macOS**: `brew install raylib` (or MacPorts: `sudo port install raylib`)
    - **Linux (Ubuntu/Debian)**: `sudo apt install libraylib-dev`
    - **Linux (Arch Linux)**: `sudo pacman -S raylib`
    - **Linux (Fedora)**: `sudo dnf install raylib-devel`
-   - **Windows**: MSYS2 (`pacman -S mingw-w64-x86_64-raylib`), vcpkg (`vcpkg install raylib:x64-windows`) или официальный инсталлятор [raylib Windows Installer](https://www.raylib.com).
-2. Компилятор **scriptc** (версия 0.2.3 или новее): `npm install -g scriptc`.
-3. Компилятор **C** (`cc` / `gcc` / `clang`) — для сборки платформенного шима.
+   - **Windows**: MSYS2 (`pacman -S mingw-w64-x86_64-raylib`), vcpkg (`vcpkg install raylib:x64-windows`), or the official [raylib Windows Installer](https://www.raylib.com).
+2. **scriptc compiler** (version 0.2.3 or newer): `npm install -g scriptc`.
+3. **C compiler** (`cc` / `gcc` / `clang`) — to compile the platform shim.
 
-### Шаг 1. Установка пакета
+### Step 1. Install package
 
 ```sh
 npm install @dayme/scriptc-raylib
-# или
+# or
 bun add @dayme/scriptc-raylib
 ```
 
-### Шаг 2. Сборка C-шима (обязательный шаг)
+### Step 2. Build C shim (required)
 
-Библиотека `libraylib_shim.a` не поставляется предсобранной, так как зависит от архитектуры процессора, ABI компилятора и установленной версии raylib. Пользователь запускает сборку шима сам:
+The `libraylib_shim.a` library is not shipped prebuilt because it depends on the consumer's CPU architecture, compiler ABI, and installed raylib version. Run the build command once:
 
 ```sh
 npx createshim
 ```
 
-Команда скомпилирует `gen/raylib_shim.c` в `gen/libraylib_shim.a` рядом с FFI-манифестом и выведет пути. Проверить, где в системе найдены библиотека и заголовочные файлы:
+This compiles `gen/raylib_shim.c` into `gen/libraylib_shim.a` beside the FFI manifest and prints out ready-to-use commands. To inspect detected paths:
 
 ```sh
 npx createshim paths
 ```
 
-### Шаг 3. Код приложения (`Raylib.config`)
+### Step 3. Application code (`Raylib.config`)
 
-В коде игры вызовите `Raylib.config(raylibpath)` — можно передать конкретный путь к библиотеке raylib либо вызвать без аргументов, чтобы библиотека нашлась автоматически по стандартным системным путям (Homebrew на macOS, `/usr/lib` и `/usr/local/lib` на Linux, MSYS2/vcpkg на Windows):
+In your game code, call `Raylib.config(raylibpath)` — you can supply an explicit path to the raylib library or directory, or call it with no arguments to automatically discover raylib in standard system locations (Homebrew on macOS, `/usr/lib` and `/usr/local/lib` on Linux, MSYS2/vcpkg on Windows):
 
 ```ts
 import { Raylib, COLORS } from "@dayme/scriptc-raylib";
 
-// Автоматический поиск raylib по путям по умолчанию (Homebrew, pkg-config, /usr/lib, MSYS2...):
+// Automatic raylib discovery via default paths (Homebrew, pkg-config, /usr/lib, MSYS2...):
 Raylib.config();
 
-// Или с явным указанием пути:
+// Or with an explicit path:
 // Raylib.config("/opt/homebrew/lib");
 // Raylib.config("C:/raylib/raylib/src");
 
@@ -115,29 +115,29 @@ Raylib.closeWindow();
 
 ---
 
-## 🚀 Шаг 4. Запуск и сборка через `scriptc`
+## 🚀 Step 4. Run and Build with `scriptc`
 
-Запуск и сборка выполняются полной командой `scriptc` с явным указанием пути к FFI-манифесту пакета `--ffi` и пути линковки `LIBRARY_PATH` (значение каталога библиотеки выводится командой `npx createshim paths`):
+Run and build using the full standard `scriptc` command with the `--ffi` manifest flag and `LIBRARY_PATH` (the directory of your raylib library can be retrieved with `npx createshim paths`):
 
 ```sh
-# Запуск игры:
+# Run your game:
 LIBRARY_PATH=/opt/homebrew/lib scriptc run src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json
 
-# Сборка автономного исполняемого файла:
+# Build a standalone native binary:
 LIBRARY_PATH=/opt/homebrew/lib scriptc build src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json -o game
 ./game
 ```
 
-> **Примечание:** Если `LIBRARY_PATH` уже экспортирован в вашей системе (`export LIBRARY_PATH=/opt/homebrew/lib`), указывать его перед каждой командой не требуется:
+> **Note:** If `LIBRARY_PATH` is already exported in your shell environment (`export LIBRARY_PATH=/opt/homebrew/lib`), you don't need to prefix each command:
 > ```sh
 > scriptc run src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json
 > ```
 
 ---
 
-## 🎨 Примеры использования
+## 🎨 Usage Examples
 
-### Вариант 1. Прямой импорт функций (рекомендуется)
+### Option 1. Direct function imports (recommended)
 
 ```ts
 import {
@@ -164,7 +164,7 @@ while (!WindowShouldClose()) {
 
   BeginDrawing();
   ClearBackground(COLORS.DARKGRAY);
-  DrawText("Привет из @dayme/scriptc-raylib!", 100, 200, 24, COLORS.RAYWHITE);
+  DrawText("Hello from @dayme/scriptc-raylib!", 100, 200, 24, COLORS.RAYWHITE);
   DrawFPS(10, 10);
   EndDrawing();
 }
@@ -172,7 +172,7 @@ while (!WindowShouldClose()) {
 CloseWindow();
 ```
 
-### Вариант 2. Через объект `Raylib` и camelCase
+### Option 2. Via `Raylib` namespace & camelCase
 
 ```ts
 import { Raylib, COLORS, KEYS } from "@dayme/scriptc-raylib";
@@ -193,73 +193,48 @@ while (!Raylib.windowShouldClose()) {
 Raylib.closeWindow();
 ```
 
-### 🎮 Запуск примеров (Examples)
+### 🎮 Running Examples
 
-В репозитории доступны 12 готовых примеров в папке `examples/`:
+The repository includes 12 ready-to-run examples in `examples/`:
 `index`, `shapes`, `shapes3d`, `textures`, `fonts`, `audio`, `models`, `shader`, `image`, `camera`, `breakout`, `instancing`.
 
-Так как `scriptc` является AOT-компилятором, нативный FFI-манифест передаётся компилятору через флаг `--ffi`:
+Since `scriptc` is an AOT compiler, pass the FFI manifest flag `--ffi`:
 
 ```sh
-# Напрямую через scriptc run:
+# Directly with scriptc run:
 scriptc run examples/index.ts --ffi gen/raylib_ffi.json
 
-# Либо через удобный раннер (автоматически подтягивает --ffi):
+# Or with the runner script (automatically attaches --ffi and LIBRARY_PATH):
 bun run example index
 bun run example shapes
 bun run example instancing
 
-# Либо сборка в автономный бинарник:
+# Or compile to a standalone executable:
 scriptc build examples/instancing.ts --ffi gen/raylib_ffi.json -o examples/instancing
 ./examples/instancing
 ```
 
-### Указание пути к raylib: `LIBRARY_PATH`
+---
 
-Линковка raylib происходит **на этапе сборки**, поэтому путь задаётся переменной окружения,
-а не вызовом из игрового кода. Манифест `gen/raylib_ffi.json` намеренно не содержит
-абсолютных путей — иначе пакет не работал бы на чужой машине. Вместо этого raylib указан
-там как системная библиотека (`system_libraries: ["raylib"]`), а каталог с ней передаётся
-линкеру через `LIBRARY_PATH`:
+## 💡 Memory Management & Zero Asset Limits
 
-```sh
-# macOS (Homebrew)
-LIBRARY_PATH=/opt/homebrew/lib scriptc build src/main.ts --ffi gen/raylib_ffi.json -o game
+Unlike fixed static registry approaches (e.g. `MAX_MODELS 64`, `MAX_IMAGES 128`, `MAX_SOUNDS 32`):
 
-# Linux
-LIBRARY_PATH=/usr/lib/x86_64-linux-gnu scriptc build src/main.ts --ffi gen/raylib_ffi.json -o game
-```
-
-Автоматический поиск (pkg-config, Homebrew, системные каталоги, MSYS2/vcpkg, `assets/`)
-выполняют `bun run build` и `bun run example`. Проверить, что и где нашлось:
-
-```sh
-bun run build                      # сам найдёт raylib и подставит LIBRARY_PATH
-npx createshim paths               # показать найденные пути
-```
-
-В коде приложения `Raylib.config(raylibpath)` находит библиотеку по путям по умолчанию или по указанному пути, подставляя её в окружение линковщика.
+- **No limits in `@dayme/scriptc-raylib`:** Every complex raylib structure (`Model`, `Image`, `Sound`, `Music`, `Shader`, `Font`, `Wave`, `Mesh`, `Material`, `ModelAnimation`) is represented as an independent `Uint8Array` buffer of exact size `sizeof(Struct)`.
+- **Direct round-trip:** When calling `LoadModel()`, the C shim copies the native structure into a newly allocated `Uint8Array`. In TS, you own this handle directly. When passed into drawing functions, the byte buffer is passed straight back to C without lookup tables.
+- **Scalability:** You can load hundreds of thousands of models, textures, or sounds — limited only by available system RAM.
 
 ---
 
-## 💡 Управление памятью и отсутствие лимитов на ассеты
+## 📊 Implementation Status
 
-В отличие от подходов с фиксированными статическими реестрами (где использовались `MAX_MODELS 64`, `MAX_IMAGES 128`, `MAX_SOUNDS 32` и т.д.):
+Total raylib 6.0 header functions: **600 functions**:
+- **501 implemented** (116 direct + 355 wrapped + 30 custom) — **83.5%**
+- **99 skipped** due to FFI architecture constraints — **16.5%**
 
-- **В `craylib` лимитов нет:** Каждая сложная структура raylib (`Model`, `Image`, `Sound`, `Music`, `Shader`, `Font`, `Wave`, `Mesh`, `Material`, `ModelAnimation`) представлена независимым буфером `Uint8Array` точного размера `sizeof(Struct)`.
-- **Прямой round-trip:** При вызове `LoadModel()` Си-шим копирует нативную структуру в свежевыделенный `Uint8Array`. В TS вы владеете этим дескриптором напрямую. При передаче в функции отрисовки буфер байтов передаётся обратно в C без промежуточных таблиц поиска.
-- **Масштабируемость:** Можно загрузить сотни тысяч моделей, текстур или звуков — ограничением выступает только физическая оперативная память системы.
+### Summary by Module
 
-
-## 📊 Статус реализации функций
-
-Всего в заголовке raylib 6.0 содержится **600 функций**:
-- **501 функция реализована** (116 direct + 355 wrapped + 30 custom) — **83.5%**
-- **99 функций исключены** по архитектурным причинам FFI — **16.5%**
-
-### Сводная таблица по модулям
-
-| Модуль | Реализовано | Пропущено | Всего | Прогресс |
+| Module | Implemented | Skipped | Total | Progress |
 |---|:---:|:---:|:---:|:---:|
 | **Core / Window & Graphics Device** | 126 | 43 | 169 | 75% |
 | **Input Handling (Keyboard, Mouse, Gamepad)** | 38 | 1 | 39 | 97% |
@@ -271,13 +246,13 @@ npx createshim paths               # показать найденные пут�
 | **3D Shapes Drawing** | 21 | 0 | 21 | 100% |
 | **3D Models & Materials** | 49 | 3 | 52 | 94% |
 | **Audio & Music** | 61 | 5 | 66 | 92% |
-| **ИТОГО** | **501** | **99** | **600** | **83.5%** |
+| **TOTAL** | **501** | **99** | **600** | **83.5%** |
 
 ---
 
-## ✅ Реализованные функции (501)
+## ✅ Implemented Functions (501)
 
-Каждая функция полностью типизирована, проверена и доступна для вызова как в PascalCase, так и в camelCase.
+Every function is fully typed, tested, and callable in both PascalCase and camelCase.
 
 
 <details>
@@ -758,17 +733,17 @@ npx createshim paths               # показать найденные пут�
 
 ---
 
-## 🚫 Функции, которые мы не будем делать (178)
+## 🚫 Functions Not Implemented (178)
 
-Ниже перечислены все исключённые функции, сгруппированные по причинам исключения с подробным объяснением.
+Below are all excluded functions, grouped by reason with detailed explanations.
 
 
-### Модификация структур по указателю (struct-pointer) (74)
+### Struct Mutation via Pointer (struct-pointer) (74)
 
-> **Почему не делаем:** Функции принимают изменяемый указатель на C-структуру (`Image*`, `Camera3D*`, `Mesh*`, `Material*`, `Wave*`) для мутации in-place, либо массивы вершин/точек (`Vector2*` в `DrawLineStrip`, `DrawTriangleStrip`, `DrawSpline*`). В FFI scriptc структуры передаются по значению через распакованные скалярные поля или через opaque буферы `Uint8Array`. Передача мутабельных указателей внутрь структур scriptc не поддерживается.
+> **Why skipped:** Functions accept a mutable pointer to a C struct (`Image*`, `Camera3D*`, `Mesh*`, `Material*`, `Wave*`) for in-place mutation, or vertex/point arrays (`Vector2*` in `DrawLineStrip`, `DrawTriangleStrip`, `DrawSpline*`). In scriptc FFI, structs are passed by value via unpacked scalar fields or opaque `Uint8Array` buffers. Mutable pointers into scriptc struct internals are not supported.
 
 <details>
-<summary><b>Список пропущенных функций (74)</b></summary>
+<summary><b>List of skipped functions (74)</b></summary>
 
 - [ ] `SetWindowIcons`
 - [ ] `UpdateCamera`
@@ -847,12 +822,12 @@ npx createshim paths               # показать найденные пут�
 
 </details>
 
-### Файловые операции ОС (file-io) (26)
+### OS File Operations (file-io) (26)
 
-> **Почему не делаем:** Прямые вызовы функций работы с файловой системой ОС (`FileExists`, `DirectoryExists`, `LoadFileData`, `SaveFileText`, `ExportImage`, `GetFileName`, `GetDirectoryPath` и др.). Управление файловой системой и путями является задачей стандартных средств рантайма/ОС. **Ресурсные лоадеры сохранены:** `LoadTexture`, `LoadSound`, `LoadMusicStream`, `LoadFont`, `LoadModel`, `LoadShader` работают штатно.
+> **Why skipped:** Direct OS filesystem calls (`FileExists`, `DirectoryExists`, `LoadFileData`, `SaveFileText`, `ExportImage`, `GetFileName`, `GetDirectoryPath`, etc.). Filesystem and path management belongs to standard runtime/OS utilities. **Resource loaders are preserved:** `LoadTexture`, `LoadSound`, `LoadMusicStream`, `LoadFont`, `LoadModel`, `LoadShader` work normally.
 
 <details>
-<summary><b>Список пропущенных функций (26)</b></summary>
+<summary><b>List of skipped functions (26)</b></summary>
 
 - [ ] `TakeScreenshot`
 - [ ] `LoadFileData`
@@ -883,12 +858,12 @@ npx createshim paths               # показать найденные пут�
 
 </details>
 
-### Возврат C-строк (string-return) (23)
+### C-String Return (string-return) (23)
 
-> **Почему не делаем:** Функции возвращают `const char*` / `char*` (`GetClipboardText`, `GetMonitorName`, `GetGamepadName`, утилиты `TextToUpper`, `TextToLower` и др.). Возврат динамически выделенных C-строк без чёткого контракта владения памятью (кто и когда вызывает `free`) приводит к утечкам памяти или висячим указателям.
+> **Why skipped:** Functions returning `const char*` / `char*` (`GetClipboardText`, `GetMonitorName`, `GetGamepadName`, utility functions `TextToUpper`, `TextToLower`, etc.). Returning dynamically allocated C strings without clear memory ownership contracts (who calls `free` and when) causes memory leaks or dangling pointers.
 
 <details>
-<summary><b>Список пропущенных функций (23)</b></summary>
+<summary><b>List of skipped functions (23)</b></summary>
 
 - [ ] `GetMonitorName`
 - [ ] `GetClipboardText`
@@ -916,12 +891,12 @@ npx createshim paths               # показать найденные пут�
 
 </details>
 
-### Возврат сырых указателей (pointer-return) (18)
+### Raw Pointer Return (pointer-return) (18)
 
-> **Почему не делаем:** Функции возвращают нетипизированные указатели (`void*`, `Color*`, `char**`, `Transform**` — например, `GetWindowHandle`, `LoadImageColors`, `LoadFontData`, `TextSplit`, `LoadMaterials`). В типизированном коде TS такие указатели не могут безопасно разыменовываться без информации о размере и структуре буфера.
+> **Why skipped:** Functions returning untyped pointers (`void*`, `Color*`, `char**`, `Transform**` — e.g. `GetWindowHandle`, `LoadImageColors`, `LoadFontData`, `TextSplit`, `LoadMaterials`). In typed TypeScript code, these cannot be safely dereferenced without buffer size and layout metadata.
 
 <details>
-<summary><b>Список пропущенных функций (18)</b></summary>
+<summary><b>List of skipped functions (18)</b></summary>
 
 - [ ] `GetWindowHandle`
 - [ ] `LoadRandomSequence`
@@ -944,12 +919,12 @@ npx createshim paths               # показать найденные пут�
 
 </details>
 
-### Параметры-указатели на память/счётчики (pointer-param) (17)
+### Memory/Count Pointer Parameters (pointer-param) (17)
 
-> **Почему не делаем:** Функции требуют передачи указателей на выходные переменные или сырые блоки памяти (`int* count`, `void* data` — например, `LoadImageAnim`, `DrawTextCodepoints`, `GetCodepoint`, `UnloadWaveSamples`).
+> **Why skipped:** Functions requiring pointers to output variables or raw memory blocks (`int* count`, `void* data` — e.g. `LoadImageAnim`, `DrawTextCodepoints`, `GetCodepoint`, `UnloadWaveSamples`).
 
 <details>
-<summary><b>Список пропущенных функций (17)</b></summary>
+<summary><b>List of skipped functions (17)</b></summary>
 
 - [ ] `UnloadRandomSequence`
 - [ ] `ComputeCRC32`
@@ -971,12 +946,12 @@ npx createshim paths               # показать найденные пут�
 
 </details>
 
-### C-колбэки (callback) (10)
+### C Callbacks (callback) (10)
 
-> **Почему не делаем:** Функции принимают C-указатели на функции обратного вызова (`SetAudioStreamCallback`, `SetTraceLogCallback`, `AttachAudioStreamProcessor` и др.). Вызов из нативного C обратно в исполняемый контекст TypeScript в рамках статического FFI scriptc не поддерживается.
+> **Why skipped:** Functions taking C function pointers as callbacks (`SetAudioStreamCallback`, `SetTraceLogCallback`, `AttachAudioStreamProcessor`, etc.). Calling from native C back into the TypeScript executable context is not supported in scriptc's static FFI.
 
 <details>
-<summary><b>Список пропущенных функций (10)</b></summary>
+<summary><b>List of skipped functions (10)</b></summary>
 
 - [ ] `SetTraceLogCallback`
 - [ ] `SetLoadFileDataCallback`
@@ -991,12 +966,12 @@ npx createshim paths               # показать найденные пут�
 
 </details>
 
-### Изменяемые байтовые указатели (mutable-pointer) (5)
+### Mutable Byte Pointers (mutable-pointer) (5)
 
-> **Почему не делаем:** Функции требуют изменяемых параметров `void*` или `char*` без информации о длине буфера (`GetPixelColor`, `SetPixelColor`, `TextCopy`, `TextAppend`, `UnloadUTF8`).
+> **Why skipped:** Functions requiring mutable `void*` or `char*` parameters without buffer length information (`GetPixelColor`, `SetPixelColor`, `TextCopy`, `TextAppend`, `UnloadUTF8`).
 
 <details>
-<summary><b>Список пропущенных функций (5)</b></summary>
+<summary><b>List of skipped functions (5)</b></summary>
 
 - [ ] `GetPixelColor`
 - [ ] `SetPixelColor`
@@ -1006,12 +981,12 @@ npx createshim paths               # показать найденные пут�
 
 </details>
 
-### Ручное управление памятью C (manual-memory) (3)
+### Manual C Memory Management (manual-memory) (3)
 
-> **Почему не делаем:** Низкоуровневые функции аллокатора C (`MemAlloc`, `MemRealloc`, `MemFree`). В TypeScript ручное выделение памяти небезопасно и не требуется.
+> **Why skipped:** Low-level C allocator functions (`MemAlloc`, `MemRealloc`, `MemFree`). Manual memory allocation is unsafe and unnecessary in TypeScript.
 
 <details>
-<summary><b>Список пропущенных функций (3)</b></summary>
+<summary><b>List of skipped functions (3)</b></summary>
 
 - [ ] `MemAlloc`
 - [ ] `MemRealloc`
@@ -1019,12 +994,12 @@ npx createshim paths               # показать найденные пут�
 
 </details>
 
-### Вариадические функции C (variadic) (2)
+### Variadic C Functions (variadic) (2)
 
-> **Почему не делаем:** Функции с переменным числом аргументов `...` (`TraceLog`, `TextFormat`). Они не имеют фиксированной сигнатуры C ABI для прямого FFI связывания.
+> **Why skipped:** Functions with variable argument counts `...` (`TraceLog`, `TextFormat`). They lack a fixed C ABI signature for direct FFI binding.
 
 <details>
-<summary><b>Список пропущенных функций (2)</b></summary>
+<summary><b>List of skipped functions (2)</b></summary>
 
 - [ ] `TraceLog`
 - [ ] `TextFormat`
@@ -1033,34 +1008,34 @@ npx createshim paths               # показать найденные пут�
 
 ---
 
-## 🛠️ Сборка и разработка
+## 🛠️ Build & Development
 
-### Сборка библиотеки и демонстрационного приложения
+### Building the Library and Demo Application
 
-Кроссплатформенная сборка (Linux, macOS, Windows):
+Cross-platform build (Linux, macOS, Windows):
 ```sh
 bun run build
-# или напрямую через bun:
+# or directly with bun:
 bun tools/build.ts
 ```
 
-На POSIX-системах (macOS / Linux):
+On POSIX systems (macOS / Linux):
 ```sh
 ./build.sh
 ```
 
-На Windows (PowerShell):
+On Windows (PowerShell):
 ```powershell
 .\build.ps1
 ```
 
-Скрипт сборки:
-1. Автоматически находит заголовок `raylib.h` (через `pkg-config`, стандартные системные пути Linux/macOS/Windows или локальные `assets/include`).
-2. Генерирует TS-биндинги, C-шим и манифест FFI в `gen/`.
-3. Компилирует Си-обёртку `gen/raylib_shim.c` в статическую библиотеку `gen/libraylib_shim.a`.
-4. Собирает бинарник через `scriptc build demo/main.ts --ffi gen/raylib_ffi.json -o demo/demo`.
+Build pipeline:
+1. Automatically discovers `raylib.h` (via `pkg-config`, standard system paths across Linux/macOS/Windows, or local `assets/include`).
+2. Generates TS bindings, C shim, and FFI manifest into `gen/`.
+3. Compiles C wrapper `gen/raylib_shim.c` into static library `gen/libraylib_shim.a`.
+4. Compiles binary via `scriptc build demo/main.ts --ffi gen/raylib_ffi.json -o demo/demo`.
 
-### Запуск демо
+### Running the Demo
 
 ```sh
 # macOS / Linux:
@@ -1070,51 +1045,48 @@ bun tools/build.ts
 .\demo\demo.exe
 ```
 
-### Запуск примеров
+### Running Examples
 
-В папке `examples/` собраны примеры использования:
-- `shapes.ts` — Рисование 2D фигур, градиентов, кругов, прямоугольников.
-- `shapes3d.ts` — 3D примитивы (кубы, сферы, цилиндры, плоскость).
-- `index.ts` — Интерактивное демо окна, мыши, клавиатуры и FPS.
-- `audio.ts` — Воспроизведение звука и музыки.
-- `fonts.ts` — Шрифты и форматирование текста.
-- `textures.ts` — Загрузка и рендеринг текстур.
-- `models.ts` — Загрузка 3D моделей.
-- `shader.ts` — Работа с шейдерами.
-- `image.ts` — Генерация изображений и процедурное рисование.
-- `camera.ts` — Режимы 3D-камеры (Orbital, Free, FPS, Third Person) через `UpdateCamera`.
-- `breakout.ts` — Классическая аркадная игра Арканоид (счёт, комбо, частицы, жизни).
+The `examples/` directory contains usage examples:
+- `shapes.ts` — 2D shapes, gradients, circles, rectangles.
+- `shapes3d.ts` — 3D primitives (cubes, spheres, cylinders, plane).
+- `index.ts` — Interactive window, mouse, keyboard, and FPS demo.
+- `audio.ts` — Sound and music playback.
+- `fonts.ts` — Fonts and text formatting.
+- `textures.ts` — Texture loading and rendering.
+- `models.ts` — 3D model loading.
+- `shader.ts` — Custom shader effects.
+- `image.ts` — Image generation and procedural drawing.
+- `camera.ts` — 3D camera modes (Orbital, Free, FPS, Third Person).
+- `breakout.ts` — Classic Breakout arcade game (score, combos, particles, lives).
+- `instancing.ts` — Mesh instancing with custom matrix arrays.
 
-Собрать любой пример можно командой:
+Compile any example with:
 ```sh
 LIBRARY_PATH="$(pkg-config --variable=libdir raylib)" scriptc build examples/shapes3d.ts --ffi gen/raylib_ffi.json -o examples/shapes3d
 ./examples/shapes3d
 ```
 
-Либо через раннер, который сам найдёт raylib и подставит `--ffi`:
+Or via the runner script:
 ```sh
 bun run example shapes3d
 ```
 
-### Проверки
+### Verification & Testing
 
 ```sh
-bun run typecheck        # tsc --noEmit по src/, gen/, tools/, demo/, examples/
-bun run test:coverage    # каждый пример и демо собираются на 100% статически
-bun run test:package     # npm pack → установка → сборка игры из tarball
-bun run test             # typecheck + обе проверки
+bun run typecheck        # tsc --noEmit across src/, gen/, tools/, demo/, examples/
+bun run test:coverage    # asserts all examples and demo compile 100% statically
+bun run test:package     # npm pack → install → build game from tarball
+bun run test             # typecheck + both tests
 ```
 
-`test:package` — главная из них: она ставит распакованный tarball в отдельный каталог,
-собирает из него игру и проверяет, что манифест не содержит машинно-зависимых путей.
-Именно такая проверка ловит регрессию, при которой пакет работает в репозитории, но
-не собирается ни у кого больше.
+`test:package` is the critical test: it installs the unpacked tarball into an isolated directory, builds a game from it, and verifies the manifest contains no machine-dependent paths. This catches regressions where a package works locally in the repository but fails on any other machine.
 
-CI (`.github/workflows/ci.yml`) прогоняет typecheck, проверку актуальности `gen/`,
-статическое покрытие и пакетный тест на macOS, Linux и Windows.
+CI (`.github/workflows/ci.yml`) runs typecheck, `gen/` freshness checks, static coverage, and package tests on macOS, Linux, and Windows.
 
 ---
 
-## 📄 Лицензия
+## 📄 License
 
-zlib License — соответствует оригинальной лицензии raylib. См. файл [LICENSE](file:///Users/ivan/dev/myself/craylib/LICENSE).
+zlib License — matching raylib's original license. See [LICENSE](LICENSE).
