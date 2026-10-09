@@ -1417,8 +1417,9 @@ export function __toVector2Bytes(points: Float32Array | Uint8Array | Vector2[]):
   const arr = points as Vector2[];
   const f = new Float32Array(arr.length * 2);
   for (let i = 0; i < arr.length; i++) {
-    f[i * 2] = arr[i].x;
-    f[i * 2 + 1] = arr[i].y;
+    const v = arr[i]!;
+    f[i * 2] = v.x;
+    f[i * 2 + 1] = v.y;
   }
   return [new Uint8Array(f.buffer), arr.length];
 }
@@ -1433,9 +1434,10 @@ export function __toVector3Bytes(points: Float32Array | Uint8Array | Vector3[]):
   const arr = points as Vector3[];
   const f = new Float32Array(arr.length * 3);
   for (let i = 0; i < arr.length; i++) {
-    f[i * 3] = arr[i].x;
-    f[i * 3 + 1] = arr[i].y;
-    f[i * 3 + 2] = arr[i].z;
+    const v = arr[i]!;
+    f[i * 3] = v.x;
+    f[i * 3 + 1] = v.y;
+    f[i * 3 + 2] = v.z;
   }
   return [new Uint8Array(f.buffer), arr.length];
 }

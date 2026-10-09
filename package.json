@@ -1,6 +1,6 @@
 {
   "name": "@dayme/scriptc-raylib",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Typed raylib bindings for scriptc — 501 native FFI functions, no JS engine in the binary",
   "type": "module",
   "publishConfig": {

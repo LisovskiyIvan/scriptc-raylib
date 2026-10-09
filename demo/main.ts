@@ -46,7 +46,7 @@ const PALETTE: Color[] = [
 ];
 
 function spawnBall(count: number): Ball {
-  const c = PALETTE[count % PALETTE.length];
+  const c = PALETTE[count % PALETTE.length]!;
   return {
     pos: { x: 60 + (count * 137) % 680, y: 60 + (count * 251) % 330 },
     vel: { x: 120 + (count * 53) % 220, y: 90 + (count * 97) % 260 },
@@ -108,7 +108,7 @@ while (WindowShouldClose() === false) {
   ClearBackground({ r: 30, g: 30, b: 40, a: 255 });
 
   // trail line from the mouse to the nearest ball
-  let nearest = balls[0];
+  let nearest = balls[0]!;
   let best = Infinity;
   for (const b of balls) {
     const dx = b.pos.x - mouse.x;
