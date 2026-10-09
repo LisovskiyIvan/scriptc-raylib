@@ -80,7 +80,7 @@ The `libraylib_shim.a` library is not shipped prebuilt because it depends on the
 npx createshim
 ```
 
-This compiles `gen/raylib_shim.c` into `gen/libraylib_shim.a` beside the FFI manifest and prints out ready-to-use commands. To inspect detected paths:
+This compiles `gen/raylib_shim.c` into `gen/libraylib_shim.a`, links `./raylib -> node_modules/@dayme/scriptc-raylib`, sets up `tsconfig.json` path mapping so `scriptc` compiles the package 100% statically without embedding any dynamic engine, and prints out ready-to-use commands. To inspect detected paths:
 
 ```sh
 npx createshim paths
