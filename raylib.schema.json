@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Raylib Configuration",
+  "description": "Configuration file for @dayme/scriptc-raylib native bindings",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON schema URL for editor validation and autocomplete"
+    },
+    "path": {
+      "type": "string",
+      "description": "Path to the raylib root directory containing lib/ and include/ subdirectories (e.g. '/opt/homebrew', 'C:/raylib/raylib', './vendor/raylib')"
+    },
+    "lib": {
+      "type": "string",
+      "description": "Direct path to the raylib compiled library file (libraylib.dylib, libraylib.so, raylib.dll, libraylib.a, raylib.lib)"
+    },
+    "header": {
+      "type": "string",
+      "description": "Direct path to raylib.h header file"
+    }
+  },
+  "additionalProperties": false
+}

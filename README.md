@@ -80,9 +80,11 @@ The `libraylib_shim.a` library is not shipped prebuilt because it depends on the
 # Automatic discovery in standard locations (Homebrew, /usr/lib, MSYS2, vcpkg):
 npx createshim
 
-# Or with a custom raylib path:
-# npx createshim /opt/homebrew/lib
-# npx createshim C:/raylib/raylib/src
+# Or generate a raylib.json config file:
+npx createshim init
+
+# Or specify a custom raylib path directly:
+npx createshim /opt/homebrew
 ```
 
 This compiles `gen/raylib_shim.c` into `gen/libraylib_shim.a`, links `./raylib -> node_modules/@dayme/scriptc-raylib`, sets up `tsconfig.json` path mapping so `scriptc` compiles the package 100% statically without embedding any dynamic engine, embeds the detected raylib library path into the FFI manifest, and prints out ready-to-use commands. To inspect detected paths:
@@ -91,14 +93,46 @@ This compiles `gen/raylib_shim.c` into `gen/libraylib_shim.a`, links `./raylib -
 npx createshim paths
 ```
 
+#### Custom Raylib Configuration (`raylib.json`)
+
+If raylib is installed in a non-standard location or custom folder, you can configure it via `raylib.json` in your project root:
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/LisovskiyIvan/scriptc-raylib/main/raylib.schema.json",
+  "path": "/opt/homebrew"
+}
+```
+
+Or with granular paths:
+
+```json
+{
+  "lib": "C:/raylib/raylib/src/raylib.dll",
+  "header": "C:/raylib/raylib/src/raylib.h"
+}
+```
+
+You can also specify it in your `package.json`:
+
+```json
+{
+  "name": "my-game",
+  "raylib": "/opt/homebrew"
+}
+```
+
+Or pass it directly:
+```sh
+npx createshim /path/to/raylib --save
+```
+
 ### Step 3. Application code
 
 In your game code, import `Raylib` and `COLORS`:
 
 ```ts
 import { Raylib, COLORS } from "@dayme/scriptc-raylib";
-
-Raylib.config();
 
 Raylib.initWindow(800, 450, "@dayme/scriptc-raylib demo");
 Raylib.setTargetFPS(60);
@@ -147,10 +181,7 @@ import {
   COLORS,
   KEY_ESCAPE,
   IsKeyDown,
-  Raylib,
 } from "@dayme/scriptc-raylib";
-
-Raylib.config();
 
 InitWindow(800, 450, "scriptc-raylib demo");
 
@@ -172,7 +203,6 @@ CloseWindow();
 ```ts
 import { Raylib, COLORS, KEYS } from "@dayme/scriptc-raylib";
 
-Raylib.config();
 Raylib.initWindow(800, 450, "scriptc-raylib demo");
 Raylib.setTargetFPS(60);
 

@@ -10,6 +10,7 @@
  */
 
 export {
+  findProjectConfig,
   findRaylibHeader,
   findRaylibLibrary,
   findRaylibLinkDir,

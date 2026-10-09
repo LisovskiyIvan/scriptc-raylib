@@ -109,9 +109,8 @@ try {
   writeFileSync(
     appPath,
     [
-      'import { InitWindow, CloseWindow, DrawText, GetScreenWidth, Raylib } from "./src/index";',
+      'import { InitWindow, CloseWindow, DrawText, GetScreenWidth } from "./src/index";',
       "",
-      "Raylib.config();",
       'InitWindow(320, 240, "scriptc-raylib package test");',
       'DrawText("scriptc-raylib", 16, 16, 20, { r: 255, g: 255, b: 255, a: 255 });',
       "console.log(`WIDTH ${GetScreenWidth()}`);",

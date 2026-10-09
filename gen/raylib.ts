@@ -3801,10 +3801,7 @@ export function SetAudioStreamBufferSizeDefault(a0: number) {
   rl_SetAudioStreamBufferSizeDefault(a0);
 }
 
-export function config(raylibPath?: string): void {}
-
 export const Raylib = {
-  config,
   InitWindow,
   initWindow: InitWindow,
   CloseWindow,

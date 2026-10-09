@@ -1640,10 +1640,7 @@ export function UnloadModelAnimation(anim: ModelAnimation): void {
     api.push(`}`);
     api.push(``);
   }
-  api.push(`export function config(raylibPath?: string): void {}`);
-  api.push(``);
   api.push(`export const Raylib = {`);
-  api.push(`  config,`);
   for (const { fn } of bound) {
     const camel = fn.name.charAt(0).toLowerCase() + fn.name.slice(1);
     api.push(`  ${fn.name},`);
