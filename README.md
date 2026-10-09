@@ -72,30 +72,31 @@ npm install @dayme/scriptc-raylib
 bun add @dayme/scriptc-raylib
 ```
 
-### Step 2. Build C shim (required)
+### Step 2. Initialize project (required)
 
-The `libraylib_shim.a` library is not shipped prebuilt because it depends on the consumer's CPU architecture, compiler ABI, and installed raylib version. Run the build command once:
+The C shim (`libraylib_shim.a`) must be compiled for your machine's CPU architecture and raylib version. Run the init command in your project root:
 
 ```sh
-# Automatic discovery in standard locations (Homebrew, /usr/lib, MSYS2, vcpkg):
-npx createshim
-
-# Or generate a raylib.json config file:
-npx createshim init
-
-# Or specify a custom raylib path directly:
-npx createshim /opt/homebrew
+npx @dayme/scriptc-raylib init
+# or with bun:
+bunx @dayme/scriptc-raylib init
 ```
 
-This compiles `gen/raylib_shim.c` into `gen/libraylib_shim.a`, links `./raylib -> node_modules/@dayme/scriptc-raylib`, sets up `tsconfig.json` path mapping so `scriptc` compiles the package 100% statically without embedding any dynamic engine, embeds the detected raylib library path into the FFI manifest, and prints out ready-to-use commands. To inspect detected paths:
+This single command:
+1. Automatically discovers raylib on your system and generates `raylib.json`.
+2. Compiles `gen/libraylib_shim.a` using your native C compiler.
+3. Links `./raylib -> node_modules/@dayme/scriptc-raylib` and updates `tsconfig.json` paths for 100% static compilation.
+4. Configures native raylib linking without requiring any `LIBRARY_PATH` environment variables.
+
+To inspect detected paths anytime:
 
 ```sh
-npx createshim paths
+npx @dayme/scriptc-raylib paths
 ```
 
 #### Custom Raylib Configuration (`raylib.json`)
 
-If raylib is installed in a non-standard location or custom folder, you can configure it via `raylib.json` in your project root:
+If raylib is installed in a non-standard location or custom folder, configure it via `raylib.json` in your project root:
 
 ```json
 {
@@ -104,7 +105,13 @@ If raylib is installed in a non-standard location or custom folder, you can conf
 }
 ```
 
-Or with granular paths:
+Or pass the path directly during initialization:
+
+```sh
+npx @dayme/scriptc-raylib init /opt/homebrew
+```
+
+Or specify granular paths if library and header are located separately:
 
 ```json
 {
@@ -113,18 +120,10 @@ Or with granular paths:
 }
 ```
 
-You can also specify it in your `package.json`:
+To recompile after editing `raylib.json`:
 
-```json
-{
-  "name": "my-game",
-  "raylib": "/opt/homebrew"
-}
-```
-
-Or pass it directly:
 ```sh
-npx createshim /path/to/raylib --save
+npx @dayme/scriptc-raylib
 ```
 
 ### Step 3. Application code

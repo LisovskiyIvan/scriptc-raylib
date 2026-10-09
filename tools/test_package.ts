@@ -82,7 +82,7 @@ try {
   // The shim archive is arch- and ABI-specific, so the published package ships
   // C source plus a CLI to compile it. A fresh install has no .a yet.
   console.log("== consumer shim");
-  const shim = spawnSync(process.execPath, [join(pkgDir, "lib", "createshim.mjs")], {
+  const shim = spawnSync(process.execPath, [join(pkgDir, "lib", "cli.mjs")], {
     cwd: pkgDir,
     encoding: "utf-8",
     env: { ...process.env, LIBRARY_PATH: linkDir },
