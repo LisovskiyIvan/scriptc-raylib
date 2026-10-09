@@ -60,12 +60,12 @@
   "license": "Zlib",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/USER/craylib.git"
+    "url": "git+https://github.com/LisovskiyIvan/scriptc-raylib.git"
   },
   "bugs": {
-    "url": "https://github.com/USER/craylib/issues"
+    "url": "https://github.com/LisovskiyIvan/scriptc-raylib/issues"
   },
-  "homepage": "https://github.com/USER/craylib#readme",
+  "homepage": "https://github.com/LisovskiyIvan/scriptc-raylib#readme",
   "engines": {
     "node": ">=24"
   },

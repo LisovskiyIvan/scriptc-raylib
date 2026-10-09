@@ -77,28 +77,28 @@ bun add @dayme/scriptc-raylib
 The `libraylib_shim.a` library is not shipped prebuilt because it depends on the consumer's CPU architecture, compiler ABI, and installed raylib version. Run the build command once:
 
 ```sh
+# Automatic discovery in standard locations (Homebrew, /usr/lib, MSYS2, vcpkg):
 npx createshim
+
+# Or with a custom raylib path:
+# npx createshim /opt/homebrew/lib
+# npx createshim C:/raylib/raylib/src
 ```
 
-This compiles `gen/raylib_shim.c` into `gen/libraylib_shim.a`, links `./raylib -> node_modules/@dayme/scriptc-raylib`, sets up `tsconfig.json` path mapping so `scriptc` compiles the package 100% statically without embedding any dynamic engine, and prints out ready-to-use commands. To inspect detected paths:
+This compiles `gen/raylib_shim.c` into `gen/libraylib_shim.a`, links `./raylib -> node_modules/@dayme/scriptc-raylib`, sets up `tsconfig.json` path mapping so `scriptc` compiles the package 100% statically without embedding any dynamic engine, embeds the detected raylib library path into the FFI manifest, and prints out ready-to-use commands. To inspect detected paths:
 
 ```sh
 npx createshim paths
 ```
 
-### Step 3. Application code (`Raylib.config`)
+### Step 3. Application code
 
-In your game code, call `Raylib.config(raylibpath)` — you can supply an explicit path to the raylib library or directory, or call it with no arguments to automatically discover raylib in standard system locations (Homebrew on macOS, `/usr/lib` and `/usr/local/lib` on Linux, MSYS2/vcpkg on Windows):
+In your game code, import `Raylib` and `COLORS`:
 
 ```ts
 import { Raylib, COLORS } from "@dayme/scriptc-raylib";
 
-// Automatic raylib discovery via default paths (Homebrew, pkg-config, /usr/lib, MSYS2...):
 Raylib.config();
-
-// Or with an explicit path:
-// Raylib.config("/opt/homebrew/lib");
-// Raylib.config("C:/raylib/raylib/src");
 
 Raylib.initWindow(800, 450, "@dayme/scriptc-raylib demo");
 Raylib.setTargetFPS(60);
@@ -117,21 +117,16 @@ Raylib.closeWindow();
 
 ## 🚀 Step 4. Run and Build with `scriptc`
 
-Run and build using the full standard `scriptc` command with the `--ffi` manifest flag and `LIBRARY_PATH` (the directory of your raylib library can be retrieved with `npx createshim paths`):
+Run and build using the standard `scriptc` command with the `--ffi` manifest flag:
 
 ```sh
 # Run your game:
-LIBRARY_PATH=/opt/homebrew/lib scriptc run src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json
+scriptc run src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json
 
 # Build a standalone native binary:
-LIBRARY_PATH=/opt/homebrew/lib scriptc build src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json -o game
+scriptc build src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json -o game
 ./game
 ```
-
-> **Note:** If `LIBRARY_PATH` is already exported in your shell environment (`export LIBRARY_PATH=/opt/homebrew/lib`), you don't need to prefix each command:
-> ```sh
-> scriptc run src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json
-> ```
 
 ---
 
