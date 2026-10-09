@@ -1468,6 +1468,8 @@ function main(): void {
   api.push(`/* Typed raylib bindings for scriptc. Opaque handle types are Uint8Array`);
   api.push(`   byte buffers: pass the SAME buffer back to native calls, never copy it. */`);
   api.push(``);
+  api.push(`declare var TextDecoder: { new (label?: string, options?: unknown): { decode(input?: Uint8Array | ArrayBufferView, options?: unknown): string } };`);
+  api.push(``);
   api.push(`import {`);
   for (const { plan } of bound) api.push(`  ${plan.tsName},`);
   api.push(`} from "./raylib_ffi";`);

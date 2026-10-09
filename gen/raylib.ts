@@ -2,6 +2,8 @@
 /* Typed raylib bindings for scriptc. Opaque handle types are Uint8Array
    byte buffers: pass the SAME buffer back to native calls, never copy it. */
 
+declare var TextDecoder: { new (label?: string, options?: unknown): { decode(input?: Uint8Array | ArrayBufferView, options?: unknown): string } };
+
 import {
   rl_InitWindow,
   rl_CloseWindow,
