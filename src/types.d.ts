@@ -1,0 +1,5 @@
+import type { Vector2, Vector3, Vector4 } from "../gen/raylib";
+export type Vec2 = Vector2;
+export type Vec3 = Vector3;
+export type Vec4 = Vector4;
+export type { Camera3D, Camera2D, Camera, Vector2, Vector3, Vector4, Matrix, Color, Rectangle, Texture, Texture2D, RenderTexture, RenderTexture2D, NPatchInfo, Ray, RayCollision, BoundingBox, Image, GlyphInfo, Font, Mesh, Shader, MaterialMap, Material, Transform, BoneInfo, ModelSkeleton, Model, ModelAnimation, Wave, AudioStream, Sound, Music, VrDeviceInfo, VrStereoConfig, FilePathList, AutomationEvent, AutomationEventList, Quaternion, ConfigFlags, } from "../gen/raylib";

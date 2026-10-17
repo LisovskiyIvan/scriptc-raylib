@@ -20,6 +20,10 @@ console.log(`== header: ${header}`);
 // 1. Generate bindings
 execSync(`bun tools/gen_bindings.ts "${header}" gen`, { stdio: "inherit" });
 
+// 1b. Generate TypeScript declarations (.d.ts)
+console.log("== types");
+execSync("bun run build:types", { stdio: "inherit" });
+
 // 2. Compile C shim
 console.log("== shim");
 let cflags = `-I"${dirname(header)}"`;

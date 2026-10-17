@@ -72,9 +72,11 @@ npm install @dayme/scriptc-raylib
 bun add @dayme/scriptc-raylib
 ```
 
-### Step 2. Initialize project (required)
+### Step 2. Setup (Automatic or Manual)
 
-The C shim (`libraylib_shim.a`) must be compiled for your machine's CPU architecture and raylib version. Run the init command in your project root:
+`@dayme/scriptc-raylib` includes a **`postinstall`** script that runs automatically on `bun add @dayme/scriptc-raylib` (or `npm install`). If raylib is installed on your system, it discovers it, compiles `libraylib_shim.a`, links `./raylib`, and maps `tsconfig.json` paths automatically!
+
+If you installed raylib after the package, or if you use a custom path, run the initialization command in your project root:
 
 ```sh
 npx @dayme/scriptc-raylib init
@@ -82,7 +84,7 @@ npx @dayme/scriptc-raylib init
 bunx @dayme/scriptc-raylib init
 ```
 
-This single command:
+This command:
 1. Automatically discovers raylib on your system and generates `raylib.json`.
 2. Compiles `gen/libraylib_shim.a` using your native C compiler.
 3. Links `./raylib -> node_modules/@dayme/scriptc-raylib` and updates `tsconfig.json` paths for 100% static compilation.
@@ -150,14 +152,14 @@ Raylib.closeWindow();
 
 ## 🚀 Step 4. Run and Build with `scriptc`
 
-Run and build using the standard `scriptc` command with the `--ffi` manifest flag:
+Run and build using the standard `scriptc` command (pass `--npm-static @dayme/scriptc-raylib` and the `--ffi` manifest flag):
 
 ```sh
 # Run your game:
-scriptc run src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json
+scriptc run src/main.ts --npm-static @dayme/scriptc-raylib --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json
 
 # Build a standalone native binary:
-scriptc build src/main.ts --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json -o game
+scriptc build src/main.ts --npm-static @dayme/scriptc-raylib --ffi node_modules/@dayme/scriptc-raylib/gen/raylib_ffi.json -o game
 ./game
 ```
 

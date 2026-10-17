@@ -1,6 +1,6 @@
 {
   "name": "@dayme/scriptc-raylib",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Typed raylib bindings for scriptc — 521 native FFI functions, no JS engine in the binary",
   "type": "module",
   "publishConfig": {
@@ -8,13 +8,29 @@
   },
   "main": "./src/index.ts",
   "module": "./src/index.ts",
-  "types": "./src/index.ts",
+  "types": "./src/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
     "./ffi": "./gen/raylib_ffi.json",
-    "./colors": "./src/colors.ts",
-    "./constants": "./src/constants.ts",
-    "./types": "./src/types.ts"
+    "./colors": {
+      "types": "./src/colors.d.ts",
+      "import": "./src/colors.ts",
+      "default": "./src/colors.ts"
+    },
+    "./constants": {
+      "types": "./src/constants.d.ts",
+      "import": "./src/constants.ts",
+      "default": "./src/constants.ts"
+    },
+    "./types": {
+      "types": "./src/types.d.ts",
+      "import": "./src/types.ts",
+      "default": "./src/types.ts"
+    }
   },
   "bin": {
     "scriptc-raylib": "./lib/cli.mjs"
@@ -24,7 +40,9 @@
     "lib",
     "gen/raylib_ffi.json",
     "gen/raylib_ffi.ts",
+    "gen/raylib_ffi.d.ts",
     "gen/raylib.ts",
+    "gen/raylib.d.ts",
     "gen/raylib_shim.c",
     "raylib.schema.json",
     "build.sh",
@@ -34,6 +52,7 @@
   ],
   "scripts": {
     "build": "bun tools/build.ts",
+    "build:types": "tsc src/index.ts --declaration --emitDeclarationOnly --outDir . --moduleResolution bundler --target ESNext --module ESNext --skipLibCheck",
     "build:sh": "./build.sh",
     "gen": "bun tools/gen_bindings.ts",
     "demo": "bun run build && ./demo/demo",
@@ -43,7 +62,8 @@
     "test:coverage": "bun tools/test_coverage.ts",
     "test:package": "bun tools/test_package.ts",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "bun run typecheck && bun run test"
+    "postinstall": "node ./lib/cli.mjs postinstall",
+    "prepublishOnly": "bun run typecheck && bun run build:types && bun run test"
   },
   "keywords": [
     "raylib",
