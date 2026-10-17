@@ -1155,6 +1155,15 @@
       "returns": "i32"
     },
     {
+      "name": "rl_GetKeyName",
+      "symbol": "rl_GetKeyName",
+      "params": [
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "i32"
+    },
+    {
       "name": "rl_SetExitKey",
       "symbol": "SetExitKey",
       "params": [
@@ -1632,132 +1641,11 @@
       "returns": "void"
     },
     {
-      "name": "rl_DrawCircle",
-      "symbol": "rl_DrawCircle",
-      "params": [
-        "i32",
-        "i32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawCircleV",
-      "symbol": "rl_DrawCircleV",
+      "name": "rl_DrawTriangle",
+      "symbol": "rl_DrawTriangle",
       "params": [
         "f32",
         "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawCircleGradient",
-      "symbol": "rl_DrawCircleGradient",
-      "params": [
-        "f32",
-        "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawCircleSector",
-      "symbol": "rl_DrawCircleSector",
-      "params": [
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "i32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawCircleSectorLines",
-      "symbol": "rl_DrawCircleSectorLines",
-      "params": [
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "i32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawCircleLines",
-      "symbol": "rl_DrawCircleLines",
-      "params": [
-        "i32",
-        "i32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawCircleLinesV",
-      "symbol": "rl_DrawCircleLinesV",
-      "params": [
-        "f32",
-        "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawEllipse",
-      "symbol": "rl_DrawEllipse",
-      "params": [
-        "i32",
-        "i32",
-        "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawEllipseV",
-      "symbol": "rl_DrawEllipseV",
-      "params": [
         "f32",
         "f32",
         "f32",
@@ -1770,11 +1658,38 @@
       "returns": "void"
     },
     {
-      "name": "rl_DrawEllipseLines",
-      "symbol": "rl_DrawEllipseLines",
+      "name": "rl_DrawTriangleGradient",
+      "symbol": "rl_DrawTriangleGradient",
       "params": [
-        "i32",
-        "i32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawTriangleLines",
+      "symbol": "rl_DrawTriangleLines",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
         "f32",
         "f32",
         "u8",
@@ -1785,9 +1700,12 @@
       "returns": "void"
     },
     {
-      "name": "rl_DrawEllipseLinesV",
-      "symbol": "rl_DrawEllipseLinesV",
+      "name": "rl_DrawTriangleLinesEx",
+      "symbol": "rl_DrawTriangleLinesEx",
       "params": [
+        "f32",
+        "f32",
+        "f32",
         "f32",
         "f32",
         "f32",
@@ -1800,15 +1718,10 @@
       "returns": "void"
     },
     {
-      "name": "rl_DrawRing",
-      "symbol": "rl_DrawRing",
+      "name": "rl_DrawTriangleFan",
+      "symbol": "rl_DrawTriangleFan",
       "params": [
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
+        "bytes",
         "i32",
         "u8",
         "u8",
@@ -1818,15 +1731,10 @@
       "returns": "void"
     },
     {
-      "name": "rl_DrawRingLines",
-      "symbol": "rl_DrawRingLines",
+      "name": "rl_DrawTriangleStrip",
+      "symbol": "rl_DrawTriangleStrip",
       "params": [
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
+        "bytes",
         "i32",
         "u8",
         "u8",
@@ -2047,66 +1955,6 @@
       "returns": "void"
     },
     {
-      "name": "rl_DrawTriangle",
-      "symbol": "rl_DrawTriangle",
-      "params": [
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawTriangleLines",
-      "symbol": "rl_DrawTriangleLines",
-      "params": [
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawTriangleFan",
-      "symbol": "rl_DrawTriangleFan",
-      "params": [
-        "bytes",
-        "i32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_DrawTriangleStrip",
-      "symbol": "rl_DrawTriangleStrip",
-      "params": [
-        "bytes",
-        "i32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
       "name": "rl_DrawPoly",
       "symbol": "rl_DrawPoly",
       "params": [
@@ -2147,6 +1995,278 @@
         "i32",
         "f32",
         "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircle",
+      "symbol": "rl_DrawCircle",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleV",
+      "symbol": "rl_DrawCircleV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleGradient",
+      "symbol": "rl_DrawCircleGradient",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleSector",
+      "symbol": "rl_DrawCircleSector",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleSectorLines",
+      "symbol": "rl_DrawCircleSectorLines",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleSectorLinesEx",
+      "symbol": "rl_DrawCircleSectorLinesEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleLines",
+      "symbol": "rl_DrawCircleLines",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleLinesV",
+      "symbol": "rl_DrawCircleLinesV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawCircleLinesEx",
+      "symbol": "rl_DrawCircleLinesEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawEllipse",
+      "symbol": "rl_DrawEllipse",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawEllipseV",
+      "symbol": "rl_DrawEllipseV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawEllipseLines",
+      "symbol": "rl_DrawEllipseLines",
+      "params": [
+        "i32",
+        "i32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawEllipseLinesV",
+      "symbol": "rl_DrawEllipseLinesV",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawEllipseLinesEx",
+      "symbol": "rl_DrawEllipseLinesEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRing",
+      "symbol": "rl_DrawRing",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRingLines",
+      "symbol": "rl_DrawRingLines",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_DrawRingLinesEx",
+      "symbol": "rl_DrawRingLinesEx",
+      "params": [
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
         "f32",
         "u8",
         "u8",
@@ -2367,8 +2487,8 @@
       "returns": "void"
     },
     {
-      "name": "rl_GetSplinePointBezierQuad",
-      "symbol": "rl_GetSplinePointBezierQuad",
+      "name": "rl_GetSplinePointBezierQuadratic",
+      "symbol": "rl_GetSplinePointBezierQuadratic",
       "params": [
         "f32",
         "f32",
@@ -3040,7 +3160,7 @@
       "symbol": "rl_ImageColorContrast",
       "params": [
         "mutable-bytes",
-        "f32"
+        "i32"
       ],
       "returns": "void"
     },
@@ -3180,6 +3300,238 @@
       "returns": "void"
     },
     {
+      "name": "rl_ImageDrawLineStrip",
+      "symbol": "rl_ImageDrawLineStrip",
+      "params": [
+        "mutable-bytes",
+        "bytes",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawTriangle",
+      "symbol": "rl_ImageDrawTriangle",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawTriangleGradient",
+      "symbol": "rl_ImageDrawTriangleGradient",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawTriangleLines",
+      "symbol": "rl_ImageDrawTriangleLines",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawTriangleFan",
+      "symbol": "rl_ImageDrawTriangleFan",
+      "params": [
+        "mutable-bytes",
+        "bytes",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawTriangleStrip",
+      "symbol": "rl_ImageDrawTriangleStrip",
+      "params": [
+        "mutable-bytes",
+        "bytes",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawRectangle",
+      "symbol": "rl_ImageDrawRectangle",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawRectangleV",
+      "symbol": "rl_ImageDrawRectangleV",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawRectangleRec",
+      "symbol": "rl_ImageDrawRectangleRec",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawRectanglePro",
+      "symbol": "rl_ImageDrawRectanglePro",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawRectangleLines",
+      "symbol": "rl_ImageDrawRectangleLines",
+      "params": [
+        "mutable-bytes",
+        "i32",
+        "i32",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawRectangleLinesEx",
+      "symbol": "rl_ImageDrawRectangleLinesEx",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawRectangleGradientEx",
+      "symbol": "rl_ImageDrawRectangleGradientEx",
+      "params": [
+        "mutable-bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_ImageDrawCircle",
       "symbol": "rl_ImageDrawCircle",
       "params": [
@@ -3240,103 +3592,13 @@
       "returns": "void"
     },
     {
-      "name": "rl_ImageDrawRectangle",
-      "symbol": "rl_ImageDrawRectangle",
-      "params": [
-        "mutable-bytes",
-        "i32",
-        "i32",
-        "i32",
-        "i32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_ImageDrawRectangleV",
-      "symbol": "rl_ImageDrawRectangleV",
+      "name": "rl_ImageDrawCircleGradient",
+      "symbol": "rl_ImageDrawCircleGradient",
       "params": [
         "mutable-bytes",
         "f32",
         "f32",
         "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_ImageDrawRectangleRec",
-      "symbol": "rl_ImageDrawRectangleRec",
-      "params": [
-        "mutable-bytes",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_ImageDrawRectangleLines",
-      "symbol": "rl_ImageDrawRectangleLines",
-      "params": [
-        "mutable-bytes",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "i32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_ImageDrawTriangle",
-      "symbol": "rl_ImageDrawTriangle",
-      "params": [
-        "mutable-bytes",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_ImageDrawTriangleEx",
-      "symbol": "rl_ImageDrawTriangleEx",
-      "params": [
-        "mutable-bytes",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8",
         "u8",
         "u8",
         "u8",
@@ -3349,29 +3611,65 @@
       "returns": "void"
     },
     {
-      "name": "rl_ImageDrawTriangleLines",
-      "symbol": "rl_ImageDrawTriangleLines",
-      "params": [
-        "mutable-bytes",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "f32",
-        "u8",
-        "u8",
-        "u8",
-        "u8"
-      ],
-      "returns": "void"
-    },
-    {
-      "name": "rl_ImageDraw",
-      "symbol": "rl_ImageDraw",
+      "name": "rl_ImageDrawImage",
+      "symbol": "rl_ImageDrawImage",
       "params": [
         "mutable-bytes",
         "bytes",
+        "i32",
+        "i32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawImageEx",
+      "symbol": "rl_ImageDrawImageEx",
+      "params": [
+        "mutable-bytes",
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawImageRec",
+      "symbol": "rl_ImageDrawImageRec",
+      "params": [
+        "mutable-bytes",
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_ImageDrawImagePro",
+      "symbol": "rl_ImageDrawImagePro",
+      "params": [
+        "mutable-bytes",
+        "bytes",
+        "f32",
+        "f32",
+        "f32",
         "f32",
         "f32",
         "f32",
@@ -3422,6 +3720,27 @@
       "returns": "void"
     },
     {
+      "name": "rl_ImageDrawTextPro",
+      "symbol": "rl_ImageDrawTextPro",
+      "params": [
+        "mutable-bytes",
+        "bytes",
+        "string",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "f32",
+        "u8",
+        "u8",
+        "u8",
+        "u8"
+      ],
+      "returns": "void"
+    },
+    {
       "name": "rl_LoadTexture",
       "symbol": "rl_LoadTexture",
       "params": [
@@ -3453,6 +3772,17 @@
       "name": "rl_LoadRenderTexture",
       "symbol": "rl_LoadRenderTexture",
       "params": [
+        "i32",
+        "i32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_LoadRenderTextureEx",
+      "symbol": "rl_LoadRenderTextureEx",
+      "params": [
+        "i32",
         "i32",
         "i32",
         "mutable-bytes"
@@ -3895,6 +4225,16 @@
       "symbol": "rl_GetColor",
       "params": [
         "u32",
+        "mutable-bytes"
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "rl_GetPixelColor",
+      "symbol": "rl_GetPixelColor",
+      "params": [
+        "bytes",
+        "i32",
         "mutable-bytes"
       ],
       "returns": "void"

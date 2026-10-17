@@ -575,6 +575,17 @@ void rl_PlayAutomationEvent(const uint8_t *event_ptr, size_t event_len) {
     PlayAutomationEvent(event);
 }
 
+int32_t rl_GetKeyName(int32_t key, uint8_t *out, size_t out_len) {
+    const char *s = GetKeyName(key);
+    if (s == NULL) return 0;
+    size_t len = strlen(s);
+    if (out != NULL && out_len > 0) {
+        size_t c = len < out_len ? len : out_len;
+        memcpy(out, s, c);
+    }
+    return (int32_t)len;
+}
+
 int32_t rl_GetGamepadName(int32_t gamepad, uint8_t *out, size_t out_len) {
     const char *s = GetGamepadName(gamepad);
     if (s == NULL) return 0;
@@ -648,8 +659,8 @@ void rl_UpdateCameraPro(uint8_t *cam_ptr, size_t cam_len, float mov_x, float mov
     memcpy(cam_ptr, &cam, sizeof(Camera3D));
 }
 
-void rl_SetShapesTexture(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float source_x, float source_y, float source_width, float source_height) {
-    SetShapesTexture((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ source_x, source_y, source_width, source_height });
+void rl_SetShapesTexture(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float rec_x, float rec_y, float rec_width, float rec_height) {
+    SetShapesTexture((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ rec_x, rec_y, rec_width, rec_height });
 }
 
 void rl_GetShapesTexture(uint8_t *out, size_t out_len) {
@@ -696,56 +707,28 @@ void rl_DrawLineDashed(float startPos_x, float startPos_y, float endPos_x, float
     DrawLineDashed((Vector2){ startPos_x, startPos_y }, (Vector2){ endPos_x, endPos_y }, dashSize, spaceSize, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawCircle(int32_t centerX, int32_t centerY, float radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawCircle(centerX, centerY, radius, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawTriangle(float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawTriangle((Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawCircleV(float center_x, float center_y, float radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawCircleV((Vector2){ center_x, center_y }, radius, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawTriangleGradient(float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t c1_r, uint8_t c1_g, uint8_t c1_b, uint8_t c1_a, uint8_t c2_r, uint8_t c2_g, uint8_t c2_b, uint8_t c2_a, uint8_t c3_r, uint8_t c3_g, uint8_t c3_b, uint8_t c3_a) {
+    DrawTriangleGradient((Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ c1_r, c1_g, c1_b, c1_a }, (Color){ c2_r, c2_g, c2_b, c2_a }, (Color){ c3_r, c3_g, c3_b, c3_a });
 }
 
-void rl_DrawCircleGradient(float center_x, float center_y, float radius, uint8_t inner_r, uint8_t inner_g, uint8_t inner_b, uint8_t inner_a, uint8_t outer_r, uint8_t outer_g, uint8_t outer_b, uint8_t outer_a) {
-    DrawCircleGradient((Vector2){ center_x, center_y }, radius, (Color){ inner_r, inner_g, inner_b, inner_a }, (Color){ outer_r, outer_g, outer_b, outer_a });
+void rl_DrawTriangleLines(float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawTriangleLines((Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawCircleSector(float center_x, float center_y, float radius, float startAngle, float endAngle, int32_t segments, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawCircleSector((Vector2){ center_x, center_y }, radius, startAngle, endAngle, segments, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawTriangleLinesEx(float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawTriangleLinesEx((Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, thick, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawCircleSectorLines(float center_x, float center_y, float radius, float startAngle, float endAngle, int32_t segments, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawCircleSectorLines((Vector2){ center_x, center_y }, radius, startAngle, endAngle, segments, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawTriangleFan(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawTriangleFan((const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
 }
 
-void rl_DrawCircleLines(int32_t centerX, int32_t centerY, float radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawCircleLines(centerX, centerY, radius, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_DrawCircleLinesV(float center_x, float center_y, float radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawCircleLinesV((Vector2){ center_x, center_y }, radius, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_DrawEllipse(int32_t centerX, int32_t centerY, float radiusH, float radiusV, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawEllipse(centerX, centerY, radiusH, radiusV, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_DrawEllipseV(float center_x, float center_y, float radiusH, float radiusV, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawEllipseV((Vector2){ center_x, center_y }, radiusH, radiusV, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_DrawEllipseLines(int32_t centerX, int32_t centerY, float radiusH, float radiusV, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawEllipseLines(centerX, centerY, radiusH, radiusV, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_DrawEllipseLinesV(float center_x, float center_y, float radiusH, float radiusV, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawEllipseLinesV((Vector2){ center_x, center_y }, radiusH, radiusV, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_DrawRing(float center_x, float center_y, float innerRadius, float outerRadius, float startAngle, float endAngle, int32_t segments, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawRing((Vector2){ center_x, center_y }, innerRadius, outerRadius, startAngle, endAngle, segments, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_DrawRingLines(float center_x, float center_y, float innerRadius, float outerRadius, float startAngle, float endAngle, int32_t segments, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawRingLines((Vector2){ center_x, center_y }, innerRadius, outerRadius, startAngle, endAngle, segments, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawTriangleStrip(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    DrawTriangleStrip((const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
 }
 
 void rl_DrawRectangle(int32_t posX, int32_t posY, int32_t width, int32_t height, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
@@ -772,16 +755,16 @@ void rl_DrawRectangleGradientH(int32_t posX, int32_t posY, int32_t width, int32_
     DrawRectangleGradientH(posX, posY, width, height, (Color){ left_r, left_g, left_b, left_a }, (Color){ right_r, right_g, right_b, right_a });
 }
 
-void rl_DrawRectangleGradientEx(float rec_x, float rec_y, float rec_width, float rec_height, uint8_t topLeft_r, uint8_t topLeft_g, uint8_t topLeft_b, uint8_t topLeft_a, uint8_t bottomLeft_r, uint8_t bottomLeft_g, uint8_t bottomLeft_b, uint8_t bottomLeft_a, uint8_t bottomRight_r, uint8_t bottomRight_g, uint8_t bottomRight_b, uint8_t bottomRight_a, uint8_t topRight_r, uint8_t topRight_g, uint8_t topRight_b, uint8_t topRight_a) {
-    DrawRectangleGradientEx((Rectangle){ rec_x, rec_y, rec_width, rec_height }, (Color){ topLeft_r, topLeft_g, topLeft_b, topLeft_a }, (Color){ bottomLeft_r, bottomLeft_g, bottomLeft_b, bottomLeft_a }, (Color){ bottomRight_r, bottomRight_g, bottomRight_b, bottomRight_a }, (Color){ topRight_r, topRight_g, topRight_b, topRight_a });
+void rl_DrawRectangleGradientEx(float rec_x, float rec_y, float rec_width, float rec_height, uint8_t col1_r, uint8_t col1_g, uint8_t col1_b, uint8_t col1_a, uint8_t col2_r, uint8_t col2_g, uint8_t col2_b, uint8_t col2_a, uint8_t col3_r, uint8_t col3_g, uint8_t col3_b, uint8_t col3_a, uint8_t col4_r, uint8_t col4_g, uint8_t col4_b, uint8_t col4_a) {
+    DrawRectangleGradientEx((Rectangle){ rec_x, rec_y, rec_width, rec_height }, (Color){ col1_r, col1_g, col1_b, col1_a }, (Color){ col2_r, col2_g, col2_b, col2_a }, (Color){ col3_r, col3_g, col3_b, col3_a }, (Color){ col4_r, col4_g, col4_b, col4_a });
 }
 
 void rl_DrawRectangleLines(int32_t posX, int32_t posY, int32_t width, int32_t height, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
     DrawRectangleLines(posX, posY, width, height, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawRectangleLinesEx(float rec_x, float rec_y, float rec_width, float rec_height, float lineThick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawRectangleLinesEx((Rectangle){ rec_x, rec_y, rec_width, rec_height }, lineThick, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawRectangleLinesEx(float rec_x, float rec_y, float rec_width, float rec_height, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawRectangleLinesEx((Rectangle){ rec_x, rec_y, rec_width, rec_height }, thick, (Color){ color_r, color_g, color_b, color_a });
 }
 
 void rl_DrawRectangleRounded(float rec_x, float rec_y, float rec_width, float rec_height, float roundness, int32_t segments, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
@@ -792,24 +775,8 @@ void rl_DrawRectangleRoundedLines(float rec_x, float rec_y, float rec_width, flo
     DrawRectangleRoundedLines((Rectangle){ rec_x, rec_y, rec_width, rec_height }, roundness, segments, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawRectangleRoundedLinesEx(float rec_x, float rec_y, float rec_width, float rec_height, float roundness, int32_t segments, float lineThick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawRectangleRoundedLinesEx((Rectangle){ rec_x, rec_y, rec_width, rec_height }, roundness, segments, lineThick, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_DrawTriangle(float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawTriangle((Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_DrawTriangleLines(float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawTriangleLines((Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_DrawTriangleFan(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    DrawTriangleFan((const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
-}
-
-void rl_DrawTriangleStrip(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-    DrawTriangleStrip((const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+void rl_DrawRectangleRoundedLinesEx(float rec_x, float rec_y, float rec_width, float rec_height, float roundness, int32_t segments, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawRectangleRoundedLinesEx((Rectangle){ rec_x, rec_y, rec_width, rec_height }, roundness, segments, thick, (Color){ color_r, color_g, color_b, color_a });
 }
 
 void rl_DrawPoly(float center_x, float center_y, int32_t sides, float radius, float rotation, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
@@ -820,8 +787,76 @@ void rl_DrawPolyLines(float center_x, float center_y, int32_t sides, float radiu
     DrawPolyLines((Vector2){ center_x, center_y }, sides, radius, rotation, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawPolyLinesEx(float center_x, float center_y, int32_t sides, float radius, float rotation, float lineThick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawPolyLinesEx((Vector2){ center_x, center_y }, sides, radius, rotation, lineThick, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawPolyLinesEx(float center_x, float center_y, int32_t sides, float radius, float rotation, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawPolyLinesEx((Vector2){ center_x, center_y }, sides, radius, rotation, thick, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawCircle(int32_t centerX, int32_t centerY, float radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCircle(centerX, centerY, radius, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawCircleV(float center_x, float center_y, float radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCircleV((Vector2){ center_x, center_y }, radius, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawCircleGradient(float center_x, float center_y, float radius, uint8_t inner_r, uint8_t inner_g, uint8_t inner_b, uint8_t inner_a, uint8_t outer_r, uint8_t outer_g, uint8_t outer_b, uint8_t outer_a) {
+    DrawCircleGradient((Vector2){ center_x, center_y }, radius, (Color){ inner_r, inner_g, inner_b, inner_a }, (Color){ outer_r, outer_g, outer_b, outer_a });
+}
+
+void rl_DrawCircleSector(float center_x, float center_y, float radius, float startAngle, float endAngle, int32_t segments, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCircleSector((Vector2){ center_x, center_y }, radius, startAngle, endAngle, segments, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawCircleSectorLines(float center_x, float center_y, float radius, float startAngle, float endAngle, int32_t segments, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCircleSectorLines((Vector2){ center_x, center_y }, radius, startAngle, endAngle, segments, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawCircleSectorLinesEx(float center_x, float center_y, float radius, float startAngle, float endAngle, int32_t segments, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCircleSectorLinesEx((Vector2){ center_x, center_y }, radius, startAngle, endAngle, segments, thick, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawCircleLines(int32_t centerX, int32_t centerY, float radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCircleLines(centerX, centerY, radius, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawCircleLinesV(float center_x, float center_y, float radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCircleLinesV((Vector2){ center_x, center_y }, radius, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawCircleLinesEx(float center_x, float center_y, float radius, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCircleLinesEx((Vector2){ center_x, center_y }, radius, thick, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawEllipse(int32_t centerX, int32_t centerY, float radiusH, float radiusV, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawEllipse(centerX, centerY, radiusH, radiusV, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawEllipseV(float center_x, float center_y, float radiusH, float radiusV, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawEllipseV((Vector2){ center_x, center_y }, radiusH, radiusV, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawEllipseLines(int32_t centerX, int32_t centerY, float radiusH, float radiusV, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawEllipseLines(centerX, centerY, radiusH, radiusV, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawEllipseLinesV(float center_x, float center_y, float radiusH, float radiusV, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawEllipseLinesV((Vector2){ center_x, center_y }, radiusH, radiusV, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawEllipseLinesEx(float center_x, float center_y, float radiusH, float radiusV, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawEllipseLinesEx((Vector2){ center_x, center_y }, radiusH, radiusV, thick, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawRing(float center_x, float center_y, float innerRadius, float outerRadius, float startAngle, float endAngle, int32_t segments, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawRing((Vector2){ center_x, center_y }, innerRadius, outerRadius, startAngle, endAngle, segments, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawRingLines(float center_x, float center_y, float innerRadius, float outerRadius, float startAngle, float endAngle, int32_t segments, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawRingLines((Vector2){ center_x, center_y }, innerRadius, outerRadius, startAngle, endAngle, segments, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_DrawRingLinesEx(float center_x, float center_y, float innerRadius, float outerRadius, float startAngle, float endAngle, int32_t segments, float thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawRingLinesEx((Vector2){ center_x, center_y }, innerRadius, outerRadius, startAngle, endAngle, segments, thick, (Color){ color_r, color_g, color_b, color_a });
 }
 
 void rl_DrawSplineLinear(const uint8_t *points_ptr, size_t points_len, int32_t pointCount, float thick, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -882,9 +917,9 @@ void rl_GetSplinePointCatmullRom(float p1_x, float p1_y, float p2_x, float p2_y,
     memcpy(out, &__v, sizeof(__v));
 }
 
-void rl_GetSplinePointBezierQuad(float p1_x, float p1_y, float c2_x, float c2_y, float p3_x, float p3_y, float t, uint8_t *out, size_t out_len) {
+void rl_GetSplinePointBezierQuadratic(float p1_x, float p1_y, float c2_x, float c2_y, float p3_x, float p3_y, float t, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(Vector2)) { return; }
-    Vector2 __v = GetSplinePointBezierQuad((Vector2){ p1_x, p1_y }, (Vector2){ c2_x, c2_y }, (Vector2){ p3_x, p3_y }, t);
+    Vector2 __v = GetSplinePointBezierQuadratic((Vector2){ p1_x, p1_y }, (Vector2){ c2_x, c2_y }, (Vector2){ p3_x, p3_y }, t);
     memcpy(out, &__v, sizeof(__v));
 }
 
@@ -1246,7 +1281,7 @@ void rl_ImageColorGrayscale(uint8_t *image_ptr, size_t image_len) {
     ImageColorGrayscale((Image *)image_ptr);
 }
 
-void rl_ImageColorContrast(uint8_t *image_ptr, size_t image_len, float contrast) {
+void rl_ImageColorContrast(uint8_t *image_ptr, size_t image_len, int32_t contrast) {
     if (image_len != (size_t)sizeof(Image)) { return; }
     ImageColorContrast((Image *)image_ptr, contrast);
 }
@@ -1309,6 +1344,71 @@ void rl_ImageDrawLineEx(uint8_t *dst_ptr, size_t dst_len, float start_x, float s
     ImageDrawLineEx((Image *)dst_ptr, (Vector2){ start_x, start_y }, (Vector2){ end_x, end_y }, thick, (Color){ color_r, color_g, color_b, color_a });
 }
 
+void rl_ImageDrawLineStrip(uint8_t *dst_ptr, size_t dst_len, const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len < sizeof(Image)) return;
+    ImageDrawLineStrip((Image *)dst_ptr, (const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}
+
+void rl_ImageDrawTriangle(uint8_t *dst_ptr, size_t dst_len, float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawTriangle((Image *)dst_ptr, (Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawTriangleGradient(uint8_t *dst_ptr, size_t dst_len, float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t c1_r, uint8_t c1_g, uint8_t c1_b, uint8_t c1_a, uint8_t c2_r, uint8_t c2_g, uint8_t c2_b, uint8_t c2_a, uint8_t c3_r, uint8_t c3_g, uint8_t c3_b, uint8_t c3_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawTriangleGradient((Image *)dst_ptr, (Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ c1_r, c1_g, c1_b, c1_a }, (Color){ c2_r, c2_g, c2_b, c2_a }, (Color){ c3_r, c3_g, c3_b, c3_a });
+}
+
+void rl_ImageDrawTriangleLines(uint8_t *dst_ptr, size_t dst_len, float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawTriangleLines((Image *)dst_ptr, (Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawTriangleFan(uint8_t *dst_ptr, size_t dst_len, const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len < sizeof(Image)) return;
+    ImageDrawTriangleFan((Image *)dst_ptr, (const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}
+
+void rl_ImageDrawTriangleStrip(uint8_t *dst_ptr, size_t dst_len, const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len < sizeof(Image)) return;
+    ImageDrawTriangleStrip((Image *)dst_ptr, (const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}
+
+void rl_ImageDrawRectangle(uint8_t *dst_ptr, size_t dst_len, int32_t posX, int32_t posY, int32_t width, int32_t height, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectangle((Image *)dst_ptr, posX, posY, width, height, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawRectangleV(uint8_t *dst_ptr, size_t dst_len, float position_x, float position_y, float size_x, float size_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectangleV((Image *)dst_ptr, (Vector2){ position_x, position_y }, (Vector2){ size_x, size_y }, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawRectangleRec(uint8_t *dst_ptr, size_t dst_len, float rec_x, float rec_y, float rec_width, float rec_height, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectangleRec((Image *)dst_ptr, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawRectanglePro(uint8_t *dst_ptr, size_t dst_len, float rec_x, float rec_y, float rec_width, float rec_height, float origin_x, float origin_y, float rotation, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectanglePro((Image *)dst_ptr, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, (Vector2){ origin_x, origin_y }, rotation, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawRectangleLines(uint8_t *dst_ptr, size_t dst_len, int32_t posX, int32_t posY, int32_t width, int32_t height, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectangleLines((Image *)dst_ptr, posX, posY, width, height, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawRectangleLinesEx(uint8_t *dst_ptr, size_t dst_len, float rec_x, float rec_y, float rec_width, float rec_height, int32_t thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectangleLinesEx((Image *)dst_ptr, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, thick, (Color){ color_r, color_g, color_b, color_a });
+}
+
+void rl_ImageDrawRectangleGradientEx(uint8_t *dst_ptr, size_t dst_len, float rec_x, float rec_y, float rec_width, float rec_height, uint8_t col1_r, uint8_t col1_g, uint8_t col1_b, uint8_t col1_a, uint8_t col2_r, uint8_t col2_g, uint8_t col2_b, uint8_t col2_a, uint8_t col3_r, uint8_t col3_g, uint8_t col3_b, uint8_t col3_a, uint8_t col4_r, uint8_t col4_g, uint8_t col4_b, uint8_t col4_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    ImageDrawRectangleGradientEx((Image *)dst_ptr, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, (Color){ col1_r, col1_g, col1_b, col1_a }, (Color){ col2_r, col2_g, col2_b, col2_a }, (Color){ col3_r, col3_g, col3_b, col3_a }, (Color){ col4_r, col4_g, col4_b, col4_a });
+}
+
 void rl_ImageDrawCircle(uint8_t *dst_ptr, size_t dst_len, int32_t centerX, int32_t centerY, int32_t radius, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
     if (dst_len != (size_t)sizeof(Image)) { return; }
     ImageDrawCircle((Image *)dst_ptr, centerX, centerY, radius, (Color){ color_r, color_g, color_b, color_a });
@@ -1329,47 +1429,41 @@ void rl_ImageDrawCircleLinesV(uint8_t *dst_ptr, size_t dst_len, float center_x, 
     ImageDrawCircleLinesV((Image *)dst_ptr, (Vector2){ center_x, center_y }, radius, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_ImageDrawRectangle(uint8_t *dst_ptr, size_t dst_len, int32_t posX, int32_t posY, int32_t width, int32_t height, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+void rl_ImageDrawCircleGradient(uint8_t *dst_ptr, size_t dst_len, float center_x, float center_y, float radius, uint8_t inner_r, uint8_t inner_g, uint8_t inner_b, uint8_t inner_a, uint8_t outer_r, uint8_t outer_g, uint8_t outer_b, uint8_t outer_a) {
     if (dst_len != (size_t)sizeof(Image)) { return; }
-    ImageDrawRectangle((Image *)dst_ptr, posX, posY, width, height, (Color){ color_r, color_g, color_b, color_a });
+    ImageDrawCircleGradient((Image *)dst_ptr, (Vector2){ center_x, center_y }, radius, (Color){ inner_r, inner_g, inner_b, inner_a }, (Color){ outer_r, outer_g, outer_b, outer_a });
 }
 
-void rl_ImageDrawRectangleV(uint8_t *dst_ptr, size_t dst_len, float position_x, float position_y, float size_x, float size_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    if (dst_len != (size_t)sizeof(Image)) { return; }
-    ImageDrawRectangleV((Image *)dst_ptr, (Vector2){ position_x, position_y }, (Vector2){ size_x, size_y }, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_ImageDrawRectangleRec(uint8_t *dst_ptr, size_t dst_len, float rec_x, float rec_y, float rec_width, float rec_height, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    if (dst_len != (size_t)sizeof(Image)) { return; }
-    ImageDrawRectangleRec((Image *)dst_ptr, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_ImageDrawRectangleLines(uint8_t *dst_ptr, size_t dst_len, float rec_x, float rec_y, float rec_width, float rec_height, int32_t thick, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    if (dst_len != (size_t)sizeof(Image)) { return; }
-    ImageDrawRectangleLines((Image *)dst_ptr, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, thick, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_ImageDrawTriangle(uint8_t *dst_ptr, size_t dst_len, float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    if (dst_len != (size_t)sizeof(Image)) { return; }
-    ImageDrawTriangle((Image *)dst_ptr, (Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_ImageDrawTriangleEx(uint8_t *dst_ptr, size_t dst_len, float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t c1_r, uint8_t c1_g, uint8_t c1_b, uint8_t c1_a, uint8_t c2_r, uint8_t c2_g, uint8_t c2_b, uint8_t c2_a, uint8_t c3_r, uint8_t c3_g, uint8_t c3_b, uint8_t c3_a) {
-    if (dst_len != (size_t)sizeof(Image)) { return; }
-    ImageDrawTriangleEx((Image *)dst_ptr, (Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ c1_r, c1_g, c1_b, c1_a }, (Color){ c2_r, c2_g, c2_b, c2_a }, (Color){ c3_r, c3_g, c3_b, c3_a });
-}
-
-void rl_ImageDrawTriangleLines(uint8_t *dst_ptr, size_t dst_len, float v1_x, float v1_y, float v2_x, float v2_y, float v3_x, float v3_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    if (dst_len != (size_t)sizeof(Image)) { return; }
-    ImageDrawTriangleLines((Image *)dst_ptr, (Vector2){ v1_x, v1_y }, (Vector2){ v2_x, v2_y }, (Vector2){ v3_x, v3_y }, (Color){ color_r, color_g, color_b, color_a });
-}
-
-void rl_ImageDraw(uint8_t *dst_ptr, size_t dst_len, const uint8_t *src_ptr, size_t src_len, float srcRec_x, float srcRec_y, float srcRec_width, float srcRec_height, float dstRec_x, float dstRec_y, float dstRec_width, float dstRec_height, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+void rl_ImageDrawImage(uint8_t *dst_ptr, size_t dst_len, const uint8_t *src_ptr, size_t src_len, int32_t posX, int32_t posY, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
     if (dst_len != (size_t)sizeof(Image)) { return; }
     if (src_len != (size_t)sizeof(Image)) { return; }
     Image src;
     memcpy(&src, src_ptr, sizeof(src));
-    ImageDraw((Image *)dst_ptr, src, (Rectangle){ srcRec_x, srcRec_y, srcRec_width, srcRec_height }, (Rectangle){ dstRec_x, dstRec_y, dstRec_width, dstRec_height }, (Color){ tint_r, tint_g, tint_b, tint_a });
+    ImageDrawImage((Image *)dst_ptr, src, posX, posY, (Color){ tint_r, tint_g, tint_b, tint_a });
+}
+
+void rl_ImageDrawImageEx(uint8_t *dst_ptr, size_t dst_len, const uint8_t *src_ptr, size_t src_len, float position_x, float position_y, float rotation, float scale, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    if (src_len != (size_t)sizeof(Image)) { return; }
+    Image src;
+    memcpy(&src, src_ptr, sizeof(src));
+    ImageDrawImageEx((Image *)dst_ptr, src, (Vector2){ position_x, position_y }, rotation, scale, (Color){ tint_r, tint_g, tint_b, tint_a });
+}
+
+void rl_ImageDrawImageRec(uint8_t *dst_ptr, size_t dst_len, const uint8_t *src_ptr, size_t src_len, float srcRec_x, float srcRec_y, float srcRec_width, float srcRec_height, float position_x, float position_y, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    if (src_len != (size_t)sizeof(Image)) { return; }
+    Image src;
+    memcpy(&src, src_ptr, sizeof(src));
+    ImageDrawImageRec((Image *)dst_ptr, src, (Rectangle){ srcRec_x, srcRec_y, srcRec_width, srcRec_height }, (Vector2){ position_x, position_y }, (Color){ tint_r, tint_g, tint_b, tint_a });
+}
+
+void rl_ImageDrawImagePro(uint8_t *dst_ptr, size_t dst_len, const uint8_t *src_ptr, size_t src_len, float srcRec_x, float srcRec_y, float srcRec_width, float srcRec_height, float dstRec_x, float dstRec_y, float dstRec_width, float dstRec_height, float origin_x, float origin_y, float rotation, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    if (src_len != (size_t)sizeof(Image)) { return; }
+    Image src;
+    memcpy(&src, src_ptr, sizeof(src));
+    ImageDrawImagePro((Image *)dst_ptr, src, (Rectangle){ srcRec_x, srcRec_y, srcRec_width, srcRec_height }, (Rectangle){ dstRec_x, dstRec_y, dstRec_width, dstRec_height }, (Vector2){ origin_x, origin_y }, rotation, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
 void rl_ImageDrawText(uint8_t *dst_ptr, size_t dst_len, const uint8_t *text_ptr, size_t text_len, int32_t posX, int32_t posY, int32_t fontSize, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
@@ -1392,6 +1486,19 @@ void rl_ImageDrawTextEx(uint8_t *dst_ptr, size_t dst_len, const uint8_t *font_pt
     Font font;
     memcpy(&font, font_ptr, sizeof(font));
     ImageDrawTextEx((Image *)dst_ptr, font, (const char *)text_buf, (Vector2){ position_x, position_y }, fontSize, spacing, (Color){ tint_r, tint_g, tint_b, tint_a });
+    free(text_buf);
+}
+
+void rl_ImageDrawTextPro(uint8_t *dst_ptr, size_t dst_len, const uint8_t *font_ptr, size_t font_len, const uint8_t *text_ptr, size_t text_len, float position_x, float position_y, float origin_x, float origin_y, float rotation, float fontSize, float spacing, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    if (dst_len != (size_t)sizeof(Image)) { return; }
+    if (font_len != (size_t)sizeof(Font)) { return; }
+    char *text_buf = (char *)malloc(text_len + 1);
+    if (text_buf == NULL) return;
+    memcpy(text_buf, text_ptr, text_len);
+    text_buf[text_len] = '\0';
+    Font font;
+    memcpy(&font, font_ptr, sizeof(font));
+    ImageDrawTextPro((Image *)dst_ptr, font, (const char *)text_buf, (Vector2){ position_x, position_y }, (Vector2){ origin_x, origin_y }, rotation, fontSize, spacing, (Color){ tint_r, tint_g, tint_b, tint_a });
     free(text_buf);
 }
 
@@ -1427,6 +1534,12 @@ void rl_LoadTextureCubemap(const uint8_t *image_ptr, size_t image_len, int32_t l
 void rl_LoadRenderTexture(int32_t width, int32_t height, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(RenderTexture)) { return; }
     RenderTexture __v = LoadRenderTexture(width, height);
+    memcpy(out, &__v, sizeof(__v));
+}
+
+void rl_LoadRenderTextureEx(int32_t width, int32_t height, int32_t format, uint8_t *out, size_t out_len) {
+    if (out_len != (size_t)sizeof(RenderTexture)) { return; }
+    RenderTexture __v = LoadRenderTextureEx(width, height, format);
     memcpy(out, &__v, sizeof(__v));
 }
 
@@ -1476,16 +1589,16 @@ void rl_DrawTextureEx(uint32_t texture_id, int32_t texture_width, int32_t textur
     DrawTextureEx((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Vector2){ position_x, position_y }, rotation, scale, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
-void rl_DrawTextureRec(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float source_x, float source_y, float source_width, float source_height, float position_x, float position_y, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
-    DrawTextureRec((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ source_x, source_y, source_width, source_height }, (Vector2){ position_x, position_y }, (Color){ tint_r, tint_g, tint_b, tint_a });
+void rl_DrawTextureRec(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float rec_x, float rec_y, float rec_width, float rec_height, float position_x, float position_y, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    DrawTextureRec((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, (Vector2){ position_x, position_y }, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
-void rl_DrawTexturePro(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float source_x, float source_y, float source_width, float source_height, float dest_x, float dest_y, float dest_width, float dest_height, float origin_x, float origin_y, float rotation, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
-    DrawTexturePro((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ source_x, source_y, source_width, source_height }, (Rectangle){ dest_x, dest_y, dest_width, dest_height }, (Vector2){ origin_x, origin_y }, rotation, (Color){ tint_r, tint_g, tint_b, tint_a });
+void rl_DrawTexturePro(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float srcrec_x, float srcrec_y, float srcrec_width, float srcrec_height, float dstrec_x, float dstrec_y, float dstrec_width, float dstrec_height, float origin_x, float origin_y, float rotation, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    DrawTexturePro((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ srcrec_x, srcrec_y, srcrec_width, srcrec_height }, (Rectangle){ dstrec_x, dstrec_y, dstrec_width, dstrec_height }, (Vector2){ origin_x, origin_y }, rotation, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
-void rl_DrawTextureNPatch(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float nPatchInfo_source_x, float nPatchInfo_source_y, float nPatchInfo_source_width, float nPatchInfo_source_height, int32_t nPatchInfo_left, int32_t nPatchInfo_top, int32_t nPatchInfo_right, int32_t nPatchInfo_bottom, int32_t nPatchInfo_layout, float dest_x, float dest_y, float dest_width, float dest_height, float origin_x, float origin_y, float rotation, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
-    DrawTextureNPatch((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (NPatchInfo){ (Rectangle){ nPatchInfo_source_x, nPatchInfo_source_y, nPatchInfo_source_width, nPatchInfo_source_height }, nPatchInfo_left, nPatchInfo_top, nPatchInfo_right, nPatchInfo_bottom, nPatchInfo_layout }, (Rectangle){ dest_x, dest_y, dest_width, dest_height }, (Vector2){ origin_x, origin_y }, rotation, (Color){ tint_r, tint_g, tint_b, tint_a });
+void rl_DrawTextureNPatch(uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float nPatchInfo_source_x, float nPatchInfo_source_y, float nPatchInfo_source_width, float nPatchInfo_source_height, int32_t nPatchInfo_left, int32_t nPatchInfo_top, int32_t nPatchInfo_right, int32_t nPatchInfo_bottom, int32_t nPatchInfo_layout, float dstrec_x, float dstrec_y, float dstrec_width, float dstrec_height, float origin_x, float origin_y, float rotation, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    DrawTextureNPatch((Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (NPatchInfo){ (Rectangle){ nPatchInfo_source_x, nPatchInfo_source_y, nPatchInfo_source_width, nPatchInfo_source_height }, nPatchInfo_left, nPatchInfo_top, nPatchInfo_right, nPatchInfo_bottom, nPatchInfo_layout }, (Rectangle){ dstrec_x, dstrec_y, dstrec_width, dstrec_height }, (Vector2){ origin_x, origin_y }, rotation, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
 bool rl_ColorIsEqual(uint8_t col1_r, uint8_t col1_g, uint8_t col1_b, uint8_t col1_a, uint8_t col2_r, uint8_t col2_g, uint8_t col2_b, uint8_t col2_a) {
@@ -1567,6 +1680,12 @@ void rl_ColorLerp(uint8_t color1_r, uint8_t color1_g, uint8_t color1_b, uint8_t 
 void rl_GetColor(uint32_t hexValue, uint8_t *out, size_t out_len) {
     if (out_len != (size_t)sizeof(Color)) { return; }
     Color __v = GetColor(hexValue);
+    memcpy(out, &__v, sizeof(__v));
+}
+
+void rl_GetPixelColor(const uint8_t *srcPtr_ptr, size_t srcPtr_len, int32_t format, uint8_t *out, size_t out_len) {
+    if (out_len != (size_t)sizeof(Color)) { return; }
+    Color __v = GetPixelColor((const void *)srcPtr_ptr, format);
     memcpy(out, &__v, sizeof(__v));
 }
 
@@ -1886,28 +2005,28 @@ void rl_DrawSphereWires(float centerPos_x, float centerPos_y, float centerPos_z,
     DrawSphereWires((Vector3){ centerPos_x, centerPos_y, centerPos_z }, radius, rings, slices, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawCylinder(float position_x, float position_y, float position_z, float radiusTop, float radiusBottom, float height, int32_t slices, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawCylinder((Vector3){ position_x, position_y, position_z }, radiusTop, radiusBottom, height, slices, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawCylinder(float position_x, float position_y, float position_z, float radiusTop, float radiusBottom, float height, int32_t sides, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCylinder((Vector3){ position_x, position_y, position_z }, radiusTop, radiusBottom, height, sides, (Color){ color_r, color_g, color_b, color_a });
 }
 
 void rl_DrawCylinderEx(float startPos_x, float startPos_y, float startPos_z, float endPos_x, float endPos_y, float endPos_z, float startRadius, float endRadius, int32_t sides, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
     DrawCylinderEx((Vector3){ startPos_x, startPos_y, startPos_z }, (Vector3){ endPos_x, endPos_y, endPos_z }, startRadius, endRadius, sides, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawCylinderWires(float position_x, float position_y, float position_z, float radiusTop, float radiusBottom, float height, int32_t slices, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawCylinderWires((Vector3){ position_x, position_y, position_z }, radiusTop, radiusBottom, height, slices, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawCylinderWires(float position_x, float position_y, float position_z, float radiusTop, float radiusBottom, float height, int32_t sides, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCylinderWires((Vector3){ position_x, position_y, position_z }, radiusTop, radiusBottom, height, sides, (Color){ color_r, color_g, color_b, color_a });
 }
 
 void rl_DrawCylinderWiresEx(float startPos_x, float startPos_y, float startPos_z, float endPos_x, float endPos_y, float endPos_z, float startRadius, float endRadius, int32_t sides, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
     DrawCylinderWiresEx((Vector3){ startPos_x, startPos_y, startPos_z }, (Vector3){ endPos_x, endPos_y, endPos_z }, startRadius, endRadius, sides, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawCapsule(float startPos_x, float startPos_y, float startPos_z, float endPos_x, float endPos_y, float endPos_z, float radius, int32_t slices, int32_t rings, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawCapsule((Vector3){ startPos_x, startPos_y, startPos_z }, (Vector3){ endPos_x, endPos_y, endPos_z }, radius, slices, rings, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawCapsule(float startPos_x, float startPos_y, float startPos_z, float endPos_x, float endPos_y, float endPos_z, float radius, int32_t rings, int32_t slices, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCapsule((Vector3){ startPos_x, startPos_y, startPos_z }, (Vector3){ endPos_x, endPos_y, endPos_z }, radius, rings, slices, (Color){ color_r, color_g, color_b, color_a });
 }
 
-void rl_DrawCapsuleWires(float startPos_x, float startPos_y, float startPos_z, float endPos_x, float endPos_y, float endPos_z, float radius, int32_t slices, int32_t rings, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
-    DrawCapsuleWires((Vector3){ startPos_x, startPos_y, startPos_z }, (Vector3){ endPos_x, endPos_y, endPos_z }, radius, slices, rings, (Color){ color_r, color_g, color_b, color_a });
+void rl_DrawCapsuleWires(float startPos_x, float startPos_y, float startPos_z, float endPos_x, float endPos_y, float endPos_z, float radius, int32_t rings, int32_t slices, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
+    DrawCapsuleWires((Vector3){ startPos_x, startPos_y, startPos_z }, (Vector3){ endPos_x, endPos_y, endPos_z }, radius, rings, slices, (Color){ color_r, color_g, color_b, color_a });
 }
 
 void rl_DrawPlane(float centerPos_x, float centerPos_y, float centerPos_z, float size_x, float size_y, uint8_t color_r, uint8_t color_g, uint8_t color_b, uint8_t color_a) {
@@ -1998,12 +2117,12 @@ void rl_DrawBillboard(float camera_position_x, float camera_position_y, float ca
     DrawBillboard((Camera3D){ (Vector3){ camera_position_x, camera_position_y, camera_position_z }, (Vector3){ camera_target_x, camera_target_y, camera_target_z }, (Vector3){ camera_up_x, camera_up_y, camera_up_z }, camera_fovy, camera_projection }, (Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Vector3){ position_x, position_y, position_z }, scale, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
-void rl_DrawBillboardRec(float camera_position_x, float camera_position_y, float camera_position_z, float camera_target_x, float camera_target_y, float camera_target_z, float camera_up_x, float camera_up_y, float camera_up_z, float camera_fovy, int32_t camera_projection, uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float source_x, float source_y, float source_width, float source_height, float position_x, float position_y, float position_z, float size_x, float size_y, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
-    DrawBillboardRec((Camera3D){ (Vector3){ camera_position_x, camera_position_y, camera_position_z }, (Vector3){ camera_target_x, camera_target_y, camera_target_z }, (Vector3){ camera_up_x, camera_up_y, camera_up_z }, camera_fovy, camera_projection }, (Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ source_x, source_y, source_width, source_height }, (Vector3){ position_x, position_y, position_z }, (Vector2){ size_x, size_y }, (Color){ tint_r, tint_g, tint_b, tint_a });
+void rl_DrawBillboardRec(float camera_position_x, float camera_position_y, float camera_position_z, float camera_target_x, float camera_target_y, float camera_target_z, float camera_up_x, float camera_up_y, float camera_up_z, float camera_fovy, int32_t camera_projection, uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float rec_x, float rec_y, float rec_width, float rec_height, float position_x, float position_y, float position_z, float size_x, float size_y, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    DrawBillboardRec((Camera3D){ (Vector3){ camera_position_x, camera_position_y, camera_position_z }, (Vector3){ camera_target_x, camera_target_y, camera_target_z }, (Vector3){ camera_up_x, camera_up_y, camera_up_z }, camera_fovy, camera_projection }, (Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, (Vector3){ position_x, position_y, position_z }, (Vector2){ size_x, size_y }, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
-void rl_DrawBillboardPro(float camera_position_x, float camera_position_y, float camera_position_z, float camera_target_x, float camera_target_y, float camera_target_z, float camera_up_x, float camera_up_y, float camera_up_z, float camera_fovy, int32_t camera_projection, uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float source_x, float source_y, float source_width, float source_height, float position_x, float position_y, float position_z, float up_x, float up_y, float up_z, float size_x, float size_y, float origin_x, float origin_y, float rotation, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
-    DrawBillboardPro((Camera3D){ (Vector3){ camera_position_x, camera_position_y, camera_position_z }, (Vector3){ camera_target_x, camera_target_y, camera_target_z }, (Vector3){ camera_up_x, camera_up_y, camera_up_z }, camera_fovy, camera_projection }, (Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ source_x, source_y, source_width, source_height }, (Vector3){ position_x, position_y, position_z }, (Vector3){ up_x, up_y, up_z }, (Vector2){ size_x, size_y }, (Vector2){ origin_x, origin_y }, rotation, (Color){ tint_r, tint_g, tint_b, tint_a });
+void rl_DrawBillboardPro(float camera_position_x, float camera_position_y, float camera_position_z, float camera_target_x, float camera_target_y, float camera_target_z, float camera_up_x, float camera_up_y, float camera_up_z, float camera_fovy, int32_t camera_projection, uint32_t texture_id, int32_t texture_width, int32_t texture_height, int32_t texture_mipmaps, int32_t texture_format, float rec_x, float rec_y, float rec_width, float rec_height, float position_x, float position_y, float position_z, float up_x, float up_y, float up_z, float size_x, float size_y, float origin_x, float origin_y, float rotation, uint8_t tint_r, uint8_t tint_g, uint8_t tint_b, uint8_t tint_a) {
+    DrawBillboardPro((Camera3D){ (Vector3){ camera_position_x, camera_position_y, camera_position_z }, (Vector3){ camera_target_x, camera_target_y, camera_target_z }, (Vector3){ camera_up_x, camera_up_y, camera_up_z }, camera_fovy, camera_projection }, (Texture){ texture_id, texture_width, texture_height, texture_mipmaps, texture_format }, (Rectangle){ rec_x, rec_y, rec_width, rec_height }, (Vector3){ position_x, position_y, position_z }, (Vector3){ up_x, up_y, up_z }, (Vector2){ size_x, size_y }, (Vector2){ origin_x, origin_y }, rotation, (Color){ tint_r, tint_g, tint_b, tint_a });
 }
 
 void rl_UploadMesh(uint8_t *mesh_ptr, size_t mesh_len, bool dynamic) {
@@ -2406,11 +2525,11 @@ bool rl_IsSoundValid(const uint8_t *sound_ptr, size_t sound_len) {
     return __ret;
 }
 
-void rl_UpdateSound(const uint8_t *sound_ptr, size_t sound_len, const uint8_t *data_ptr, size_t data_len, int32_t sampleCount) {
+void rl_UpdateSound(const uint8_t *sound_ptr, size_t sound_len, const uint8_t *data_ptr, size_t data_len, int32_t frameCount) {
     if (sound_len != (size_t)sizeof(Sound)) { return; }
     Sound sound;
     memcpy(&sound, sound_ptr, sizeof(sound));
-    UpdateSound(sound, (const void *)data_ptr, sampleCount);
+    UpdateSound(sound, (const void *)data_ptr, frameCount);
 }
 
 void rl_UnloadWave(const uint8_t *wave_ptr, size_t wave_len) {

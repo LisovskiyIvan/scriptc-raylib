@@ -1,6 +1,6 @@
 # @dayme/scriptc-raylib — raylib bindings for scriptc
 
-TypeScript bindings for [raylib 6.0](https://www.raylib.com), generated from the original C header
+TypeScript bindings for [raylib 6.2](https://www.raylib.com), generated from the original C header
 and linked via native [scriptc](https://scriptc.dev) FFI.
 
 No Node.js, V8, or JIT engine inside — produces a compact, standalone static executable running at native machine speed.
@@ -15,7 +15,7 @@ No Node.js, V8, or JIT engine inside — produces a compact, standalone static e
 - **🔄 Dual API Style**:
   - Direct C-style functions (`InitWindow`, `BeginDrawing`, `ClearBackground`, `DrawCircle`).
   - `Raylib` namespace with camelCase support (`Raylib.initWindow`, `Raylib.beginDrawing`, `Raylib.drawCircle`).
-- **🛡️ 501 raylib Functions**: 116 direct scalar calls + 355 wrapped via C shim with compile-time layout checks (`_Static_assert`) + 30 custom FFI adapters (83.5% of raylib).
+- **🛡️ 521 raylib Functions**: 116 direct scalar calls + 371 wrapped via C shim with compile-time layout checks (`_Static_assert`) + 34 custom FFI adapters (84.2% of raylib).
 
 ---
 
@@ -47,7 +47,7 @@ The generator classifies each of the 600 raylib functions into three groups:
    - **line collision check (`CheckCollisionLines`)** — returns a structured object `{ collision: boolean, point: Vector2 }`;
    - **memory loading (`LoadImageFromMemory`, `LoadWaveFromMemory`, `LoadMusicStreamFromMemory`)** — decodes png/jpg/wav/ogg/mp3 directly from `Uint8Array` byte buffers;
    - **model animations (`LoadModelAnimations`, `UnloadModelAnimations`)** — loads skeletal animation sequences into a `ModelAnimation[]` array.
-3. **skipped (99)** — functions unsupported due to FFI architecture constraints (see detailed breakdown below).
+3. **skipped (98)** — functions unsupported due to FFI architecture constraints (see detailed breakdown below).
 
 ---
 
@@ -55,7 +55,7 @@ The generator classifies each of the 600 raylib functions into three groups:
 
 ### Prerequisites
 
-1. **raylib 5.5 / 6.0**:
+1. **raylib 6.0 / 6.2**:
    - **macOS**: `brew install raylib` (or MacPorts: `sudo port install raylib`)
    - **Linux (Ubuntu/Debian)**: `sudo apt install libraylib-dev`
    - **Linux (Arch Linux)**: `sudo pacman -S raylib`
@@ -252,29 +252,29 @@ Unlike fixed static registry approaches (e.g. `MAX_MODELS 64`, `MAX_IMAGES 128`,
 
 ## 📊 Implementation Status
 
-Total raylib 6.0 header functions: **600 functions**:
-- **501 implemented** (116 direct + 355 wrapped + 30 custom) — **83.5%**
-- **99 skipped** due to FFI architecture constraints — **16.5%**
+Total raylib 6.2 header functions: **619 functions**:
+- **521 implemented** (116 direct + 371 wrapped + 34 custom) — **84.2%**
+- **98 skipped** due to FFI architecture constraints — **15.8%**
 
 ### Summary by Module
 
 | Module | Implemented | Skipped | Total | Progress |
 |---|:---:|:---:|:---:|:---:|
-| **Core / Window & Graphics Device** | 126 | 43 | 169 | 75% |
-| **Input Handling (Keyboard, Mouse, Gamepad)** | 38 | 1 | 39 | 97% |
+| **Core / Window & Graphics Device** | 127 | 45 | 172 | 74% |
+| **Input Handling (Keyboard, Mouse, Gamepad)** | 39 | 0 | 39 | 100% |
 | **Gestures & Touch** | 8 | 0 | 8 | 100% |
 | **Camera System** | 2 | 0 | 2 | 100% |
-| **2D Shapes & Splines** | 70 | 0 | 70 | 100% |
-| **Textures & Images** | 98 | 16 | 114 | 86% |
-| **Fonts & Text** | 28 | 31 | 59 | 47% |
+| **2D Shapes & Splines** | 76 | 0 | 76 | 100% |
+| **Textures & Images** | 109 | 14 | 123 | 89% |
+| **Fonts & Text** | 29 | 31 | 60 | 48% |
 | **3D Shapes Drawing** | 21 | 0 | 21 | 100% |
 | **3D Models & Materials** | 49 | 3 | 52 | 94% |
 | **Audio & Music** | 61 | 5 | 66 | 92% |
-| **TOTAL** | **501** | **99** | **600** | **83.5%** |
+| **TOTAL** | **521** | **98** | **619** | **84.2%** |
 
 ---
 
-## ✅ Implemented Functions (501)
+## ✅ Implemented Functions (521)
 
 Every function is fully typed, tested, and callable in both PascalCase and camelCase.
 

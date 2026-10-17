@@ -385,6 +385,7 @@ function layoutStruct(nameArg: string): Layout {
 // Pure OS-filesystem management: excluded from the bindings.
 const SKIP_FILE_IO: RegExp[] = [
   /^FileExists$/, /^DirectoryExists$/, /^IsPathValid$/, /^IsFileDropped$/,
+  /^IsFileHidden$/, /^IsPathDirectory$/, /^IsPathAbsolute$/,
   /^GetFileExtension$/, /^GetFileName$/, /^GetFileNameWithoutExt$/, /^GetDirectoryPath$/,
   /^GetWorkingDirectory$/, /^GetApplicationDirectory$/, /^ChangeDirectory$/, /^GetFileModTime$/,
   /^LoadDroppedFiles$/, /^UnloadDroppedFiles$/,
@@ -499,6 +500,54 @@ const CUSTOM_HANDLERS: Record<string, () => Extract<FnPlan, { k: "custom" }>> = 
   rl_DrawTriangleStrip3D(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
 }`,
   }),
+  ImageDrawLineStrip: () => ({
+    k: "custom",
+    tsName: "rl_ImageDrawLineStrip",
+    symbol: "rl_ImageDrawLineStrip",
+    manifestParams: ["mutable-bytes", "bytes", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_ImageDrawLineStrip(uint8_t *dst_ptr, size_t dst_len, const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len < sizeof(Image)) return;
+    ImageDrawLineStrip((Image *)dst_ptr, (const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_ImageDrawLineStrip(dst: Uint8Array, points: Uint8Array, pointCount: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function ImageDrawLineStrip(dst: Image, points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_ImageDrawLineStrip(dst, __b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}`,
+  }),
+  ImageDrawTriangleFan: () => ({
+    k: "custom",
+    tsName: "rl_ImageDrawTriangleFan",
+    symbol: "rl_ImageDrawTriangleFan",
+    manifestParams: ["mutable-bytes", "bytes", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_ImageDrawTriangleFan(uint8_t *dst_ptr, size_t dst_len, const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len < sizeof(Image)) return;
+    ImageDrawTriangleFan((Image *)dst_ptr, (const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_ImageDrawTriangleFan(dst: Uint8Array, points: Uint8Array, pointCount: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function ImageDrawTriangleFan(dst: Image, points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_ImageDrawTriangleFan(dst, __b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}`,
+  }),
+  ImageDrawTriangleStrip: () => ({
+    k: "custom",
+    tsName: "rl_ImageDrawTriangleStrip",
+    symbol: "rl_ImageDrawTriangleStrip",
+    manifestParams: ["mutable-bytes", "bytes", "i32", "u8", "u8", "u8", "u8"],
+    manifestRet: "void",
+    cCode: `void rl_ImageDrawTriangleStrip(uint8_t *dst_ptr, size_t dst_len, const uint8_t *points_ptr, size_t points_len, int32_t pointCount, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+    if (dst_len < sizeof(Image)) return;
+    ImageDrawTriangleStrip((Image *)dst_ptr, (const Vector2 *)points_ptr, pointCount, (Color){ r, g, b, a });
+}`,
+    ffiDecl: `export declare function rl_ImageDrawTriangleStrip(dst: Uint8Array, points: Uint8Array, pointCount: number, r: number, g: number, b: number, a: number): void;`,
+    apiCode: `export function ImageDrawTriangleStrip(dst: Image, points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_ImageDrawTriangleStrip(dst, __b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}`,
+  }),
   DrawSplineLinear: makeSplineHandler("DrawSplineLinear"),
   DrawSplineBasis: makeSplineHandler("DrawSplineBasis"),
   DrawSplineCatmullRom: makeSplineHandler("DrawSplineCatmullRom"),
@@ -577,6 +626,30 @@ const CUSTOM_HANDLERS: Record<string, () => Extract<FnPlan, { k: "custom" }>> = 
   const __len = rl_GetGamepadName(gamepad, __buf);
   if (__len <= 0) return "";
   return new TextDecoder().decode(__buf.subarray(0, Math.min(__len, 256)));
+}`,
+  }),
+  GetKeyName: () => ({
+    k: "custom",
+    tsName: "rl_GetKeyName",
+    symbol: "rl_GetKeyName",
+    manifestParams: ["i32", "mutable-bytes"],
+    manifestRet: "i32",
+    cCode: `int32_t rl_GetKeyName(int32_t key, uint8_t *out, size_t out_len) {
+    const char *s = GetKeyName(key);
+    if (s == NULL) return 0;
+    size_t len = strlen(s);
+    if (out != NULL && out_len > 0) {
+        size_t c = len < out_len ? len : out_len;
+        memcpy(out, s, c);
+    }
+    return (int32_t)len;
+}`,
+    ffiDecl: `export declare function rl_GetKeyName(key: number, __out: Uint8Array): number;`,
+    apiCode: `export function GetKeyName(key: number): string {
+  const __buf = new Uint8Array(64);
+  const __len = rl_GetKeyName(key, __buf);
+  if (__len <= 0) return "";
+  return new TextDecoder().decode(__buf.subarray(0, Math.min(__len, 64)));
 }`,
   }),
   LoadFontEx: () => ({
@@ -1640,6 +1713,13 @@ export function UnloadModelAnimation(anim: ModelAnimation): void {
     api.push(`}`);
     api.push(``);
   }
+  // Backwards compatibility aliases for renamed functions
+  api.push(`export const GetSplinePointBezierQuad = GetSplinePointBezierQuadratic;`);
+  api.push(`export const ImageDrawTriangleEx = ImageDrawTriangleGradient;`);
+  api.push(`export function ImageDraw(dst: Image, src: Image, srcRec: Rectangle, dstRec: Rectangle, tint: Color): void {`);
+  api.push(`  ImageDrawImagePro(dst, src, srcRec, dstRec, { x: 0, y: 0 }, 0, tint);`);
+  api.push(`}`);
+  api.push(``);
   api.push(`export const Raylib = {`);
   for (const { fn } of bound) {
     const camel = fn.name.charAt(0).toLowerCase() + fn.name.slice(1);
@@ -1648,6 +1728,12 @@ export function UnloadModelAnimation(anim: ModelAnimation): void {
       api.push(`  ${camel}: ${fn.name},`);
     }
   }
+  api.push(`  GetSplinePointBezierQuad,`);
+  api.push(`  getSplinePointBezierQuad: GetSplinePointBezierQuad,`);
+  api.push(`  ImageDrawTriangleEx,`);
+  api.push(`  imageDrawTriangleEx: ImageDrawTriangleEx,`);
+  api.push(`  ImageDraw,`);
+  api.push(`  imageDraw: ImageDraw,`);
   api.push(`  getModelAnimationBoneCount: GetModelAnimationBoneCount,`);
   api.push(`  GetModelAnimationBoneCount,`);
   api.push(`  getModelAnimationFrameCount: GetModelAnimationFrameCount,`);

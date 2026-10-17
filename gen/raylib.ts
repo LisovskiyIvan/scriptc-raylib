@@ -138,6 +138,7 @@ import {
   rl_IsKeyUp,
   rl_GetKeyPressed,
   rl_GetCharPressed,
+  rl_GetKeyName,
   rl_SetExitKey,
   rl_IsGamepadAvailable,
   rl_GetGamepadName,
@@ -190,19 +191,12 @@ import {
   rl_DrawLineStrip,
   rl_DrawLineBezier,
   rl_DrawLineDashed,
-  rl_DrawCircle,
-  rl_DrawCircleV,
-  rl_DrawCircleGradient,
-  rl_DrawCircleSector,
-  rl_DrawCircleSectorLines,
-  rl_DrawCircleLines,
-  rl_DrawCircleLinesV,
-  rl_DrawEllipse,
-  rl_DrawEllipseV,
-  rl_DrawEllipseLines,
-  rl_DrawEllipseLinesV,
-  rl_DrawRing,
-  rl_DrawRingLines,
+  rl_DrawTriangle,
+  rl_DrawTriangleGradient,
+  rl_DrawTriangleLines,
+  rl_DrawTriangleLinesEx,
+  rl_DrawTriangleFan,
+  rl_DrawTriangleStrip,
   rl_DrawRectangle,
   rl_DrawRectangleV,
   rl_DrawRectangleRec,
@@ -215,13 +209,26 @@ import {
   rl_DrawRectangleRounded,
   rl_DrawRectangleRoundedLines,
   rl_DrawRectangleRoundedLinesEx,
-  rl_DrawTriangle,
-  rl_DrawTriangleLines,
-  rl_DrawTriangleFan,
-  rl_DrawTriangleStrip,
   rl_DrawPoly,
   rl_DrawPolyLines,
   rl_DrawPolyLinesEx,
+  rl_DrawCircle,
+  rl_DrawCircleV,
+  rl_DrawCircleGradient,
+  rl_DrawCircleSector,
+  rl_DrawCircleSectorLines,
+  rl_DrawCircleSectorLinesEx,
+  rl_DrawCircleLines,
+  rl_DrawCircleLinesV,
+  rl_DrawCircleLinesEx,
+  rl_DrawEllipse,
+  rl_DrawEllipseV,
+  rl_DrawEllipseLines,
+  rl_DrawEllipseLinesV,
+  rl_DrawEllipseLinesEx,
+  rl_DrawRing,
+  rl_DrawRingLines,
+  rl_DrawRingLinesEx,
   rl_DrawSplineLinear,
   rl_DrawSplineBasis,
   rl_DrawSplineCatmullRom,
@@ -235,7 +242,7 @@ import {
   rl_GetSplinePointLinear,
   rl_GetSplinePointBasis,
   rl_GetSplinePointCatmullRom,
-  rl_GetSplinePointBezierQuad,
+  rl_GetSplinePointBezierQuadratic,
   rl_GetSplinePointBezierCubic,
   rl_CheckCollisionRecs,
   rl_CheckCollisionCircles,
@@ -302,24 +309,36 @@ import {
   rl_ImageDrawLine,
   rl_ImageDrawLineV,
   rl_ImageDrawLineEx,
+  rl_ImageDrawLineStrip,
+  rl_ImageDrawTriangle,
+  rl_ImageDrawTriangleGradient,
+  rl_ImageDrawTriangleLines,
+  rl_ImageDrawTriangleFan,
+  rl_ImageDrawTriangleStrip,
+  rl_ImageDrawRectangle,
+  rl_ImageDrawRectangleV,
+  rl_ImageDrawRectangleRec,
+  rl_ImageDrawRectanglePro,
+  rl_ImageDrawRectangleLines,
+  rl_ImageDrawRectangleLinesEx,
+  rl_ImageDrawRectangleGradientEx,
   rl_ImageDrawCircle,
   rl_ImageDrawCircleV,
   rl_ImageDrawCircleLines,
   rl_ImageDrawCircleLinesV,
-  rl_ImageDrawRectangle,
-  rl_ImageDrawRectangleV,
-  rl_ImageDrawRectangleRec,
-  rl_ImageDrawRectangleLines,
-  rl_ImageDrawTriangle,
-  rl_ImageDrawTriangleEx,
-  rl_ImageDrawTriangleLines,
-  rl_ImageDraw,
+  rl_ImageDrawCircleGradient,
+  rl_ImageDrawImage,
+  rl_ImageDrawImageEx,
+  rl_ImageDrawImageRec,
+  rl_ImageDrawImagePro,
   rl_ImageDrawText,
   rl_ImageDrawTextEx,
+  rl_ImageDrawTextPro,
   rl_LoadTexture,
   rl_LoadTextureFromImage,
   rl_LoadTextureCubemap,
   rl_LoadRenderTexture,
+  rl_LoadRenderTextureEx,
   rl_IsTextureValid,
   rl_UnloadTexture,
   rl_IsRenderTextureValid,
@@ -348,6 +367,7 @@ import {
   rl_ColorAlphaBlend,
   rl_ColorLerp,
   rl_GetColor,
+  rl_GetPixelColor,
   rl_GetPixelDataSize,
   rl_GetFontDefault,
   rl_LoadFont,
@@ -2056,6 +2076,13 @@ export function GetCharPressed(): number {
   return rl_GetCharPressed();
 }
 
+export function GetKeyName(key: number): string {
+  const __buf = new Uint8Array(64);
+  const __len = rl_GetKeyName(key, __buf);
+  if (__len <= 0) return "";
+  return new TextDecoder().decode(__buf.subarray(0, Math.min(__len, 64)));
+}
+
 export function SetExitKey(a0: number) {
   rl_SetExitKey(a0);
 }
@@ -2287,8 +2314,8 @@ export function UpdateCameraPro(camera: Camera3D, movement: Vector3, rotation: V
   return camera;
 }
 
-export function SetShapesTexture(texture: Texture, source: Rectangle): void {
-  rl_SetShapesTexture(texture.id, texture.width, texture.height, texture.mipmaps, texture.format, source.x, source.y, source.width, source.height);
+export function SetShapesTexture(texture: Texture, rec: Rectangle): void {
+  rl_SetShapesTexture(texture.id, texture.width, texture.height, texture.mipmaps, texture.format, rec.x, rec.y, rec.width, rec.height);
 }
 
 export function GetShapesTexture(): Texture {
@@ -2336,60 +2363,30 @@ export function DrawLineDashed(startPos: Vector2, endPos: Vector2, dashSize: num
   rl_DrawLineDashed(startPos.x, startPos.y, endPos.x, endPos.y, dashSize, spaceSize, color.r, color.g, color.b, color.a);
 }
 
-export function DrawCircle(centerX: number, centerY: number, radius: number, color: Color): void {
-  rl_DrawCircle(centerX, centerY, radius, color.r, color.g, color.b, color.a);
+export function DrawTriangle(v1: Vector2, v2: Vector2, v3: Vector2, color: Color): void {
+  rl_DrawTriangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
 }
 
-export function DrawCircleV(center: Vector2, radius: number, color: Color): void {
-  rl_DrawCircleV(center.x, center.y, radius, color.r, color.g, color.b, color.a);
+export function DrawTriangleGradient(v1: Vector2, v2: Vector2, v3: Vector2, c1: Color, c2: Color, c3: Color): void {
+  rl_DrawTriangleGradient(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, c1.r, c1.g, c1.b, c1.a, c2.r, c2.g, c2.b, c2.a, c3.r, c3.g, c3.b, c3.a);
 }
 
-export function DrawCircleGradient(a: Vector2 | number, b: number, c: number | Color, d?: Color, e?: Color): void {
-  if (typeof a === "object") {
-    rl_DrawCircleGradient((a as Vector2).x, (a as Vector2).y, b, (c as Color).r, (c as Color).g, (c as Color).b, (c as Color).a, d!.r, d!.g, d!.b, d!.a);
-  } else {
-    rl_DrawCircleGradient(a as number, b, c as number, d!.r, d!.g, d!.b, d!.a, e!.r, e!.g, e!.b, e!.a);
-  }
+export function DrawTriangleLines(v1: Vector2, v2: Vector2, v3: Vector2, color: Color): void {
+  rl_DrawTriangleLines(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
 }
 
-export function DrawCircleSector(center: Vector2, radius: number, startAngle: number, endAngle: number, segments: number, color: Color): void {
-  rl_DrawCircleSector(center.x, center.y, radius, startAngle, endAngle, segments, color.r, color.g, color.b, color.a);
+export function DrawTriangleLinesEx(v1: Vector2, v2: Vector2, v3: Vector2, thick: number, color: Color): void {
+  rl_DrawTriangleLinesEx(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, thick, color.r, color.g, color.b, color.a);
 }
 
-export function DrawCircleSectorLines(center: Vector2, radius: number, startAngle: number, endAngle: number, segments: number, color: Color): void {
-  rl_DrawCircleSectorLines(center.x, center.y, radius, startAngle, endAngle, segments, color.r, color.g, color.b, color.a);
+export function DrawTriangleFan(points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawTriangleFan(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
 }
 
-export function DrawCircleLines(centerX: number, centerY: number, radius: number, color: Color): void {
-  rl_DrawCircleLines(centerX, centerY, radius, color.r, color.g, color.b, color.a);
-}
-
-export function DrawCircleLinesV(center: Vector2, radius: number, color: Color): void {
-  rl_DrawCircleLinesV(center.x, center.y, radius, color.r, color.g, color.b, color.a);
-}
-
-export function DrawEllipse(centerX: number, centerY: number, radiusH: number, radiusV: number, color: Color): void {
-  rl_DrawEllipse(centerX, centerY, radiusH, radiusV, color.r, color.g, color.b, color.a);
-}
-
-export function DrawEllipseV(center: Vector2, radiusH: number, radiusV: number, color: Color): void {
-  rl_DrawEllipseV(center.x, center.y, radiusH, radiusV, color.r, color.g, color.b, color.a);
-}
-
-export function DrawEllipseLines(centerX: number, centerY: number, radiusH: number, radiusV: number, color: Color): void {
-  rl_DrawEllipseLines(centerX, centerY, radiusH, radiusV, color.r, color.g, color.b, color.a);
-}
-
-export function DrawEllipseLinesV(center: Vector2, radiusH: number, radiusV: number, color: Color): void {
-  rl_DrawEllipseLinesV(center.x, center.y, radiusH, radiusV, color.r, color.g, color.b, color.a);
-}
-
-export function DrawRing(center: Vector2, innerRadius: number, outerRadius: number, startAngle: number, endAngle: number, segments: number, color: Color): void {
-  rl_DrawRing(center.x, center.y, innerRadius, outerRadius, startAngle, endAngle, segments, color.r, color.g, color.b, color.a);
-}
-
-export function DrawRingLines(center: Vector2, innerRadius: number, outerRadius: number, startAngle: number, endAngle: number, segments: number, color: Color): void {
-  rl_DrawRingLines(center.x, center.y, innerRadius, outerRadius, startAngle, endAngle, segments, color.r, color.g, color.b, color.a);
+export function DrawTriangleStrip(points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_DrawTriangleStrip(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
 }
 
 export function DrawRectangle(posX: number, posY: number, width: number, height: number, color: Color): void {
@@ -2416,16 +2413,16 @@ export function DrawRectangleGradientH(posX: number, posY: number, width: number
   rl_DrawRectangleGradientH(posX, posY, width, height, left.r, left.g, left.b, left.a, right.r, right.g, right.b, right.a);
 }
 
-export function DrawRectangleGradientEx(rec: Rectangle, topLeft: Color, bottomLeft: Color, bottomRight: Color, topRight: Color): void {
-  rl_DrawRectangleGradientEx(rec.x, rec.y, rec.width, rec.height, topLeft.r, topLeft.g, topLeft.b, topLeft.a, bottomLeft.r, bottomLeft.g, bottomLeft.b, bottomLeft.a, bottomRight.r, bottomRight.g, bottomRight.b, bottomRight.a, topRight.r, topRight.g, topRight.b, topRight.a);
+export function DrawRectangleGradientEx(rec: Rectangle, col1: Color, col2: Color, col3: Color, col4: Color): void {
+  rl_DrawRectangleGradientEx(rec.x, rec.y, rec.width, rec.height, col1.r, col1.g, col1.b, col1.a, col2.r, col2.g, col2.b, col2.a, col3.r, col3.g, col3.b, col3.a, col4.r, col4.g, col4.b, col4.a);
 }
 
 export function DrawRectangleLines(posX: number, posY: number, width: number, height: number, color: Color): void {
   rl_DrawRectangleLines(posX, posY, width, height, color.r, color.g, color.b, color.a);
 }
 
-export function DrawRectangleLinesEx(rec: Rectangle, lineThick: number, color: Color): void {
-  rl_DrawRectangleLinesEx(rec.x, rec.y, rec.width, rec.height, lineThick, color.r, color.g, color.b, color.a);
+export function DrawRectangleLinesEx(rec: Rectangle, thick: number, color: Color): void {
+  rl_DrawRectangleLinesEx(rec.x, rec.y, rec.width, rec.height, thick, color.r, color.g, color.b, color.a);
 }
 
 export function DrawRectangleRounded(rec: Rectangle, roundness: number, segments: number, color: Color): void {
@@ -2436,26 +2433,8 @@ export function DrawRectangleRoundedLines(rec: Rectangle, roundness: number, seg
   rl_DrawRectangleRoundedLines(rec.x, rec.y, rec.width, rec.height, roundness, segments, color.r, color.g, color.b, color.a);
 }
 
-export function DrawRectangleRoundedLinesEx(rec: Rectangle, roundness: number, segments: number, lineThick: number, color: Color): void {
-  rl_DrawRectangleRoundedLinesEx(rec.x, rec.y, rec.width, rec.height, roundness, segments, lineThick, color.r, color.g, color.b, color.a);
-}
-
-export function DrawTriangle(v1: Vector2, v2: Vector2, v3: Vector2, color: Color): void {
-  rl_DrawTriangle(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
-}
-
-export function DrawTriangleLines(v1: Vector2, v2: Vector2, v3: Vector2, color: Color): void {
-  rl_DrawTriangleLines(v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
-}
-
-export function DrawTriangleFan(points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
-  const [__b, __cnt] = __toVector2Bytes(points);
-  rl_DrawTriangleFan(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
-}
-
-export function DrawTriangleStrip(points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
-  const [__b, __cnt] = __toVector2Bytes(points);
-  rl_DrawTriangleStrip(__b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+export function DrawRectangleRoundedLinesEx(rec: Rectangle, roundness: number, segments: number, thick: number, color: Color): void {
+  rl_DrawRectangleRoundedLinesEx(rec.x, rec.y, rec.width, rec.height, roundness, segments, thick, color.r, color.g, color.b, color.a);
 }
 
 export function DrawPoly(center: Vector2, sides: number, radius: number, rotation: number, color: Color): void {
@@ -2466,8 +2445,80 @@ export function DrawPolyLines(center: Vector2, sides: number, radius: number, ro
   rl_DrawPolyLines(center.x, center.y, sides, radius, rotation, color.r, color.g, color.b, color.a);
 }
 
-export function DrawPolyLinesEx(center: Vector2, sides: number, radius: number, rotation: number, lineThick: number, color: Color): void {
-  rl_DrawPolyLinesEx(center.x, center.y, sides, radius, rotation, lineThick, color.r, color.g, color.b, color.a);
+export function DrawPolyLinesEx(center: Vector2, sides: number, radius: number, rotation: number, thick: number, color: Color): void {
+  rl_DrawPolyLinesEx(center.x, center.y, sides, radius, rotation, thick, color.r, color.g, color.b, color.a);
+}
+
+export function DrawCircle(centerX: number, centerY: number, radius: number, color: Color): void {
+  rl_DrawCircle(centerX, centerY, radius, color.r, color.g, color.b, color.a);
+}
+
+export function DrawCircleV(center: Vector2, radius: number, color: Color): void {
+  rl_DrawCircleV(center.x, center.y, radius, color.r, color.g, color.b, color.a);
+}
+
+export function DrawCircleGradient(a: Vector2 | number, b: number, c: number | Color, d?: Color, e?: Color): void {
+  if (typeof a === "object") {
+    rl_DrawCircleGradient((a as Vector2).x, (a as Vector2).y, b, (c as Color).r, (c as Color).g, (c as Color).b, (c as Color).a, d!.r, d!.g, d!.b, d!.a);
+  } else {
+    rl_DrawCircleGradient(a as number, b, c as number, d!.r, d!.g, d!.b, d!.a, e!.r, e!.g, e!.b, e!.a);
+  }
+}
+
+export function DrawCircleSector(center: Vector2, radius: number, startAngle: number, endAngle: number, segments: number, color: Color): void {
+  rl_DrawCircleSector(center.x, center.y, radius, startAngle, endAngle, segments, color.r, color.g, color.b, color.a);
+}
+
+export function DrawCircleSectorLines(center: Vector2, radius: number, startAngle: number, endAngle: number, segments: number, color: Color): void {
+  rl_DrawCircleSectorLines(center.x, center.y, radius, startAngle, endAngle, segments, color.r, color.g, color.b, color.a);
+}
+
+export function DrawCircleSectorLinesEx(center: Vector2, radius: number, startAngle: number, endAngle: number, segments: number, thick: number, color: Color): void {
+  rl_DrawCircleSectorLinesEx(center.x, center.y, radius, startAngle, endAngle, segments, thick, color.r, color.g, color.b, color.a);
+}
+
+export function DrawCircleLines(centerX: number, centerY: number, radius: number, color: Color): void {
+  rl_DrawCircleLines(centerX, centerY, radius, color.r, color.g, color.b, color.a);
+}
+
+export function DrawCircleLinesV(center: Vector2, radius: number, color: Color): void {
+  rl_DrawCircleLinesV(center.x, center.y, radius, color.r, color.g, color.b, color.a);
+}
+
+export function DrawCircleLinesEx(center: Vector2, radius: number, thick: number, color: Color): void {
+  rl_DrawCircleLinesEx(center.x, center.y, radius, thick, color.r, color.g, color.b, color.a);
+}
+
+export function DrawEllipse(centerX: number, centerY: number, radiusH: number, radiusV: number, color: Color): void {
+  rl_DrawEllipse(centerX, centerY, radiusH, radiusV, color.r, color.g, color.b, color.a);
+}
+
+export function DrawEllipseV(center: Vector2, radiusH: number, radiusV: number, color: Color): void {
+  rl_DrawEllipseV(center.x, center.y, radiusH, radiusV, color.r, color.g, color.b, color.a);
+}
+
+export function DrawEllipseLines(centerX: number, centerY: number, radiusH: number, radiusV: number, color: Color): void {
+  rl_DrawEllipseLines(centerX, centerY, radiusH, radiusV, color.r, color.g, color.b, color.a);
+}
+
+export function DrawEllipseLinesV(center: Vector2, radiusH: number, radiusV: number, color: Color): void {
+  rl_DrawEllipseLinesV(center.x, center.y, radiusH, radiusV, color.r, color.g, color.b, color.a);
+}
+
+export function DrawEllipseLinesEx(center: Vector2, radiusH: number, radiusV: number, thick: number, color: Color): void {
+  rl_DrawEllipseLinesEx(center.x, center.y, radiusH, radiusV, thick, color.r, color.g, color.b, color.a);
+}
+
+export function DrawRing(center: Vector2, innerRadius: number, outerRadius: number, startAngle: number, endAngle: number, segments: number, color: Color): void {
+  rl_DrawRing(center.x, center.y, innerRadius, outerRadius, startAngle, endAngle, segments, color.r, color.g, color.b, color.a);
+}
+
+export function DrawRingLines(center: Vector2, innerRadius: number, outerRadius: number, startAngle: number, endAngle: number, segments: number, color: Color): void {
+  rl_DrawRingLines(center.x, center.y, innerRadius, outerRadius, startAngle, endAngle, segments, color.r, color.g, color.b, color.a);
+}
+
+export function DrawRingLinesEx(center: Vector2, innerRadius: number, outerRadius: number, startAngle: number, endAngle: number, segments: number, thick: number, color: Color): void {
+  rl_DrawRingLinesEx(center.x, center.y, innerRadius, outerRadius, startAngle, endAngle, segments, thick, color.r, color.g, color.b, color.a);
 }
 
 export function DrawSplineLinear(points: Float32Array | Uint8Array | Vector2[], thick: number, color: Color, pointCount?: number): void {
@@ -2533,9 +2584,9 @@ export function GetSplinePointCatmullRom(p1: Vector2, p2: Vector2, p3: Vector2, 
   return __read_Vector2(__buf);
 }
 
-export function GetSplinePointBezierQuad(p1: Vector2, c2: Vector2, p3: Vector2, t: number): Vector2 {
+export function GetSplinePointBezierQuadratic(p1: Vector2, c2: Vector2, p3: Vector2, t: number): Vector2 {
   const __buf = new Uint8Array(8);
-  rl_GetSplinePointBezierQuad(p1.x, p1.y, c2.x, c2.y, p3.x, p3.y, t, __buf);
+  rl_GetSplinePointBezierQuadratic(p1.x, p1.y, c2.x, c2.y, p3.x, p3.y, t, __buf);
   return __read_Vector2(__buf);
 }
 
@@ -2853,6 +2904,61 @@ export function ImageDrawLineEx(dst: Image, start: Vector2, end: Vector2, thick:
   rl_ImageDrawLineEx(dst, start.x, start.y, end.x, end.y, thick, color.r, color.g, color.b, color.a);
 }
 
+export function ImageDrawLineStrip(dst: Image, points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_ImageDrawLineStrip(dst, __b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawTriangle(dst: Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color): void {
+  rl_ImageDrawTriangle(dst, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawTriangleGradient(dst: Image, v1: Vector2, v2: Vector2, v3: Vector2, c1: Color, c2: Color, c3: Color): void {
+  rl_ImageDrawTriangleGradient(dst, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, c1.r, c1.g, c1.b, c1.a, c2.r, c2.g, c2.b, c2.a, c3.r, c3.g, c3.b, c3.a);
+}
+
+export function ImageDrawTriangleLines(dst: Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color): void {
+  rl_ImageDrawTriangleLines(dst, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawTriangleFan(dst: Image, points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_ImageDrawTriangleFan(dst, __b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawTriangleStrip(dst: Image, points: Float32Array | Uint8Array | Vector2[], color: Color, pointCount?: number): void {
+  const [__b, __cnt] = __toVector2Bytes(points);
+  rl_ImageDrawTriangleStrip(dst, __b, pointCount !== undefined ? pointCount : __cnt, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawRectangle(dst: Image, posX: number, posY: number, width: number, height: number, color: Color): void {
+  rl_ImageDrawRectangle(dst, posX, posY, width, height, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawRectangleV(dst: Image, position: Vector2, size: Vector2, color: Color): void {
+  rl_ImageDrawRectangleV(dst, position.x, position.y, size.x, size.y, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawRectangleRec(dst: Image, rec: Rectangle, color: Color): void {
+  rl_ImageDrawRectangleRec(dst, rec.x, rec.y, rec.width, rec.height, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawRectanglePro(dst: Image, rec: Rectangle, origin: Vector2, rotation: number, color: Color): void {
+  rl_ImageDrawRectanglePro(dst, rec.x, rec.y, rec.width, rec.height, origin.x, origin.y, rotation, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawRectangleLines(dst: Image, posX: number, posY: number, width: number, height: number, color: Color): void {
+  rl_ImageDrawRectangleLines(dst, posX, posY, width, height, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawRectangleLinesEx(dst: Image, rec: Rectangle, thick: number, color: Color): void {
+  rl_ImageDrawRectangleLinesEx(dst, rec.x, rec.y, rec.width, rec.height, thick, color.r, color.g, color.b, color.a);
+}
+
+export function ImageDrawRectangleGradientEx(dst: Image, rec: Rectangle, col1: Color, col2: Color, col3: Color, col4: Color): void {
+  rl_ImageDrawRectangleGradientEx(dst, rec.x, rec.y, rec.width, rec.height, col1.r, col1.g, col1.b, col1.a, col2.r, col2.g, col2.b, col2.a, col3.r, col3.g, col3.b, col3.a, col4.r, col4.g, col4.b, col4.a);
+}
+
 export function ImageDrawCircle(dst: Image, centerX: number, centerY: number, radius: number, color: Color): void {
   rl_ImageDrawCircle(dst, centerX, centerY, radius, color.r, color.g, color.b, color.a);
 }
@@ -2869,36 +2975,24 @@ export function ImageDrawCircleLinesV(dst: Image, center: Vector2, radius: numbe
   rl_ImageDrawCircleLinesV(dst, center.x, center.y, radius, color.r, color.g, color.b, color.a);
 }
 
-export function ImageDrawRectangle(dst: Image, posX: number, posY: number, width: number, height: number, color: Color): void {
-  rl_ImageDrawRectangle(dst, posX, posY, width, height, color.r, color.g, color.b, color.a);
+export function ImageDrawCircleGradient(dst: Image, center: Vector2, radius: number, inner: Color, outer: Color): void {
+  rl_ImageDrawCircleGradient(dst, center.x, center.y, radius, inner.r, inner.g, inner.b, inner.a, outer.r, outer.g, outer.b, outer.a);
 }
 
-export function ImageDrawRectangleV(dst: Image, position: Vector2, size: Vector2, color: Color): void {
-  rl_ImageDrawRectangleV(dst, position.x, position.y, size.x, size.y, color.r, color.g, color.b, color.a);
+export function ImageDrawImage(dst: Image, src: Uint8Array, posX: number, posY: number, tint: Color): void {
+  rl_ImageDrawImage(dst, src, posX, posY, tint.r, tint.g, tint.b, tint.a);
 }
 
-export function ImageDrawRectangleRec(dst: Image, rec: Rectangle, color: Color): void {
-  rl_ImageDrawRectangleRec(dst, rec.x, rec.y, rec.width, rec.height, color.r, color.g, color.b, color.a);
+export function ImageDrawImageEx(dst: Image, src: Uint8Array, position: Vector2, rotation: number, scale: number, tint: Color): void {
+  rl_ImageDrawImageEx(dst, src, position.x, position.y, rotation, scale, tint.r, tint.g, tint.b, tint.a);
 }
 
-export function ImageDrawRectangleLines(dst: Image, rec: Rectangle, thick: number, color: Color): void {
-  rl_ImageDrawRectangleLines(dst, rec.x, rec.y, rec.width, rec.height, thick, color.r, color.g, color.b, color.a);
+export function ImageDrawImageRec(dst: Image, src: Uint8Array, srcRec: Rectangle, position: Vector2, tint: Color): void {
+  rl_ImageDrawImageRec(dst, src, srcRec.x, srcRec.y, srcRec.width, srcRec.height, position.x, position.y, tint.r, tint.g, tint.b, tint.a);
 }
 
-export function ImageDrawTriangle(dst: Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color): void {
-  rl_ImageDrawTriangle(dst, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
-}
-
-export function ImageDrawTriangleEx(dst: Image, v1: Vector2, v2: Vector2, v3: Vector2, c1: Color, c2: Color, c3: Color): void {
-  rl_ImageDrawTriangleEx(dst, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, c1.r, c1.g, c1.b, c1.a, c2.r, c2.g, c2.b, c2.a, c3.r, c3.g, c3.b, c3.a);
-}
-
-export function ImageDrawTriangleLines(dst: Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color): void {
-  rl_ImageDrawTriangleLines(dst, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y, color.r, color.g, color.b, color.a);
-}
-
-export function ImageDraw(dst: Image, src: Uint8Array, srcRec: Rectangle, dstRec: Rectangle, tint: Color): void {
-  rl_ImageDraw(dst, src, srcRec.x, srcRec.y, srcRec.width, srcRec.height, dstRec.x, dstRec.y, dstRec.width, dstRec.height, tint.r, tint.g, tint.b, tint.a);
+export function ImageDrawImagePro(dst: Image, src: Uint8Array, srcRec: Rectangle, dstRec: Rectangle, origin: Vector2, rotation: number, tint: Color): void {
+  rl_ImageDrawImagePro(dst, src, srcRec.x, srcRec.y, srcRec.width, srcRec.height, dstRec.x, dstRec.y, dstRec.width, dstRec.height, origin.x, origin.y, rotation, tint.r, tint.g, tint.b, tint.a);
 }
 
 export function ImageDrawText(dst: Image, text: string, posX: number, posY: number, fontSize: number, color: Color): void {
@@ -2907,6 +3001,10 @@ export function ImageDrawText(dst: Image, text: string, posX: number, posY: numb
 
 export function ImageDrawTextEx(dst: Image, font: Uint8Array, text: string, position: Vector2, fontSize: number, spacing: number, tint: Color): void {
   rl_ImageDrawTextEx(dst, font, text, position.x, position.y, fontSize, spacing, tint.r, tint.g, tint.b, tint.a);
+}
+
+export function ImageDrawTextPro(dst: Image, font: Uint8Array, text: string, position: Vector2, origin: Vector2, rotation: number, fontSize: number, spacing: number, tint: Color): void {
+  rl_ImageDrawTextPro(dst, font, text, position.x, position.y, origin.x, origin.y, rotation, fontSize, spacing, tint.r, tint.g, tint.b, tint.a);
 }
 
 export function LoadTexture(fileName: string): Texture {
@@ -2930,6 +3028,12 @@ export function LoadTextureCubemap(image: Uint8Array, layout: number): Texture {
 export function LoadRenderTexture(width: number, height: number): RenderTexture {
   const __buf = new Uint8Array(44);
   rl_LoadRenderTexture(width, height, __buf);
+  return __read_RenderTexture(__buf);
+}
+
+export function LoadRenderTextureEx(width: number, height: number, format: number): RenderTexture {
+  const __buf = new Uint8Array(44);
+  rl_LoadRenderTextureEx(width, height, format, __buf);
   return __read_RenderTexture(__buf);
 }
 
@@ -2977,16 +3081,16 @@ export function DrawTextureEx(texture: Texture, position: Vector2, rotation: num
   rl_DrawTextureEx(texture.id, texture.width, texture.height, texture.mipmaps, texture.format, position.x, position.y, rotation, scale, tint.r, tint.g, tint.b, tint.a);
 }
 
-export function DrawTextureRec(texture: Texture, source: Rectangle, position: Vector2, tint: Color): void {
-  rl_DrawTextureRec(texture.id, texture.width, texture.height, texture.mipmaps, texture.format, source.x, source.y, source.width, source.height, position.x, position.y, tint.r, tint.g, tint.b, tint.a);
+export function DrawTextureRec(texture: Texture, rec: Rectangle, position: Vector2, tint: Color): void {
+  rl_DrawTextureRec(texture.id, texture.width, texture.height, texture.mipmaps, texture.format, rec.x, rec.y, rec.width, rec.height, position.x, position.y, tint.r, tint.g, tint.b, tint.a);
 }
 
-export function DrawTexturePro(texture: Texture, source: Rectangle, dest: Rectangle, origin: Vector2, rotation: number, tint: Color): void {
-  rl_DrawTexturePro(texture.id, texture.width, texture.height, texture.mipmaps, texture.format, source.x, source.y, source.width, source.height, dest.x, dest.y, dest.width, dest.height, origin.x, origin.y, rotation, tint.r, tint.g, tint.b, tint.a);
+export function DrawTexturePro(texture: Texture, srcrec: Rectangle, dstrec: Rectangle, origin: Vector2, rotation: number, tint: Color): void {
+  rl_DrawTexturePro(texture.id, texture.width, texture.height, texture.mipmaps, texture.format, srcrec.x, srcrec.y, srcrec.width, srcrec.height, dstrec.x, dstrec.y, dstrec.width, dstrec.height, origin.x, origin.y, rotation, tint.r, tint.g, tint.b, tint.a);
 }
 
-export function DrawTextureNPatch(texture: Texture, nPatchInfo: NPatchInfo, dest: Rectangle, origin: Vector2, rotation: number, tint: Color): void {
-  rl_DrawTextureNPatch(texture.id, texture.width, texture.height, texture.mipmaps, texture.format, nPatchInfo.source.x, nPatchInfo.source.y, nPatchInfo.source.width, nPatchInfo.source.height, nPatchInfo.left, nPatchInfo.top, nPatchInfo.right, nPatchInfo.bottom, nPatchInfo.layout, dest.x, dest.y, dest.width, dest.height, origin.x, origin.y, rotation, tint.r, tint.g, tint.b, tint.a);
+export function DrawTextureNPatch(texture: Texture, nPatchInfo: NPatchInfo, dstrec: Rectangle, origin: Vector2, rotation: number, tint: Color): void {
+  rl_DrawTextureNPatch(texture.id, texture.width, texture.height, texture.mipmaps, texture.format, nPatchInfo.source.x, nPatchInfo.source.y, nPatchInfo.source.width, nPatchInfo.source.height, nPatchInfo.left, nPatchInfo.top, nPatchInfo.right, nPatchInfo.bottom, nPatchInfo.layout, dstrec.x, dstrec.y, dstrec.width, dstrec.height, origin.x, origin.y, rotation, tint.r, tint.g, tint.b, tint.a);
 }
 
 export function ColorIsEqual(col1: Color, col2: Color): boolean {
@@ -3066,6 +3170,12 @@ export function ColorLerp(color1: Color, color2: Color, factor: number): Color {
 export function GetColor(hexValue: number): Color {
   const __buf = new Uint8Array(4);
   rl_GetColor(hexValue, __buf);
+  return __read_Color(__buf);
+}
+
+export function GetPixelColor(srcPtr: Uint8Array, format: number): Color {
+  const __buf = new Uint8Array(4);
+  rl_GetPixelColor(srcPtr, format, __buf);
   return __read_Color(__buf);
 }
 
@@ -3255,28 +3365,28 @@ export function DrawSphereWires(centerPos: Vector3, radius: number, rings: numbe
   rl_DrawSphereWires(centerPos.x, centerPos.y, centerPos.z, radius, rings, slices, color.r, color.g, color.b, color.a);
 }
 
-export function DrawCylinder(position: Vector3, radiusTop: number, radiusBottom: number, height: number, slices: number, color: Color): void {
-  rl_DrawCylinder(position.x, position.y, position.z, radiusTop, radiusBottom, height, slices, color.r, color.g, color.b, color.a);
+export function DrawCylinder(position: Vector3, radiusTop: number, radiusBottom: number, height: number, sides: number, color: Color): void {
+  rl_DrawCylinder(position.x, position.y, position.z, radiusTop, radiusBottom, height, sides, color.r, color.g, color.b, color.a);
 }
 
 export function DrawCylinderEx(startPos: Vector3, endPos: Vector3, startRadius: number, endRadius: number, sides: number, color: Color): void {
   rl_DrawCylinderEx(startPos.x, startPos.y, startPos.z, endPos.x, endPos.y, endPos.z, startRadius, endRadius, sides, color.r, color.g, color.b, color.a);
 }
 
-export function DrawCylinderWires(position: Vector3, radiusTop: number, radiusBottom: number, height: number, slices: number, color: Color): void {
-  rl_DrawCylinderWires(position.x, position.y, position.z, radiusTop, radiusBottom, height, slices, color.r, color.g, color.b, color.a);
+export function DrawCylinderWires(position: Vector3, radiusTop: number, radiusBottom: number, height: number, sides: number, color: Color): void {
+  rl_DrawCylinderWires(position.x, position.y, position.z, radiusTop, radiusBottom, height, sides, color.r, color.g, color.b, color.a);
 }
 
 export function DrawCylinderWiresEx(startPos: Vector3, endPos: Vector3, startRadius: number, endRadius: number, sides: number, color: Color): void {
   rl_DrawCylinderWiresEx(startPos.x, startPos.y, startPos.z, endPos.x, endPos.y, endPos.z, startRadius, endRadius, sides, color.r, color.g, color.b, color.a);
 }
 
-export function DrawCapsule(startPos: Vector3, endPos: Vector3, radius: number, slices: number, rings: number, color: Color): void {
-  rl_DrawCapsule(startPos.x, startPos.y, startPos.z, endPos.x, endPos.y, endPos.z, radius, slices, rings, color.r, color.g, color.b, color.a);
+export function DrawCapsule(startPos: Vector3, endPos: Vector3, radius: number, rings: number, slices: number, color: Color): void {
+  rl_DrawCapsule(startPos.x, startPos.y, startPos.z, endPos.x, endPos.y, endPos.z, radius, rings, slices, color.r, color.g, color.b, color.a);
 }
 
-export function DrawCapsuleWires(startPos: Vector3, endPos: Vector3, radius: number, slices: number, rings: number, color: Color): void {
-  rl_DrawCapsuleWires(startPos.x, startPos.y, startPos.z, endPos.x, endPos.y, endPos.z, radius, slices, rings, color.r, color.g, color.b, color.a);
+export function DrawCapsuleWires(startPos: Vector3, endPos: Vector3, radius: number, rings: number, slices: number, color: Color): void {
+  rl_DrawCapsuleWires(startPos.x, startPos.y, startPos.z, endPos.x, endPos.y, endPos.z, radius, rings, slices, color.r, color.g, color.b, color.a);
 }
 
 export function DrawPlane(centerPos: Vector3, size: Vector2, color: Color): void {
@@ -3341,12 +3451,12 @@ export function DrawBillboard(camera: Camera3D, texture: Texture, position: Vect
   rl_DrawBillboard(camera.position.x, camera.position.y, camera.position.z, camera.target.x, camera.target.y, camera.target.z, camera.up.x, camera.up.y, camera.up.z, camera.fovy, camera.projection, texture.id, texture.width, texture.height, texture.mipmaps, texture.format, position.x, position.y, position.z, scale, tint.r, tint.g, tint.b, tint.a);
 }
 
-export function DrawBillboardRec(camera: Camera3D, texture: Texture, source: Rectangle, position: Vector3, size: Vector2, tint: Color): void {
-  rl_DrawBillboardRec(camera.position.x, camera.position.y, camera.position.z, camera.target.x, camera.target.y, camera.target.z, camera.up.x, camera.up.y, camera.up.z, camera.fovy, camera.projection, texture.id, texture.width, texture.height, texture.mipmaps, texture.format, source.x, source.y, source.width, source.height, position.x, position.y, position.z, size.x, size.y, tint.r, tint.g, tint.b, tint.a);
+export function DrawBillboardRec(camera: Camera3D, texture: Texture, rec: Rectangle, position: Vector3, size: Vector2, tint: Color): void {
+  rl_DrawBillboardRec(camera.position.x, camera.position.y, camera.position.z, camera.target.x, camera.target.y, camera.target.z, camera.up.x, camera.up.y, camera.up.z, camera.fovy, camera.projection, texture.id, texture.width, texture.height, texture.mipmaps, texture.format, rec.x, rec.y, rec.width, rec.height, position.x, position.y, position.z, size.x, size.y, tint.r, tint.g, tint.b, tint.a);
 }
 
-export function DrawBillboardPro(camera: Camera3D, texture: Texture, source: Rectangle, position: Vector3, up: Vector3, size: Vector2, origin: Vector2, rotation: number, tint: Color): void {
-  rl_DrawBillboardPro(camera.position.x, camera.position.y, camera.position.z, camera.target.x, camera.target.y, camera.target.z, camera.up.x, camera.up.y, camera.up.z, camera.fovy, camera.projection, texture.id, texture.width, texture.height, texture.mipmaps, texture.format, source.x, source.y, source.width, source.height, position.x, position.y, position.z, up.x, up.y, up.z, size.x, size.y, origin.x, origin.y, rotation, tint.r, tint.g, tint.b, tint.a);
+export function DrawBillboardPro(camera: Camera3D, texture: Texture, rec: Rectangle, position: Vector3, up: Vector3, size: Vector2, origin: Vector2, rotation: number, tint: Color): void {
+  rl_DrawBillboardPro(camera.position.x, camera.position.y, camera.position.z, camera.target.x, camera.target.y, camera.target.z, camera.up.x, camera.up.y, camera.up.z, camera.fovy, camera.projection, texture.id, texture.width, texture.height, texture.mipmaps, texture.format, rec.x, rec.y, rec.width, rec.height, position.x, position.y, position.z, up.x, up.y, up.z, size.x, size.y, origin.x, origin.y, rotation, tint.r, tint.g, tint.b, tint.a);
 }
 
 export function UploadMesh(mesh: Mesh, dynamic: boolean): void {
@@ -3605,8 +3715,8 @@ export function IsSoundValid(sound: Uint8Array): boolean {
   return rl_IsSoundValid(sound);
 }
 
-export function UpdateSound(sound: Uint8Array, data: Uint8Array, sampleCount: number): void {
-  rl_UpdateSound(sound, data, sampleCount);
+export function UpdateSound(sound: Uint8Array, data: Uint8Array, frameCount: number): void {
+  rl_UpdateSound(sound, data, frameCount);
 }
 
 export function UnloadWave(wave: Uint8Array): void {
@@ -3799,6 +3909,12 @@ export function SetAudioStreamPan(stream: Uint8Array, pan: number): void {
 
 export function SetAudioStreamBufferSizeDefault(a0: number) {
   rl_SetAudioStreamBufferSizeDefault(a0);
+}
+
+export const GetSplinePointBezierQuad = GetSplinePointBezierQuadratic;
+export const ImageDrawTriangleEx = ImageDrawTriangleGradient;
+export function ImageDraw(dst: Image, src: Image, srcRec: Rectangle, dstRec: Rectangle, tint: Color): void {
+  ImageDrawImagePro(dst, src, srcRec, dstRec, { x: 0, y: 0 }, 0, tint);
 }
 
 export const Raylib = {
@@ -4068,6 +4184,8 @@ export const Raylib = {
   getKeyPressed: GetKeyPressed,
   GetCharPressed,
   getCharPressed: GetCharPressed,
+  GetKeyName,
+  getKeyName: GetKeyName,
   SetExitKey,
   setExitKey: SetExitKey,
   IsGamepadAvailable,
@@ -4172,32 +4290,18 @@ export const Raylib = {
   drawLineBezier: DrawLineBezier,
   DrawLineDashed,
   drawLineDashed: DrawLineDashed,
-  DrawCircle,
-  drawCircle: DrawCircle,
-  DrawCircleV,
-  drawCircleV: DrawCircleV,
-  DrawCircleGradient,
-  drawCircleGradient: DrawCircleGradient,
-  DrawCircleSector,
-  drawCircleSector: DrawCircleSector,
-  DrawCircleSectorLines,
-  drawCircleSectorLines: DrawCircleSectorLines,
-  DrawCircleLines,
-  drawCircleLines: DrawCircleLines,
-  DrawCircleLinesV,
-  drawCircleLinesV: DrawCircleLinesV,
-  DrawEllipse,
-  drawEllipse: DrawEllipse,
-  DrawEllipseV,
-  drawEllipseV: DrawEllipseV,
-  DrawEllipseLines,
-  drawEllipseLines: DrawEllipseLines,
-  DrawEllipseLinesV,
-  drawEllipseLinesV: DrawEllipseLinesV,
-  DrawRing,
-  drawRing: DrawRing,
-  DrawRingLines,
-  drawRingLines: DrawRingLines,
+  DrawTriangle,
+  drawTriangle: DrawTriangle,
+  DrawTriangleGradient,
+  drawTriangleGradient: DrawTriangleGradient,
+  DrawTriangleLines,
+  drawTriangleLines: DrawTriangleLines,
+  DrawTriangleLinesEx,
+  drawTriangleLinesEx: DrawTriangleLinesEx,
+  DrawTriangleFan,
+  drawTriangleFan: DrawTriangleFan,
+  DrawTriangleStrip,
+  drawTriangleStrip: DrawTriangleStrip,
   DrawRectangle,
   drawRectangle: DrawRectangle,
   DrawRectangleV,
@@ -4222,20 +4326,46 @@ export const Raylib = {
   drawRectangleRoundedLines: DrawRectangleRoundedLines,
   DrawRectangleRoundedLinesEx,
   drawRectangleRoundedLinesEx: DrawRectangleRoundedLinesEx,
-  DrawTriangle,
-  drawTriangle: DrawTriangle,
-  DrawTriangleLines,
-  drawTriangleLines: DrawTriangleLines,
-  DrawTriangleFan,
-  drawTriangleFan: DrawTriangleFan,
-  DrawTriangleStrip,
-  drawTriangleStrip: DrawTriangleStrip,
   DrawPoly,
   drawPoly: DrawPoly,
   DrawPolyLines,
   drawPolyLines: DrawPolyLines,
   DrawPolyLinesEx,
   drawPolyLinesEx: DrawPolyLinesEx,
+  DrawCircle,
+  drawCircle: DrawCircle,
+  DrawCircleV,
+  drawCircleV: DrawCircleV,
+  DrawCircleGradient,
+  drawCircleGradient: DrawCircleGradient,
+  DrawCircleSector,
+  drawCircleSector: DrawCircleSector,
+  DrawCircleSectorLines,
+  drawCircleSectorLines: DrawCircleSectorLines,
+  DrawCircleSectorLinesEx,
+  drawCircleSectorLinesEx: DrawCircleSectorLinesEx,
+  DrawCircleLines,
+  drawCircleLines: DrawCircleLines,
+  DrawCircleLinesV,
+  drawCircleLinesV: DrawCircleLinesV,
+  DrawCircleLinesEx,
+  drawCircleLinesEx: DrawCircleLinesEx,
+  DrawEllipse,
+  drawEllipse: DrawEllipse,
+  DrawEllipseV,
+  drawEllipseV: DrawEllipseV,
+  DrawEllipseLines,
+  drawEllipseLines: DrawEllipseLines,
+  DrawEllipseLinesV,
+  drawEllipseLinesV: DrawEllipseLinesV,
+  DrawEllipseLinesEx,
+  drawEllipseLinesEx: DrawEllipseLinesEx,
+  DrawRing,
+  drawRing: DrawRing,
+  DrawRingLines,
+  drawRingLines: DrawRingLines,
+  DrawRingLinesEx,
+  drawRingLinesEx: DrawRingLinesEx,
   DrawSplineLinear,
   drawSplineLinear: DrawSplineLinear,
   DrawSplineBasis,
@@ -4262,8 +4392,8 @@ export const Raylib = {
   getSplinePointBasis: GetSplinePointBasis,
   GetSplinePointCatmullRom,
   getSplinePointCatmullRom: GetSplinePointCatmullRom,
-  GetSplinePointBezierQuad,
-  getSplinePointBezierQuad: GetSplinePointBezierQuad,
+  GetSplinePointBezierQuadratic,
+  getSplinePointBezierQuadratic: GetSplinePointBezierQuadratic,
   GetSplinePointBezierCubic,
   getSplinePointBezierCubic: GetSplinePointBezierCubic,
   CheckCollisionRecs,
@@ -4396,6 +4526,32 @@ export const Raylib = {
   imageDrawLineV: ImageDrawLineV,
   ImageDrawLineEx,
   imageDrawLineEx: ImageDrawLineEx,
+  ImageDrawLineStrip,
+  imageDrawLineStrip: ImageDrawLineStrip,
+  ImageDrawTriangle,
+  imageDrawTriangle: ImageDrawTriangle,
+  ImageDrawTriangleGradient,
+  imageDrawTriangleGradient: ImageDrawTriangleGradient,
+  ImageDrawTriangleLines,
+  imageDrawTriangleLines: ImageDrawTriangleLines,
+  ImageDrawTriangleFan,
+  imageDrawTriangleFan: ImageDrawTriangleFan,
+  ImageDrawTriangleStrip,
+  imageDrawTriangleStrip: ImageDrawTriangleStrip,
+  ImageDrawRectangle,
+  imageDrawRectangle: ImageDrawRectangle,
+  ImageDrawRectangleV,
+  imageDrawRectangleV: ImageDrawRectangleV,
+  ImageDrawRectangleRec,
+  imageDrawRectangleRec: ImageDrawRectangleRec,
+  ImageDrawRectanglePro,
+  imageDrawRectanglePro: ImageDrawRectanglePro,
+  ImageDrawRectangleLines,
+  imageDrawRectangleLines: ImageDrawRectangleLines,
+  ImageDrawRectangleLinesEx,
+  imageDrawRectangleLinesEx: ImageDrawRectangleLinesEx,
+  ImageDrawRectangleGradientEx,
+  imageDrawRectangleGradientEx: ImageDrawRectangleGradientEx,
   ImageDrawCircle,
   imageDrawCircle: ImageDrawCircle,
   ImageDrawCircleV,
@@ -4404,26 +4560,22 @@ export const Raylib = {
   imageDrawCircleLines: ImageDrawCircleLines,
   ImageDrawCircleLinesV,
   imageDrawCircleLinesV: ImageDrawCircleLinesV,
-  ImageDrawRectangle,
-  imageDrawRectangle: ImageDrawRectangle,
-  ImageDrawRectangleV,
-  imageDrawRectangleV: ImageDrawRectangleV,
-  ImageDrawRectangleRec,
-  imageDrawRectangleRec: ImageDrawRectangleRec,
-  ImageDrawRectangleLines,
-  imageDrawRectangleLines: ImageDrawRectangleLines,
-  ImageDrawTriangle,
-  imageDrawTriangle: ImageDrawTriangle,
-  ImageDrawTriangleEx,
-  imageDrawTriangleEx: ImageDrawTriangleEx,
-  ImageDrawTriangleLines,
-  imageDrawTriangleLines: ImageDrawTriangleLines,
-  ImageDraw,
-  imageDraw: ImageDraw,
+  ImageDrawCircleGradient,
+  imageDrawCircleGradient: ImageDrawCircleGradient,
+  ImageDrawImage,
+  imageDrawImage: ImageDrawImage,
+  ImageDrawImageEx,
+  imageDrawImageEx: ImageDrawImageEx,
+  ImageDrawImageRec,
+  imageDrawImageRec: ImageDrawImageRec,
+  ImageDrawImagePro,
+  imageDrawImagePro: ImageDrawImagePro,
   ImageDrawText,
   imageDrawText: ImageDrawText,
   ImageDrawTextEx,
   imageDrawTextEx: ImageDrawTextEx,
+  ImageDrawTextPro,
+  imageDrawTextPro: ImageDrawTextPro,
   LoadTexture,
   loadTexture: LoadTexture,
   LoadTextureFromImage,
@@ -4432,6 +4584,8 @@ export const Raylib = {
   loadTextureCubemap: LoadTextureCubemap,
   LoadRenderTexture,
   loadRenderTexture: LoadRenderTexture,
+  LoadRenderTextureEx,
+  loadRenderTextureEx: LoadRenderTextureEx,
   IsTextureValid,
   isTextureValid: IsTextureValid,
   UnloadTexture,
@@ -4488,6 +4642,8 @@ export const Raylib = {
   colorLerp: ColorLerp,
   GetColor,
   getColor: GetColor,
+  GetPixelColor,
+  getPixelColor: GetPixelColor,
   GetPixelDataSize,
   getPixelDataSize: GetPixelDataSize,
   GetFontDefault,
@@ -4804,6 +4960,12 @@ export const Raylib = {
   setAudioStreamPan: SetAudioStreamPan,
   SetAudioStreamBufferSizeDefault,
   setAudioStreamBufferSizeDefault: SetAudioStreamBufferSizeDefault,
+  GetSplinePointBezierQuad,
+  getSplinePointBezierQuad: GetSplinePointBezierQuad,
+  ImageDrawTriangleEx,
+  imageDrawTriangleEx: ImageDrawTriangleEx,
+  ImageDraw,
+  imageDraw: ImageDraw,
   getModelAnimationBoneCount: GetModelAnimationBoneCount,
   GetModelAnimationBoneCount,
   getModelAnimationFrameCount: GetModelAnimationFrameCount,
