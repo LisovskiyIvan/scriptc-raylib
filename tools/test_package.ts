@@ -34,9 +34,10 @@ function cleanup(): void {
 try {
   // 1. Pack. Staging into a temp dir keeps the repository free of tarballs.
   console.log("== npm pack");
-  const pack = spawnSync("npm", ["pack", "--pack-destination", workDir], {
+  const pack = spawnSync("npm", ["pack", "--dry-run=false", "--ignore-scripts", "--pack-destination", workDir], {
     cwd: rootDir,
     encoding: "utf-8",
+    env: { ...process.env, npm_config_dry_run: "false" },
   });
   if (pack.status !== 0) {
     console.error(pack.stderr || pack.stdout);
